@@ -1,65 +1,103 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - MockDasher</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-gray-100 font-sans">
-    <div class="min-h-screen">
-        <nav class="bg-white shadow-sm border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16">
-                    <div class="flex">
-                        <div class="shrink-0 flex items-center">
-                            <span class="text-xl font-bold text-blue-600">MockDasher Admin</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <span class="text-gray-700">{{ auth()->user()->name }} (Admin)</span>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="text-gray-600 hover:text-gray-900 font-medium">Log Out</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </nav>
+@extends('layouts.admin')
 
-        <main class="py-10">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-                </div>
+@section('title', 'Admin Dashboard')
+@section('header', 'Overview')
+@section('subheader', 'Welcome to the MockDasher Content Management System.')
 
-                @if(session('success'))
-                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-                        {{ session('success') }}
-                    </div>
-                @endif
-                
-                <div class="bg-white shadow rounded-lg p-6">
-                    <h2 class="text-xl font-semibold mb-4 text-gray-800">Available Tests</h2>
-                    <ul class="divide-y divide-gray-200">
-                        @forelse($tests as $test)
-                            <li class="py-4 flex justify-between items-center">
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900">{{ $test->title }} (Test {{ $test->number }})</p>
-                                </div>
-                                <div class="flex gap-2">
-                                    <a href="{{ route('admin.writing-tasks.create', $test->id) }}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                        Add Writing Task
-                                    </a>
-                                </div>
-                            </li>
-                        @empty
-                            <li class="py-4 text-gray-500 text-sm">No tests available.</li>
-                        @endforelse
-                    </ul>
-                </div>
+@section('content')
+    <!-- Dashboard Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Stats Card 1 -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center">
+            <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                <i class="fas fa-folder-open text-2xl"></i>
             </div>
-        </main>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Total Collections</p>
+                <p class="text-2xl font-bold text-gray-900">{{ $stats['collections'] }}</p>
+            </div>
+        </div>
+
+        <!-- Stats Card 2 -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center">
+            <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                <i class="fas fa-file-alt text-2xl"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Published Tests</p>
+                <p class="text-2xl font-bold text-gray-900">{{ $stats['published_tests'] }}</p>
+            </div>
+        </div>
+
+        <!-- Stats Card 3 -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center">
+            <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
+                <i class="fas fa-users text-2xl"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Active Users</p>
+                <p class="text-2xl font-bold text-gray-900">{{ $stats['users'] }}</p>
+            </div>
+        </div>
+
+        <!-- Stats Card 4 -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center">
+            <div class="p-3 rounded-full bg-orange-100 text-orange-600 mr-4">
+                <i class="fas fa-chart-line text-2xl"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-gray-500">Test Attempts</p>
+                <p class="text-2xl font-bold text-gray-900">{{ $stats['attempts'] }}</p>
+            </div>
+        </div>
     </div>
-</body>
-</html>
+
+    <!-- Recent Tests Table -->
+    <div class="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h3 class="text-lg font-medium text-gray-900">Recent Tests Overview</h3>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test Info</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th scope="col" class="relative px-6 py-3">
+                            <span class="sr-only">Actions</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @forelse($tests as $test)
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">{{ $test->title }}</div>
+                                <div class="text-sm text-gray-500">Test Number: {{ $test->number }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $test->status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                    {{ ucfirst($test->status) }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="{{ route('admin.tests.show', $test->id) }}" class="text-blue-600 hover:text-blue-900">Manage Content</a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="px-6 py-8 text-center text-sm text-gray-500">
+                                <div class="flex flex-col items-center">
+                                    <i class="fas fa-folder-open text-4xl text-gray-300 mb-3"></i>
+                                    <p>No tests available yet.</p>
+                                    <a href="{{ route('admin.collections.index') }}" class="mt-2 text-blue-600 font-medium hover:underline">Create a Collection first</a>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+@endsection

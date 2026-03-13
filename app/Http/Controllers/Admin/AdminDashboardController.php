@@ -9,7 +9,15 @@ class AdminDashboardController extends Controller
 {
     public function index()
     {
-        $tests = \App\Models\Test::with('collection')->get();
-        return view('admin.dashboard', compact('tests'));
+        $stats = [
+            'users' => \App\Models\User::count(),
+            'collections' => \App\Models\IeltsCollection::count(),
+            'published_tests' => \App\Models\Test::where('status', 'published')->count(),
+            'attempts' => \App\Models\TestAttempt::count(),
+        ];
+
+        $tests = \App\Models\Test::with('collection')->orderBy('created_at', 'desc')->take(5)->get();
+        
+        return view('admin.dashboard', compact('tests', 'stats'));
     }
 }

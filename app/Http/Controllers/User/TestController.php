@@ -25,6 +25,16 @@ class TestController extends Controller
             return redirect()->route('user.writing.show', $attempt->id);
         }
 
+        if ($request->module === 'speaking') {
+            $attempt = \App\Models\TestAttempt::firstOrCreate([
+                'user_id' => auth()->id(),
+                'test_id' => $test->id,
+                'status' => 'speaking'
+            ]);
+            
+            return redirect()->route('user.speaking.show', $attempt->id);
+        }
+
         abort(404, 'Module not found or not yet available.');
     }
 }

@@ -30,9 +30,13 @@
                 </form>
             </div>
 
-            <div class="bg-white shadow rounded-lg p-6 flex flex-col items-center justify-center min-h-[200px] border border-gray-200 opacity-50">
-                <h2 class="text-xl font-bold text-gray-600 mb-4">Speaking</h2>
-                <span class="bg-gray-200 text-gray-600 px-3 py-1 rounded text-sm font-semibold">Coming Soon</span>
+            <div class="bg-white shadow-md rounded-lg p-6 flex flex-col items-center justify-center min-h-[200px] border-t-4 border-green-500 hover:shadow-lg transition">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Speaking</h2>
+                <form action="{{ url('/tests/' . $test->id . '/start') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="module" value="speaking">
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded">Start Module</button>
+                </form>
             </div>
         </div>
 

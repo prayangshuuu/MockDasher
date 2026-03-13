@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class IeltsCollection extends Model
 {
-    protected $fillable = ['title', 'description'];
+    protected $fillable = ['title', 'exam_type', 'year', 'description'];
 
     public function tests()
     {
