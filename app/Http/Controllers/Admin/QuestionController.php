@@ -13,8 +13,26 @@ class QuestionController extends Controller
             return \App\Models\ListeningSection::findOrFail($id);
         } elseif ($type === 'reading') {
             return \App\Models\ReadingPassage::findOrFail($id);
+        } elseif ($type === 'reading_group') {
+            return \App\Models\ReadingQuestionGroup::findOrFail($id);
         }
         abort(404);
+    }
+
+    private function getRedirectRoute($type, $id)
+    {
+        if ($type === 'listening') return ['admin.listening-sections.edit', $id];
+        if ($type === 'reading')   return ['admin.reading-passages.edit',   $id];
+        if ($type === 'reading_group') {
+            $group = \App\Models\ReadingQuestionGroup::find($id);
+            return ['admin.reading-question-groups.edit', $id];
+        }
+        return ['admin.reading-passages.edit', $id];
+    }
+
+    private function allTypes(): string
+    {
+        return 'multiple_choice,short_answer,true_false_not_given,yes_no_not_given,matching_headings,matching_information,matching_sentence_endings,sentence_completion,summary_completion,table_completion,flow_chart_completion,matching,form_completion';
     }
 
     public function create($type, $id)
@@ -28,7 +46,7 @@ class QuestionController extends Controller
         $parent = $this->getParentModel($type, $id);
 
         $validated = $request->validate([
-            'question_type' => 'required|in:multiple_choice,short_answer,true_false_not_given,matching,table_completion,form_completion,sentence_completion',
+            'question_type' => 'required|in:'.$this->allTypes(),
             'question_text' => 'required|string',
             'correct_answer' => 'nullable|string',
             'explanation' => 'nullable|string',
@@ -55,20 +73,27 @@ class QuestionController extends Controller
             }
         }
 
-        $redirectRoute = $type === 'listening' ? 'admin.listening-sections.edit' : 'admin.reading-passages.edit';
-        return redirect()->route($redirectRoute, $id)->with('success', 'Question added successfully.');
+        [$route, $param] = $this->getRedirectRoute($type, $id);
+        return redirect()->route($route, $param)->with('success', 'Question added successfully.');
     }
 
     public function edit(\App\Models\Question $question)
     {
-        $type = $question->questionable_type === \App\Models\ListeningSection::class ? 'listening' : 'reading';
-        return view('admin.questions.edit', compact('question', 'type'));
+        $morphType = $question->questionable_type;
+        if ($morphType === \App\Models\ListeningSection::class) {
+            $type = 'listening';
+        } elseif ($morphType === \App\Models\ReadingQuestionGroup::class) {
+            $type = 'reading_group';
+        } else {
+            $type = 'reading';
+        }
+        return view('admin.questions.create', compact('question', 'type'));
     }
 
     public function update(Request $request, \App\Models\Question $question)
     {
         $validated = $request->validate([
-            'question_type' => 'required|in:multiple_choice,short_answer,true_false_not_given,matching,table_completion,form_completion,sentence_completion',
+            'question_type' => 'required|in:'.$this->allTypes(),
             'question_text' => 'required|string',
             'correct_answer' => 'nullable|string',
             'explanation' => 'nullable|string',
@@ -97,21 +122,34 @@ class QuestionController extends Controller
             }
         }
 
-        $type = $question->questionable_type === \App\Models\ListeningSection::class ? 'listening' : 'reading';
-        $redirectRoute = $type === 'listening' ? 'admin.listening-sections.edit' : 'admin.reading-passages.edit';
-        
-        return redirect()->route($redirectRoute, $question->questionable_id)->with('success', 'Question updated successfully.');
+        $morphType = $question->questionable_type;
+        if ($morphType === \App\Models\ListeningSection::class) {
+            $type = 'listening';
+        } elseif ($morphType === \App\Models\ReadingQuestionGroup::class) {
+            $type = 'reading_group';
+        } else {
+            $type = 'reading';
+        }
+        [$route, $param] = $this->getRedirectRoute($type, $question->questionable_id);
+        return redirect()->route($route, $param)->with('success', 'Question updated successfully.');
     }
 
     public function destroy(\App\Models\Question $question)
     {
-        $type = $question->questionable_type === \App\Models\ListeningSection::class ? 'listening' : 'reading';
-        $parentId = $question->questionable_id;
-        $redirectRoute = $type === 'listening' ? 'admin.listening-sections.edit' : 'admin.reading-passages.edit';
+        $morphType = $question->questionable_type;
+        $parentId  = $question->questionable_id;
+        if ($morphType === \App\Models\ListeningSection::class) {
+            $type = 'listening';
+        } elseif ($morphType === \App\Models\ReadingQuestionGroup::class) {
+            $type = 'reading_group';
+        } else {
+            $type = 'reading';
+        }
 
         $question->options()->delete();
         $question->delete();
 
-        return redirect()->route($redirectRoute, $parentId)->with('success', 'Question deleted successfully.');
+        [$route, $param] = $this->getRedirectRoute($type, $parentId);
+        return redirect()->route($route, $param)->with('success', 'Question deleted successfully.');
     }
 }

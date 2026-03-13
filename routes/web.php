@@ -26,6 +26,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/tests/attempts/{attempt}/listening/complete-section', [\App\Http\Controllers\User\ListeningTestController::class, 'completeSection'])->name('user.listening.completeSection');
     Route::post('/tests/attempts/{attempt}/listening/submit', [\App\Http\Controllers\User\ListeningTestController::class, 'submit'])->name('user.listening.submit');
 
+    Route::get('/tests/attempts/{attempt}/reading', [\App\Http\Controllers\User\ReadingTestController::class, 'show'])->name('user.reading.show');
+    Route::post('/tests/attempts/{attempt}/reading/autosave', [\App\Http\Controllers\User\ReadingTestController::class, 'autosave'])->name('user.reading.autosave');
+    Route::post('/tests/attempts/{attempt}/reading/submit', [\App\Http\Controllers\User\ReadingTestController::class, 'submit'])->name('user.reading.submit');
+
     // Profile & History Routes
     Route::get('/profile', [\App\Http\Controllers\User\ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile/update', [\App\Http\Controllers\User\ProfileController::class, 'update'])->name('profile.update');
@@ -70,6 +74,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/reading-passages/{reading_passage}/edit', [\App\Http\Controllers\Admin\ReadingPassageController::class, 'edit'])->name('reading-passages.edit');
         Route::put('/reading-passages/{reading_passage}', [\App\Http\Controllers\Admin\ReadingPassageController::class, 'update'])->name('reading-passages.update');
         Route::delete('/reading-passages/{reading_passage}', [\App\Http\Controllers\Admin\ReadingPassageController::class, 'destroy'])->name('reading-passages.destroy');
+
+        Route::get('/reading-passages/{passageId}/question-groups/create', [\App\Http\Controllers\Admin\ReadingQuestionGroupController::class, 'create'])->name('reading-question-groups.create');
+        Route::post('/reading-passages/{passageId}/question-groups', [\App\Http\Controllers\Admin\ReadingQuestionGroupController::class, 'store'])->name('reading-question-groups.store');
+        Route::get('/reading-question-groups/{group}/edit', [\App\Http\Controllers\Admin\ReadingQuestionGroupController::class, 'edit'])->name('reading-question-groups.edit');
+        Route::put('/reading-question-groups/{group}', [\App\Http\Controllers\Admin\ReadingQuestionGroupController::class, 'update'])->name('reading-question-groups.update');
+        Route::delete('/reading-question-groups/{group}', [\App\Http\Controllers\Admin\ReadingQuestionGroupController::class, 'destroy'])->name('reading-question-groups.destroy');
 
         Route::get('/{type}/{id}/questions/create', [\App\Http\Controllers\Admin\QuestionController::class, 'create'])->name('questions.create');
         Route::post('/{type}/{id}/questions', [\App\Http\Controllers\Admin\QuestionController::class, 'store'])->name('questions.store');

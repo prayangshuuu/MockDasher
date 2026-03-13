@@ -12,7 +12,8 @@
 
 @section('content')
     <div class="max-w-5xl">
-        <form action="{{ route('admin.reading-passages.store', $test->id) }}" method="POST" class="bg-white shadow-sm border border-gray-200 rounded-lg p-8">
+        <form action="{{ route('admin.reading-passages.store', $test->id) }}" method="POST"
+              class="bg-white shadow-sm border border-gray-200 rounded-lg p-8">
             @csrf
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -26,19 +27,22 @@
                 </div>
                 <div>
                     <label class="block text-gray-700 text-sm font-semibold mb-2">Passage Title / Heading</label>
-                    <input type="text" name="title" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 sm:text-sm" required placeholder="e.g. The History of the Bicycle">
+                    <input type="text" name="title" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 sm:text-sm" required
+                        placeholder="e.g. The Future of Ocean Exploration">
                 </div>
             </div>
 
             <div class="mb-8 border border-gray-100 p-4 rounded bg-gray-50">
                 <label class="block text-gray-700 text-sm font-semibold mb-2">Passage Content</label>
-                <p class="text-xs text-gray-500 mb-3">Include HTML tags (like &lt;p&gt;, &lt;h3&gt;, &lt;strong&gt;) for formatting.</p>
-                <textarea name="content" rows="20" class="w-full font-mono text-sm border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500" required></textarea>
+                <p class="text-xs text-gray-500 mb-3">Use HTML tags: &lt;p&gt;, &lt;h3&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;ul&gt;, &lt;li&gt; for proper formatting.</p>
+                <textarea name="content" rows="20"
+                    class="w-full font-mono text-sm border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
+                    required placeholder="&lt;p&gt;Passage text goes here...&lt;/p&gt;"></textarea>
             </div>
 
             <div class="flex justify-end border-t border-gray-100 pt-6">
                 <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-6 rounded-md shadow-sm transition flex items-center">
-                    <i class="fas fa-save mr-2"></i> Save Passage
+                    <i class="fas fa-save mr-2"></i> Create Passage
                 </button>
             </div>
         </form>

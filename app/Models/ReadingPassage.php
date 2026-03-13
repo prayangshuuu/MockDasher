@@ -13,8 +13,15 @@ class ReadingPassage extends Model
         return $this->belongsTo(Test::class);
     }
 
+    // Legacy direct questions (still works for existing data)
     public function questions()
     {
         return $this->morphMany(Question::class, 'questionable');
+    }
+
+    // New: question groups
+    public function questionGroups()
+    {
+        return $this->hasMany(ReadingQuestionGroup::class)->orderBy('sort_order');
     }
 }

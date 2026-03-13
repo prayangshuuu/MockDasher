@@ -47,6 +47,14 @@ class TestController extends Controller
             return redirect()->route('user.listening.show', $attempt->id);
         }
 
+        if ($request->module === 'reading') {
+            $attempt = \App\Models\ReadingAttempt::firstOrCreate(
+                ['user_id' => auth()->id(), 'test_id' => $test->id],
+                ['status' => 'in_progress']
+            );
+            return redirect()->route('user.reading.show', $attempt->id);
+        }
+
         abort(404, 'Module not found or not yet available.');
     }
 }

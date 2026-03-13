@@ -38,17 +38,21 @@
             </div>
 
             {{-- READING --}}
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden opacity-60">
-                <div class="h-1.5 bg-gradient-to-r from-orange-300 to-orange-500"></div>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 hover:border-orange-400 hover:shadow-md transition overflow-hidden group">
+                <div class="h-1.5 bg-gradient-to-r from-orange-400 to-orange-600"></div>
                 <div class="p-6 flex flex-col items-center text-center">
-                    <div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center mb-4">
+                    <div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-orange-100 transition">
                         <i class="fas fa-book-open text-orange-500 text-xl"></i>
                     </div>
-                    <h2 class="text-lg font-bold text-gray-700 mb-1">Reading</h2>
+                    <h2 class="text-lg font-bold text-gray-800 mb-1">Reading</h2>
                     <p class="text-xs text-gray-500 mb-5">3 passages · 40 questions · 60 min</p>
-                    <span class="w-full text-center bg-gray-100 text-gray-500 font-semibold py-2 px-4 rounded-lg text-sm block">
-                        Coming Soon
-                    </span>
+                    <form action="{{ route('user.tests.start', $test->id) }}" method="POST" class="w-full">
+                        @csrf
+                        <input type="hidden" name="module" value="reading">
+                        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg text-sm transition shadow-sm">
+                            Start Module
+                        </button>
+                    </form>
                 </div>
             </div>
 
