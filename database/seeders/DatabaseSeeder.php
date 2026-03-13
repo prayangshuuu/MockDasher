@@ -17,31 +17,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $adminRole = Role::firstOrCreate(['name' => 'Admin']);
-        $userRole = Role::firstOrCreate(['name' => 'User']);
-
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@mockdasher.test'],
-            [
-                'name' => 'Admin User',
-                'password' => Hash::make('password'),
-            ]
-        );
-
-        if (!$admin->roles()->where('name', 'Admin')->exists()) {
-            $admin->roles()->attach($adminRole);
-        }
-
-        $user = User::firstOrCreate(
-            ['email' => 'user@mockdasher.test'],
-            [
-                'name' => 'Test Access',
-                'password' => Hash::make('password'),
-            ]
-        );
-
-        if (!$user->roles()->where('name', 'User')->exists()) {
-            $user->roles()->attach($userRole);
-        }
+        $this->call([
+            DefaultUsersSeeder::class,
+        ]);
     }
 }

@@ -59,6 +59,18 @@ To run this project locally, follow these steps:
    npm run dev
    ```
 
+## Development Seed Accounts
+
+The following accounts are generated automatically when running `php artisan migrate --seed`. They are for development and testing purposes only.
+
+**Admin Account**
+* email: `prayangshu073@gmail.com`
+* password: `MockDasher@TST`
+
+**User Account**
+* email: `prayangshuuu@gmail.com`
+* password: `MockDasher@TST`
+
 ## Project Structure
 * `app/`: Contains the core logic, Models, Controllers, and middleware of the application.
 * `routes/`: Defines all the web and API routes.
