@@ -29,10 +29,22 @@ class TestController extends Controller
             $attempt = \App\Models\TestAttempt::firstOrCreate([
                 'user_id' => auth()->id(),
                 'test_id' => $test->id,
-                'status' => 'speaking'
+                'status'  => 'speaking'
             ]);
             
             return redirect()->route('user.speaking.show', $attempt->id);
+        }
+
+        if ($request->module === 'listening') {
+            $attempt = \App\Models\ListeningAttempt::firstOrCreate([
+                'user_id' => auth()->id(),
+                'test_id' => $test->id,
+            ], [
+                'status'          => 'in_progress',
+                'current_section' => 1,
+            ]);
+
+            return redirect()->route('user.listening.show', $attempt->id);
         }
 
         abort(404, 'Module not found or not yet available.');

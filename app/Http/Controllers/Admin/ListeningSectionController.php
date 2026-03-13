@@ -18,9 +18,10 @@ class ListeningSectionController extends Controller
         $test = \App\Models\Test::findOrFail($testId);
 
         $validated = $request->validate([
-            'section_number' => 'required|in:1,2,3,4',
-            'audio_file' => 'nullable|file|mimes:mp3,wav|max:10240', // 10MB
-            'passage_text' => 'nullable|string',
+            'section_number'   => 'required|in:1,2,3,4',
+            'instruction_text' => 'nullable|string',
+            'audio_file'       => 'nullable|file|mimes:mp3,wav|max:10240',
+            'passage_text'     => 'nullable|string',
         ]);
 
         $data = \Illuminate\Support\Arr::except($validated, ['audio_file']);
@@ -42,9 +43,10 @@ class ListeningSectionController extends Controller
     public function update(Request $request, \App\Models\ListeningSection $listening_section)
     {
         $validated = $request->validate([
-            'section_number' => 'required|in:1,2,3,4',
-            'audio_file' => 'nullable|file|mimes:mp3,wav|max:10240',
-            'passage_text' => 'nullable|string',
+            'section_number'   => 'required|in:1,2,3,4',
+            'instruction_text' => 'nullable|string',
+            'audio_file'       => 'nullable|file|mimes:mp3,wav|max:10240',
+            'passage_text'     => 'nullable|string',
         ]);
 
         $data = \Illuminate\Support\Arr::except($validated, ['audio_file']);

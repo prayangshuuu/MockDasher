@@ -21,6 +21,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tests/attempts/{attempt}/speaking', [\App\Http\Controllers\User\SpeakingTestController::class, 'show'])->name('user.speaking.show');
     Route::post('/tests/attempts/{attempt}/speaking/submit', [\App\Http\Controllers\User\SpeakingTestController::class, 'submit'])->name('user.speaking.submit');
 
+    Route::get('/tests/attempts/{attempt}/listening', [\App\Http\Controllers\User\ListeningTestController::class, 'show'])->name('user.listening.show');
+    Route::post('/tests/attempts/{attempt}/listening/autosave', [\App\Http\Controllers\User\ListeningTestController::class, 'autosave'])->name('user.listening.autosave');
+    Route::post('/tests/attempts/{attempt}/listening/complete-section', [\App\Http\Controllers\User\ListeningTestController::class, 'completeSection'])->name('user.listening.completeSection');
+    Route::post('/tests/attempts/{attempt}/listening/submit', [\App\Http\Controllers\User\ListeningTestController::class, 'submit'])->name('user.listening.submit');
+
     // Profile & History Routes
     Route::get('/profile', [\App\Http\Controllers\User\ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile/update', [\App\Http\Controllers\User\ProfileController::class, 'update'])->name('profile.update');

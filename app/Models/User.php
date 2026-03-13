@@ -66,6 +66,11 @@ class User extends Authenticatable
         return $this->roles->contains('name', 'Admin');
     }
 
+    public function hasRole(string $roleName): bool
+    {
+        return $this->roles->contains('name', $roleName);
+    }
+
     public function writingAnswers()
     {
         return $this->hasMany(WritingAnswer::class);

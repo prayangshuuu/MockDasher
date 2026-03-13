@@ -18,10 +18,23 @@
             <div class="mb-6">
                 <label class="block text-gray-700 text-sm font-semibold mb-2">Question Type</label>
                 <select name="question_type" id="question_type" class="w-full md:w-1/2 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                    <option value="multiple_choice">Multiple Choice</option>
-                    <option value="short_answer">Short Answer / Fill in the Blanks</option>
-                    <option value="true_false_not_given">True/False/Not Given (or Yes/No)</option>
-                    <option value="matching">Matching</option>
+                    @if($type === 'listening')
+                        <optgroup label="Completion Types">
+                            <option value="form_completion">Form Completion</option>
+                            <option value="table_completion">Table Completion</option>
+                            <option value="sentence_completion">Sentence Completion</option>
+                        </optgroup>
+                        <optgroup label="Other Types">
+                            <option value="multiple_choice">Multiple Choice</option>
+                            <option value="matching">Matching</option>
+                            <option value="short_answer">Short Answer</option>
+                        </optgroup>
+                    @else
+                        <option value="multiple_choice">Multiple Choice</option>
+                        <option value="short_answer">Short Answer / Fill in the Blanks</option>
+                        <option value="true_false_not_given">True/False/Not Given (or Yes/No)</option>
+                        <option value="matching">Matching</option>
+                    @endif
                 </select>
             </div>
 

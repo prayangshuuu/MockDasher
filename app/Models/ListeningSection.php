@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ListeningSection extends Model
 {
-    protected $fillable = ['test_id', 'section_number', 'audio_path', 'passage_text'];
+    protected $fillable = ['test_id', 'section_number', 'instruction_text', 'audio_path', 'passage_text'];
 
     public function test()
     {

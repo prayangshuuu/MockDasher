@@ -28,7 +28,7 @@ class QuestionController extends Controller
         $parent = $this->getParentModel($type, $id);
 
         $validated = $request->validate([
-            'question_type' => 'required|in:multiple_choice,short_answer,true_false_not_given,matching',
+            'question_type' => 'required|in:multiple_choice,short_answer,true_false_not_given,matching,table_completion,form_completion,sentence_completion',
             'question_text' => 'required|string',
             'correct_answer' => 'nullable|string',
             'explanation' => 'nullable|string',
@@ -68,7 +68,7 @@ class QuestionController extends Controller
     public function update(Request $request, \App\Models\Question $question)
     {
         $validated = $request->validate([
-            'question_type' => 'required|in:multiple_choice,short_answer,true_false_not_given,matching',
+            'question_type' => 'required|in:multiple_choice,short_answer,true_false_not_given,matching,table_completion,form_completion,sentence_completion',
             'question_text' => 'required|string',
             'correct_answer' => 'nullable|string',
             'explanation' => 'nullable|string',

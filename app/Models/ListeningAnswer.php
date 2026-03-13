@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class ListeningAnswer extends Model
+{
+    protected $fillable = ['user_id', 'test_attempt_id', 'question_id', 'answer_text'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function attempt()
+    {
+        return $this->belongsTo(ListeningAttempt::class, 'test_attempt_id');
+    }
+
+    public function question()
+    {
+        return $this->belongsTo(Question::class);
+    }
+}
