@@ -25,4 +25,9 @@ class TestAttempt extends Model
     {
         return $this->belongsTo(Test::class);
     }
+
+    public function writingAnswers()
+    {
+        return $this->hasMany(WritingAnswer::class);
+    }
 }

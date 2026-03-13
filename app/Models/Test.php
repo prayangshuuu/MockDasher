@@ -17,4 +17,9 @@ class Test extends Model
     {
         return $this->hasMany(Section::class);
     }
+
+    public function writingTasks()
+    {
+        return $this->hasMany(WritingTask::class);
+    }
 }
