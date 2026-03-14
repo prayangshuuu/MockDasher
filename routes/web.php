@@ -42,12 +42,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware([\App\Http\Middleware\RoleMiddleware::class.':Admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::resource('collections', \App\Http\Controllers\Admin\IeltsCollectionController::class);
         
-        Route::get('/collections/{collection}/tests/create', [\App\Http\Controllers\Admin\TestController::class, 'create'])->name('tests.create');
-        Route::post('/collections/{collection}/tests', [\App\Http\Controllers\Admin\TestController::class, 'store'])->name('tests.store');
-        Route::get('/tests/{test}/edit', [\App\Http\Controllers\Admin\TestController::class, 'edit'])->name('tests.edit');
-        Route::put('/tests/{test}', [\App\Http\Controllers\Admin\TestController::class, 'update'])->name('tests.update');
-        Route::delete('/tests/{test}', [\App\Http\Controllers\Admin\TestController::class, 'destroy'])->name('tests.destroy');
-        Route::get('/tests/{test}', [\App\Http\Controllers\Admin\TestController::class, 'show'])->name('tests.show');
+        Route::resource('tests', \App\Http\Controllers\Admin\TestController::class);
         
         Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
 

@@ -2,11 +2,11 @@
 
 @section('title', 'Edit Test')
 @section('header', 'Edit Test: ' . $test->title)
-@section('subheader', 'Within collection: ' . $test->collection->title)
+@section('subheader', $test->collection ? 'Within collection: ' . $test->collection->title : 'Standalone test')
 
 @section('header_actions')
-    <a href="{{ route('admin.collections.show', $test->ielts_collection_id) }}" class="text-gray-600 hover:text-gray-900 font-medium transition flex items-center">
-        <i class="fas fa-arrow-left mr-2"></i> Back to Collection
+    <a href="{{ route('admin.tests.show', $test->id) }}" class="text-gray-600 hover:text-gray-900 font-medium transition flex items-center">
+        <i class="fas fa-arrow-left mr-2"></i> Back to Test
     </a>
 @endsection
 
@@ -16,6 +16,16 @@
             @csrf
             @method('PUT')
             
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-semibold mb-2">Collection (Optional)</label>
+                <select name="ielts_collection_id" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    <option value="">-- None (Standalone Test) --</option>
+                    @foreach($collections as $col)
+                        <option value="{{ $col->id }}" {{ $test->ielts_collection_id == $col->id ? 'selected' : '' }}>{{ $col->title }}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="mb-6">
                 <label class="block text-gray-700 text-sm font-semibold mb-2">Test Title</label>
                 <input type="text" name="title" value="{{ $test->title }}" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" required>
@@ -47,6 +57,9 @@
         <form id="delete-test" action="{{ route('admin.tests.destroy', $test->id) }}" method="POST" class="hidden">
             @csrf
             @method('DELETE')
+            @if(request()->has('redirect_to_collection'))
+                <input type="hidden" name="redirect_to_collection" value="1">
+            @endif
         </form>
     </div>
 @endsection

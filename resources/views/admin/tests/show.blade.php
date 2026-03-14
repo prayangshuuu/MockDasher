@@ -2,16 +2,22 @@
 
 @section('title', 'Test Details')
 @section('header', 'Manage Test: ' . $test->title)
-@section('subheader', 'Part of ' . $test->collection->title . ' • Status: ' . ucfirst($test->status))
+@section('subheader', ($test->collection ? 'Part of ' . $test->collection->title : 'Standalone test') . ' • Status: ' . ucfirst($test->status))
 
 @section('header_actions')
     <div class="flex space-x-3">
         <a href="{{ route('admin.tests.edit', $test->id) }}" class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-2 px-4 rounded shadow-sm transition flex items-center">
             <i class="fas fa-cog mr-2"></i> Test Settings
         </a>
-        <a href="{{ route('admin.collections.show', $test->ielts_collection_id) }}" class="text-gray-600 hover:text-gray-900 font-medium transition flex items-center px-4">
-            <i class="fas fa-arrow-left mr-2"></i> Back
-        </a>
+        @if($test->ielts_collection_id)
+            <a href="{{ route('admin.collections.show', $test->ielts_collection_id) }}" class="text-gray-600 hover:text-gray-900 font-medium transition flex items-center px-4">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Collection
+            </a>
+        @else
+            <a href="{{ route('admin.tests.index') }}" class="text-gray-600 hover:text-gray-900 font-medium transition flex items-center px-4">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Tests
+            </a>
+        @endif
     </div>
 @endsection
 

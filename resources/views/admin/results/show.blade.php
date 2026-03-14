@@ -46,17 +46,15 @@
         </div>
     </div>
 
-    <!-- Detailed Module Results (Placeholder/Structure) -->
+    <!-- Detailed Module Results -->
     <div class="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden mb-8">
         <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
             <h3 class="text-lg font-semibold text-gray-800">Module Breakdown</h3>
         </div>
         <div class="p-6">
-            <p class="text-gray-500 text-sm mb-4">Detailed answers and scoring breakdown will be displayed here.</p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <!-- Reading Score -->
-                <div class="border border-gray-100 rounded-lg p-4 bg-gray-50 flex justify-between items-center">
+                <div class="border border-gray-100 rounded-lg p-4 bg-gray-50 flex justify-between items-center hover:shadow-sm transition">
                     <div>
                         <h4 class="font-semibold text-gray-800">Reading Module</h4>
                         <p class="text-sm text-gray-500">Band Score</p>
@@ -65,7 +63,7 @@
                 </div>
 
                 <!-- Listening Score -->
-                <div class="border border-gray-100 rounded-lg p-4 bg-gray-50 flex justify-between items-center">
+                <div class="border border-gray-100 rounded-lg p-4 bg-gray-50 flex justify-between items-center hover:shadow-sm transition">
                     <div>
                         <h4 class="font-semibold text-gray-800">Listening Module</h4>
                         <p class="text-sm text-gray-500">Band Score</p>
@@ -74,7 +72,7 @@
                 </div>
 
                 <!-- Writing Score -->
-                <div class="border border-gray-100 rounded-lg p-4 bg-gray-50 flex justify-between items-center">
+                <div class="border border-gray-100 rounded-lg p-4 bg-gray-50 flex justify-between items-center hover:shadow-sm transition">
                     <div>
                         <h4 class="font-semibold text-gray-800">Writing Module</h4>
                         <p class="text-sm text-gray-500">Band Score</p>
@@ -83,7 +81,7 @@
                 </div>
 
                 <!-- Speaking Score -->
-                <div class="border border-gray-100 rounded-lg p-4 bg-gray-50 flex justify-between items-center">
+                <div class="border border-gray-100 rounded-lg p-4 bg-gray-50 flex justify-between items-center hover:shadow-sm transition">
                     <div>
                         <h4 class="font-semibold text-gray-800">Speaking Module</h4>
                         <p class="text-sm text-gray-500">Band Score</p>
@@ -91,6 +89,29 @@
                     <div class="text-2xl font-bold text-blue-600">{{ $result->speaking_band ?? 'Pending Evaluation' }}</div>
                 </div>
             </div>
+
+            @if($result->writingAnswers && $result->writingAnswers->count() > 0)
+                <div class="border-t border-gray-200 pt-6 mt-2">
+                    <h4 class="text-md font-semibold text-gray-800 mb-4"><i class="fas fa-pen-nib text-blue-500 mr-2"></i>Writing Responses</h4>
+                    <div class="space-y-4">
+                        @foreach($result->writingAnswers as $answer)
+                            <div class="border border-gray-200 rounded-lg overflow-hidden">
+                                <div class="px-4 py-3 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+                                    <span class="text-sm font-semibold text-gray-700">
+                                        {{ optional($answer->writingTask)->title ?? 'Writing Task' }}
+                                    </span>
+                                    <span class="text-xs text-gray-500">
+                                        {{ str_word_count($answer->answer_text ?? '') }} words
+                                    </span>
+                                </div>
+                                <div class="p-4 text-sm text-gray-700 leading-relaxed max-h-48 overflow-y-auto">
+                                    {!! nl2br(e($answer->answer_text ?? 'No response submitted.')) !!}
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 @endsection

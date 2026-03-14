@@ -9,7 +9,7 @@ class SpeakingTestController extends Controller
 {
     public function show(\App\Models\TestAttempt $attempt)
     {
-        if ($attempt->user_id !== auth()->id()) {
+        if ((int) $attempt->user_id !== (int) auth()->id()) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -36,7 +36,7 @@ class SpeakingTestController extends Controller
 
     public function submit(Request $request, \App\Models\TestAttempt $attempt)
     {
-        if ($attempt->user_id !== auth()->id() || $attempt->status === 'completed') {
+        if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->status === 'completed') {
             abort(403);
         }
 

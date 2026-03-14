@@ -36,7 +36,7 @@
                 </div>
                 <div class="p-4 text-center">
                     <span class="block text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Tests Taken</span>
-                    <span class="text-xl font-bold text-gray-900">{{ auth()->user()->testAttempts()->count() }}</span>
+                    <span class="text-xl font-bold text-gray-900">{{ $testsTakenCount }}</span>
                 </div>
                 <div class="p-4 text-center">
                     <span class="block text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Exam Type</span>
@@ -76,16 +76,13 @@
                                         <div class="border border-gray-200 rounded p-4 hover:border-blue-400 hover:shadow-sm transition group">
                                             <div class="flex justify-between items-start mb-2">
                                                 <h5 class="font-semibold text-gray-900 group-hover:text-blue-600 transition">{{ $test->title }}</h5>
-                                                @if($test->status === 'draft')
-                                                    <span class="text-xs text-yellow-600 bg-yellow-50 px-2 py-1 rounded">Draft</span>
-                                                @endif
                                             </div>
                                             <p class="text-xs text-gray-500 mb-4 text-left">4 Modules &bull; Reading, Writing, Listening, Speaking</p>
                                             
                                             <form action="{{ route('user.tests.start', $test->id) }}" method="POST">
                                                 @csrf
-                                                <button type="submit" class="w-full text-center bg-gray-50 hover:bg-blue-600 text-gray-700 hover:text-white border border-gray-200 hover:border-blue-600 font-medium py-2 px-4 rounded text-sm transition" {{ $test->status === 'draft' ? 'disabled' : '' }}>
-                                                    {{ $test->status === 'draft' ? 'Unavailable' : 'Start Preparation' }}
+                                                <button type="submit" class="w-full text-center bg-gray-50 hover:bg-blue-600 text-gray-700 hover:text-white border border-gray-200 hover:border-blue-600 font-medium py-2 px-4 rounded text-sm transition">
+                                                    Start Preparation
                                                 </button>
                                             </form>
                                         </div>
@@ -105,9 +102,25 @@
                         </div>
                     @endforelse
                 </div>
-            </div>
 
-            <!-- Sidebar -->
+                @if($standaloneTests->isNotEmpty())
+                    <h3 class="text-xl font-bold text-gray-900 mb-4 mt-8">More Tests</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        @foreach($standaloneTests as $test)
+                            <div class="bg-white border border-gray-200 rounded-lg p-5 hover:border-blue-400 hover:shadow-md transition group">
+                                <h5 class="font-semibold text-gray-900 group-hover:text-blue-600 transition mb-1">{{ $test->title }}</h5>
+                                <p class="text-xs text-gray-500 mb-4">4 Modules &bull; Reading, Writing, Listening, Speaking</p>
+                                <form action="{{ route('user.tests.start', $test->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="w-full text-center bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 hover:border-blue-600 font-medium py-2 px-4 rounded text-sm transition">
+                                        Start Preparation
+                                    </button>
+                                </form>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
             <div class="space-y-6">
                 
                 <!-- Recent Activity -->

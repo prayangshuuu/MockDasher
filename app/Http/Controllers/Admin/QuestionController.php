@@ -24,7 +24,6 @@ class QuestionController extends Controller
         if ($type === 'listening') return ['admin.listening-sections.edit', $id];
         if ($type === 'reading')   return ['admin.reading-passages.edit',   $id];
         if ($type === 'reading_group') {
-            $group = \App\Models\ReadingQuestionGroup::find($id);
             return ['admin.reading-question-groups.edit', $id];
         }
         return ['admin.reading-passages.edit', $id];
@@ -58,8 +57,8 @@ class QuestionController extends Controller
         $question = $parent->questions()->create([
             'question_type' => $validated['question_type'],
             'question_text' => $validated['question_text'],
-            'correct_answer' => $validated['correct_answer'],
-            'explanation' => $validated['explanation'],
+            'correct_answer' => $validated['correct_answer'] ?? null,
+            'explanation' => $validated['explanation'] ?? null,
         ]);
 
         if (isset($validated['options']) && is_array($validated['options'])) {
@@ -105,8 +104,8 @@ class QuestionController extends Controller
         $question->update([
             'question_type' => $validated['question_type'],
             'question_text' => $validated['question_text'],
-            'correct_answer' => $validated['correct_answer'],
-            'explanation' => $validated['explanation'],
+            'correct_answer' => $validated['correct_answer'] ?? null,
+            'explanation' => $validated['explanation'] ?? null,
         ]);
 
         // Manage options: easiest way is to delete old and create new

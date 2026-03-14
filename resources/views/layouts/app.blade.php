@@ -76,16 +76,34 @@
     @if(session('success') || session('error'))
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
         @if(session('success'))
-            <div class="bg-green-100 border border-green-200 text-green-700 px-4 py-3 rounded shadow-sm flex items-center">
-                <i class="fas fa-check-circle mr-2"></i> {{ session('success') }}
+            <div id="flash-success" class="bg-green-100 border border-green-200 text-green-700 px-4 py-3 rounded shadow-sm flex items-center justify-between transition-all duration-500 ease-in-out">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle mr-2"></i> {{ session('success') }}
+                </div>
+                <button onclick="this.parentElement.style.opacity='0';setTimeout(()=>this.parentElement.remove(),500)" class="text-green-500 hover:text-green-700 ml-4">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         @endif
         @if(session('error'))
-            <div class="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded shadow-sm flex items-center">
-                <i class="fas fa-exclamation-circle mr-2"></i> {{ session('error') }}
+            <div id="flash-error" class="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded shadow-sm flex items-center justify-between transition-all duration-500 ease-in-out">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-circle mr-2"></i> {{ session('error') }}
+                </div>
+                <button onclick="this.parentElement.style.opacity='0';setTimeout(()=>this.parentElement.remove(),500)" class="text-red-500 hover:text-red-700 ml-4">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         @endif
     </div>
+    <script>
+        setTimeout(function() {
+            document.querySelectorAll('#flash-success, #flash-error').forEach(function(el) {
+                el.style.opacity = '0';
+                setTimeout(function() { el.remove(); }, 500);
+            });
+        }, 4000);
+    </script>
     @endif
 
     <!-- Page Content -->
@@ -110,5 +128,6 @@
         </div>
     </footer>
 
+    @stack('scripts')
 </body>
 </html>

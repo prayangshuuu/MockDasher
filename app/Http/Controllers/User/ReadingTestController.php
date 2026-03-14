@@ -11,7 +11,7 @@ class ReadingTestController extends Controller
 {
     public function show(ReadingAttempt $attempt)
     {
-        if ($attempt->user_id !== auth()->id()) {
+        if ((int) $attempt->user_id !== (int) auth()->id()) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -29,7 +29,7 @@ class ReadingTestController extends Controller
         $totalSeconds    = 3600; // 60 minutes
         $remainingSeconds = max(0, $totalSeconds - $elapsedSeconds);
 
-        if ($remainingSeconds === 0) {
+        if ($remainingSeconds <= 0) {
             return $this->forceSubmit($attempt);
         }
 
@@ -53,7 +53,7 @@ class ReadingTestController extends Controller
 
     public function autosave(Request $request, ReadingAttempt $attempt)
     {
-        if ($attempt->user_id !== auth()->id() || $attempt->status === 'completed') {
+        if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->status === 'completed') {
             return response()->json(['error' => 'Unauthorized or completed'], 403);
         }
 
@@ -73,7 +73,7 @@ class ReadingTestController extends Controller
 
     public function submit(Request $request, ReadingAttempt $attempt)
     {
-        if ($attempt->user_id !== auth()->id() || $attempt->status === 'completed') {
+        if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->status === 'completed') {
             abort(403);
         }
 

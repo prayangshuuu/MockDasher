@@ -15,7 +15,7 @@ class ListeningTestController extends Controller
      */
     public function show(ListeningAttempt $attempt)
     {
-        if ($attempt->user_id !== auth()->id()) {
+        if ((int) $attempt->user_id !== (int) auth()->id()) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -43,7 +43,7 @@ class ListeningTestController extends Controller
         if ($attempt->status === 'transfer' && $attempt->transfer_started_at) {
             $elapsed = now()->diffInSeconds($attempt->transfer_started_at);
             $transferRemainingSeconds = max(0, 600 - $elapsed); // 10 minutes
-            if ($transferRemainingSeconds === 0) {
+            if ($transferRemainingSeconds <= 0) {
                 return $this->forceSubmit($attempt);
             }
         }
@@ -58,7 +58,7 @@ class ListeningTestController extends Controller
      */
     public function autosave(Request $request, ListeningAttempt $attempt)
     {
-        if ($attempt->user_id !== auth()->id() || $attempt->status === 'completed') {
+        if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->status === 'completed') {
             return response()->json(['error' => 'Unauthorized or completed'], 403);
         }
 
@@ -85,7 +85,7 @@ class ListeningTestController extends Controller
      */
     public function completeSection(Request $request, ListeningAttempt $attempt)
     {
-        if ($attempt->user_id !== auth()->id()) {
+        if ((int) $attempt->user_id !== (int) auth()->id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
@@ -116,7 +116,7 @@ class ListeningTestController extends Controller
      */
     public function submit(Request $request, ListeningAttempt $attempt)
     {
-        if ($attempt->user_id !== auth()->id() || $attempt->status === 'completed') {
+        if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->status === 'completed') {
             abort(403);
         }
 

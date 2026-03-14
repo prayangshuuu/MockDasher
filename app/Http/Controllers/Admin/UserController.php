@@ -43,7 +43,10 @@ class UserController extends Controller
 
         // Manually update role if applicable (assuming single role for now, depends on implementation)
         if ($user->roles()->count() > 0) {
-            $role = \App\Models\Role::where('name', ucfirst($validated['role']))->first();
+            /** @var \App\Models\Role|null $role */
+            $role = \App\Models\Role::query()->where(function ($q) use ($validated) {
+                $q->where('name', '=', ucfirst($validated['role']));
+            })->first();
             if ($role) {
                 $user->roles()->sync([$role->id]);
             }

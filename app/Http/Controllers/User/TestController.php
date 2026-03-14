@@ -16,7 +16,8 @@ class TestController extends Controller
 
         // Handle specific module starts
         if ($request->module === 'writing') {
-            $attempt = \App\Models\TestAttempt::firstOrCreate([
+            /** @var \App\Models\TestAttempt $attempt */
+            $attempt = \App\Models\TestAttempt::query()->firstOrCreate([
                 'user_id' => auth()->id(),
                 'test_id' => $test->id,
                 'status' => 'writing'
@@ -26,7 +27,8 @@ class TestController extends Controller
         }
 
         if ($request->module === 'speaking') {
-            $attempt = \App\Models\TestAttempt::firstOrCreate([
+            /** @var \App\Models\TestAttempt $attempt */
+            $attempt = \App\Models\TestAttempt::query()->firstOrCreate([
                 'user_id' => auth()->id(),
                 'test_id' => $test->id,
                 'status'  => 'speaking'
@@ -36,22 +38,29 @@ class TestController extends Controller
         }
 
         if ($request->module === 'listening') {
-            $attempt = \App\Models\ListeningAttempt::firstOrCreate([
+            /** @var \App\Models\ListeningAttempt $attempt */
+            $attempt = \App\Models\ListeningAttempt::query()->firstOrCreate([
                 'user_id' => auth()->id(),
                 'test_id' => $test->id,
-            ], [
-                'status'          => 'in_progress',
-                'current_section' => 1,
             ]);
+            if ($attempt->wasRecentlyCreated) {
+                $attempt->update([
+                    'status'          => 'in_progress',
+                    'current_section' => 1,
+                ]);
+            }
 
             return redirect()->route('user.listening.show', $attempt->id);
         }
 
         if ($request->module === 'reading') {
-            $attempt = \App\Models\ReadingAttempt::firstOrCreate(
-                ['user_id' => auth()->id(), 'test_id' => $test->id],
-                ['status' => 'in_progress']
+            /** @var \App\Models\ReadingAttempt $attempt */
+            $attempt = \App\Models\ReadingAttempt::query()->firstOrCreate(
+                ['user_id' => auth()->id(), 'test_id' => $test->id]
             );
+            if ($attempt->wasRecentlyCreated) {
+                $attempt->update(['status' => 'in_progress']);
+            }
             return redirect()->route('user.reading.show', $attempt->id);
         }
 

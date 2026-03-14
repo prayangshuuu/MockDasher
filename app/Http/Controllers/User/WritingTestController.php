@@ -9,7 +9,7 @@ class WritingTestController extends Controller
 {
     public function show(\App\Models\TestAttempt $attempt)
     {
-        if ($attempt->user_id !== auth()->id()) {
+        if ((int) $attempt->user_id !== (int) auth()->id()) {
             abort(403, 'Unauthorized access.');
         }
 
@@ -28,7 +28,7 @@ class WritingTestController extends Controller
         $totalSeconds = 60 * 60; // 60 minutes
         $remainingSeconds = max(0, $totalSeconds - $elapsedSeconds);
 
-        if ($remainingSeconds === 0) {
+        if ($remainingSeconds <= 0) {
             return $this->forceSubmit($attempt);
         }
 
@@ -40,7 +40,7 @@ class WritingTestController extends Controller
 
     public function autosave(Request $request, \App\Models\TestAttempt $attempt)
     {
-        if ($attempt->user_id !== auth()->id() || $attempt->status === 'completed') {
+        if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->status === 'completed') {
             return response()->json(['error' => 'Unauthorized or completed'], 403);
         }
 
@@ -65,7 +65,7 @@ class WritingTestController extends Controller
 
     public function submit(Request $request, \App\Models\TestAttempt $attempt)
     {
-        if ($attempt->user_id !== auth()->id() || $attempt->status === 'completed') {
+        if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->status === 'completed') {
             abort(403);
         }
 
