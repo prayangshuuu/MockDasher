@@ -44,8 +44,9 @@ class ReadingTestController extends Controller
         }
 
         // Saved answers keyed by question_id
-        $savedAnswers = $attempt->answers()->pluck('answer_text', 'question_id')->toArray();
-        $flaggedAnswers = $attempt->answers()->where('is_flagged', true)->pluck('is_flagged', 'question_id')->toArray();
+        $answers = $attempt->answers;
+        $savedAnswers = $answers->pluck('answer_text', 'question_id')->toArray();
+        $flaggedAnswers = $answers->filter(fn($a) => $a->is_flagged)->pluck('is_flagged', 'question_id')->toArray();
 
         return view('user.reading-test.show', compact(
             'attempt', 'test', 'passages', 'savedAnswers', 'flaggedAnswers', 'remainingSeconds'
