@@ -37,6 +37,7 @@ class ListeningTestController extends Controller
 
         // Get saved answers keyed by question_id
         $savedAnswers = $attempt->answers()->pluck('answer_text', 'question_id')->toArray();
+        $flaggedAnswers = $attempt->answers()->where('is_flagged', true)->pluck('is_flagged', 'question_id')->toArray();
 
         // If in transfer mode, calculate transfer remaining time
         $transferRemainingSeconds = null;
@@ -49,7 +50,7 @@ class ListeningTestController extends Controller
         }
 
         return view('user.listening-test.show', compact(
-            'attempt', 'test', 'sections', 'savedAnswers', 'transferRemainingSeconds'
+            'attempt', 'test', 'sections', 'savedAnswers', 'flaggedAnswers', 'transferRemainingSeconds'
         ));
     }
 
@@ -63,6 +64,7 @@ class ListeningTestController extends Controller
         }
 
         $answers = $request->input('answers', []);
+        $flagged = $request->input('flagged', []);
 
         foreach ($answers as $questionId => $answerText) {
             ListeningAnswer::updateOrCreate(
@@ -73,8 +75,24 @@ class ListeningTestController extends Controller
                 ],
                 [
                     'answer_text' => $answerText,
+                    'is_flagged'  => !empty($flagged[$questionId])
                 ]
             );
+        }
+
+        foreach ($flagged as $questionId => $isFlagged) {
+            if (!array_key_exists($questionId, $answers)) {
+                ListeningAnswer::updateOrCreate(
+                    [
+                        'user_id'          => auth()->id(),
+                        'test_attempt_id'  => $attempt->id,
+                        'question_id'      => $questionId,
+                    ],
+                    [
+                        'is_flagged'  => (bool) $isFlagged
+                    ]
+                );
+            }
         }
 
         return response()->json(['success' => true, 'saved_at' => now()->toTimeString()]);
@@ -122,6 +140,7 @@ class ListeningTestController extends Controller
 
         // Save any final answers passed in payload
         $answers = $request->input('answers', []);
+        $flagged = $request->input('flagged', []);
         foreach ($answers as $questionId => $answerText) {
             ListeningAnswer::updateOrCreate(
                 [
@@ -129,8 +148,26 @@ class ListeningTestController extends Controller
                     'test_attempt_id' => $attempt->id,
                     'question_id'     => $questionId,
                 ],
-                ['answer_text' => $answerText]
+                [
+                    'answer_text' => $answerText,
+                    'is_flagged'  => !empty($flagged[$questionId])
+                ]
             );
+        }
+        
+        foreach ($flagged as $questionId => $isFlagged) {
+            if (!array_key_exists($questionId, $answers)) {
+                ListeningAnswer::updateOrCreate(
+                    [
+                        'user_id'          => auth()->id(),
+                        'test_attempt_id'  => $attempt->id,
+                        'question_id'      => $questionId,
+                    ],
+                    [
+                        'is_flagged'  => (bool) $isFlagged
+                    ]
+                );
+            }
         }
 
         $attempt->update([

@@ -45,9 +45,10 @@ class ReadingTestController extends Controller
 
         // Saved answers keyed by question_id
         $savedAnswers = $attempt->answers()->pluck('answer_text', 'question_id')->toArray();
+        $flaggedAnswers = $attempt->answers()->where('is_flagged', true)->pluck('is_flagged', 'question_id')->toArray();
 
         return view('user.reading-test.show', compact(
-            'attempt', 'test', 'passages', 'savedAnswers', 'remainingSeconds'
+            'attempt', 'test', 'passages', 'savedAnswers', 'flaggedAnswers', 'remainingSeconds'
         ));
     }
 
@@ -57,6 +58,8 @@ class ReadingTestController extends Controller
             return response()->json(['error' => 'Unauthorized or completed'], 403);
         }
 
+        $flagged = $request->input('flagged', []);
+
         foreach ($request->input('answers', []) as $questionId => $answerText) {
             ReadingAnswer::updateOrCreate(
                 [
@@ -64,8 +67,26 @@ class ReadingTestController extends Controller
                     'test_attempt_id' => $attempt->id,
                     'question_id'    => $questionId,
                 ],
-                ['answer_text' => $answerText]
+                [
+                    'answer_text' => $answerText,
+                    'is_flagged'  => !empty($flagged[$questionId])
+                ]
             );
+        }
+
+        foreach ($flagged as $questionId => $isFlagged) {
+            if (!array_key_exists($questionId, $request->input('answers', []))) {
+                ReadingAnswer::updateOrCreate(
+                    [
+                        'user_id'        => auth()->id(),
+                        'test_attempt_id' => $attempt->id,
+                        'question_id'    => $questionId,
+                    ],
+                    [
+                        'is_flagged'  => (bool) $isFlagged
+                    ]
+                );
+            }
         }
 
         return response()->json(['success' => true, 'saved_at' => now()->toTimeString()]);
@@ -77,6 +98,8 @@ class ReadingTestController extends Controller
             abort(403);
         }
 
+        $flagged = $request->input('flagged', []);
+
         foreach ($request->input('answers', []) as $questionId => $answerText) {
             ReadingAnswer::updateOrCreate(
                 [
@@ -84,8 +107,26 @@ class ReadingTestController extends Controller
                     'test_attempt_id' => $attempt->id,
                     'question_id'     => $questionId,
                 ],
-                ['answer_text' => $answerText]
+                [
+                    'answer_text' => $answerText,
+                    'is_flagged'  => !empty($flagged[$questionId])
+                ]
             );
+        }
+
+        foreach ($flagged as $questionId => $isFlagged) {
+            if (!array_key_exists($questionId, $request->input('answers', []))) {
+                ReadingAnswer::updateOrCreate(
+                    [
+                        'user_id'        => auth()->id(),
+                        'test_attempt_id' => $attempt->id,
+                        'question_id'    => $questionId,
+                    ],
+                    [
+                        'is_flagged'  => (bool) $isFlagged
+                    ]
+                );
+            }
         }
 
         $attempt->update(['status' => 'completed', 'completed_at' => now()]);
