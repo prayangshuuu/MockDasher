@@ -1,97 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-[var(--color-dwimik-bg)] font-sans antialiased text-[var(--color-dwimik-text)]">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Admin Dashboard') - MockDasher</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <!-- FontAwesome for icons -->
+    <title>@yield('title', 'Admin Dashboard') - MockDasher</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-dwimik-bg text-dwimik-text font-sans antialiased overflow-hidden">
-    <!-- Navbar -->
-    <nav class="bg-dwimik-primary text-white shadow-sm fixed w-full z-10 top-0 h-16">
-        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <span class="text-2xl font-bold tracking-wider">MockDasher CMS</span>
+<body class="h-full overflow-hidden flex flex-col">
+
+    <!-- Top Navbar -->
+    <nav class="bg-white border-b border-[var(--color-dwimik-divider)] shadow-sm h-16 flex items-center justify-between px-6 z-20 shrink-0 relative">
+        <div class="flex items-center gap-3">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded shrink-0 bg-[var(--color-dwimik-primary)] flex items-center justify-center text-white font-bold text-lg">M</div>
+                <span class="font-bold text-xl tracking-tight hidden sm:block">MockDasher <span class="text-sm font-normal text-gray-500 ml-2">CMS</span></span>
+            </a>
+        </div>
+        
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-3">
+                <div class="h-8 w-8 rounded-full bg-blue-50 border border-[var(--color-dwimik-divider)] flex items-center justify-center text-sm font-bold text-[var(--color-dwimik-primary)]">
+                    {{ substr(auth()->user()->name ?? 'A', 0, 1) }}
                 </div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-sm font-medium">{{ auth()->user()->name ?? 'Admin' }}</span>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="bg-transparent border border-white hover:bg-white hover:text-dwimik-primary text-white px-3 py-1.5 rounded-dwimik text-sm font-medium transition duration-150">
-                            <i class="fas fa-sign-out-alt mr-1"></i> Logout
-                        </button>
-                    </form>
-                </div>
+                <span class="text-sm font-medium hidden sm:block">{{ auth()->user()->name ?? 'Admin' }}</span>
             </div>
+            
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="text-sm font-medium text-[var(--color-dwimik-error)] hover:opacity-80 transition-opacity">
+                    <i class="fas fa-sign-out-alt mr-1"></i> Logout
+                </button>
+            </form>
         </div>
     </nav>
 
-    <!-- Sidebar & Content -->
-    <div class="flex h-screen pt-16">
+    <div class="flex flex-1 overflow-hidden">
         <!-- Sidebar -->
-        <aside class="w-64 bg-white flex-shrink-0 h-full overflow-y-auto border-r border-dwimik-divider">
-            <div class="py-6 px-4">
-                <nav class="space-y-1">
-                    <a href="{{ route('admin.dashboard') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-dwimik {{ request()->routeIs('admin.dashboard') ? 'bg-dwimik-primary text-white' : 'text-dwimik-text hover:bg-dwimik-bg hover:text-dwimik-primary' }} transition">
-                        <i class="fas fa-home w-6 text-center mr-2 {{ request()->routeIs('admin.dashboard') ? 'text-white' : 'text-gray-400 group-hover:text-dwimik-primary' }}"></i>
-                        Dashboard
-                    </a>
+        <aside class="w-64 bg-white border-r border-[var(--color-dwimik-divider)] flex-shrink-0 flex flex-col overflow-y-auto z-10 hidden md:flex">
+            <nav class="flex-1 px-4 py-6 space-y-2">
+                @php
+                    $navItems = [
+                        ['route' => 'admin.dashboard', 'icon' => 'fa-home', 'label' => 'Dashboard', 'pattern' => 'admin.dashboard'],
+                        ['route' => 'admin.tests.index', 'icon' => 'fa-file-alt', 'label' => 'Tests', 'pattern' => 'admin.tests.*'],
+                        ['route' => 'admin.users.index', 'icon' => 'fa-users', 'label' => 'Users', 'pattern' => 'admin.users.*'],
+                        ['route' => 'admin.results.index', 'icon' => 'fa-chart-bar', 'label' => 'Results', 'pattern' => 'admin.results.*'],
+                    ];
+                @endphp
 
-                    <a href="{{ route('admin.tests.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-dwimik {{ request()->routeIs('admin.tests.*') ? 'bg-dwimik-primary text-white' : 'text-dwimik-text hover:bg-dwimik-bg hover:text-dwimik-primary' }} transition">
-                        <i class="fas fa-file-alt w-6 text-center mr-2 {{ request()->routeIs('admin.tests.*') ? 'text-white' : 'text-gray-400 group-hover:text-dwimik-primary' }}"></i>
-                        Tests
+                @foreach($navItems as $item)
+                    <a href="{{ route($item['route']) }}" class="flex items-center px-4 py-3 rounded-[var(--radius-dwimik)] text-sm font-medium transition-colors {{ request()->routeIs($item['pattern']) ? 'bg-[var(--color-dwimik-primary)] text-white shadow-sm' : 'text-[var(--color-dwimik-text)] hover:bg-[#F9F8F6]' }}">
+                        <i class="fas {{ $item['icon'] }} w-5 mr-3 {{ request()->routeIs($item['pattern']) ? 'text-white' : 'text-gray-400' }}"></i>
+                        {{ $item['label'] }}
                     </a>
-                    
-                    <div class="pt-4 pb-2">
-                        <span class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Modules Management</span>
-                    </div>
-
-                    <a href="{{ route('admin.tests.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-dwimik text-dwimik-text hover:bg-dwimik-bg hover:text-dwimik-primary transition">
-                        <i class="fas fa-pen-nib w-6 text-center mr-2 text-gray-400 group-hover:text-dwimik-primary"></i>
-                        Writing Tasks
-                    </a>
-                    <a href="{{ route('admin.tests.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-dwimik text-dwimik-text hover:bg-dwimik-bg hover:text-dwimik-primary transition">
-                        <i class="fas fa-microphone w-6 text-center mr-2 text-gray-400 group-hover:text-dwimik-primary"></i>
-                        Speaking Module
-                    </a>
-                    <a href="{{ route('admin.tests.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-dwimik text-dwimik-text hover:bg-dwimik-bg hover:text-dwimik-primary transition">
-                        <i class="fas fa-headphones w-6 text-center mr-2 text-gray-400 group-hover:text-dwimik-primary"></i>
-                        Listening Module
-                    </a>
-                    <a href="{{ route('admin.tests.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-dwimik text-dwimik-text hover:bg-dwimik-bg hover:text-dwimik-primary transition">
-                        <i class="fas fa-book-open w-6 text-center mr-2 text-gray-400 group-hover:text-dwimik-primary"></i>
-                        Reading Module
-                    </a>
-
-                    <div class="pt-4 pb-2">
-                        <span class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">System</span>
-                    </div>
-
-                    <a href="{{ route('admin.users.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-dwimik {{ request()->routeIs('admin.users.*') ? 'bg-dwimik-primary text-white' : 'text-dwimik-text hover:bg-dwimik-bg hover:text-dwimik-primary' }} transition">
-                        <i class="fas fa-users w-6 text-center mr-2 {{ request()->routeIs('admin.users.*') ? 'text-white' : 'text-gray-400 group-hover:text-dwimik-primary' }}"></i>
-                        Users
-                    </a>
-                    <a href="{{ route('admin.results.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-dwimik {{ request()->routeIs('admin.results.*') ? 'bg-dwimik-primary text-white' : 'text-dwimik-text hover:bg-dwimik-bg hover:text-dwimik-primary' }} transition">
-                        <i class="fas fa-chart-bar w-6 text-center mr-2 {{ request()->routeIs('admin.results.*') ? 'text-white' : 'text-gray-400 group-hover:text-dwimik-primary' }}"></i>
-                        Results
-                    </a>
-                </nav>
-            </div>
+                @endforeach
+            </nav>
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto bg-dwimik-bg pb-20">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main class="flex-1 overflow-y-auto bg-[var(--color-dwimik-bg)] p-4 md:p-8">
+            <div class="max-w-7xl mx-auto w-full">
                 <!-- Header -->
-                <div class="mb-6 flex justify-between items-center border-b border-dwimik-divider pb-4">
+                <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                     <div>
-                        <h1 class="text-3xl font-bold text-dwimik-text">@yield('header', 'Dashboard')</h1>
+                        <h1 class="text-[var(--text-dwimik-h2)] font-bold tracking-tight text-[var(--color-dwimik-text)]">@yield('header', 'Dashboard')</h1>
                         @if(View::hasSection('subheader'))
-                            <p class="mt-1 text-sm text-gray-500">@yield('subheader')</p>
+                            <p class="mt-2 text-sm text-gray-500">@yield('subheader')</p>
                         @endif
                     </div>
                     <div>
@@ -99,34 +74,26 @@
                     </div>
                 </div>
 
-                <!-- Alerts -->
+                <!-- Global Flash Messages -->
                 @if(session('success'))
-                    <div id="admin-flash-success" class="bg-green-50 border-l-4 border-green-400 p-4 mb-6 rounded shadow-sm flex items-center justify-between transition-all duration-500 ease-in-out">
-                        <div class="flex items-center">
-                            <i class="fas fa-check-circle text-green-400 text-xl mr-3"></i>
-                            <p class="text-green-700 text-sm font-medium">{{ session('success') }}</p>
+                    <x-alert variant="success" class="mb-6 flex justify-between items-center" id="admin-flash-success">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-check-circle"></i>
+                            <span>{{ session('success') }}</span>
                         </div>
-                        <button onclick="this.parentElement.style.opacity='0';setTimeout(()=>this.parentElement.remove(),500)" class="text-green-400 hover:text-green-600 ml-4">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
+                    </x-alert>
                 @endif
                 @if(session('error'))
-                    <div id="admin-flash-error" class="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded shadow-sm flex items-center justify-between transition-all duration-500 ease-in-out">
-                        <div class="flex items-center">
-                            <i class="fas fa-exclamation-circle text-red-400 text-xl mr-3"></i>
-                            <p class="text-red-700 text-sm font-medium">{{ session('error') }}</p>
+                    <x-alert variant="error" class="mb-6 flex justify-between items-center" id="admin-flash-error">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>{{ session('error') }}</span>
                         </div>
-                        <button onclick="this.parentElement.style.opacity='0';setTimeout(()=>this.parentElement.remove(),500)" class="text-red-400 hover:text-red-600 ml-4">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
+                    </x-alert>
                 @endif
 
                 <!-- Page Content -->
-                <div class="mt-4">
-                    @yield('content')
-                </div>
+                @yield('content')
             </div>
         </main>
     </div>
@@ -135,6 +102,7 @@
     <script>
         setTimeout(function() {
             document.querySelectorAll('#admin-flash-success, #admin-flash-error').forEach(function(el) {
+                el.style.transition = 'opacity 0.5s ease-out';
                 el.style.opacity = '0';
                 setTimeout(function() { el.remove(); }, 500);
             });

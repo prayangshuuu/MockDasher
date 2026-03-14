@@ -1,133 +1,111 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-gray-50">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-[var(--color-dwimik-bg)] font-sans antialiased text-[var(--color-dwimik-text)]">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
     <title>{{ config('app.name', 'MockDasher') }}</title>
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Build assets -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased h-full flex flex-col text-gray-900 selection:bg-blue-500 selection:text-white">
+<body class="h-full overflow-hidden flex flex-col">
 
-    <!-- Top Navigation -->
-    <nav class="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex">
-                    <!-- Logo -->
-                    <div class="shrink-0 flex items-center">
-                        <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
-                            <div class="w-8 h-8 bg-blue-600 text-white rounded flex items-center justify-center font-bold text-lg shadow-sm">
-                                M
-                            </div>
-                            <span class="font-bold text-xl tracking-tight text-gray-900 hidden sm:block">MockDasher</span>
-                        </a>
-                    </div>
-                    
-                    <!-- Primary Nav Links -->
-                    <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                        <a href="{{ route('dashboard') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('dashboard') ? 'border-blue-500 text-gray-900 font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm leading-5 transition">
-                            Dashboard
-                        </a>
-                        <a href="{{ route('user.history.index') }}" class="inline-flex items-center px-1 pt-1 border-b-2 {{ request()->routeIs('user.history.*') ? 'border-blue-500 text-gray-900 font-semibold' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }} text-sm leading-5 transition">
-                            My History
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Settings Dropdown / Profile -->
-                <div class="flex items-center space-x-4">
-                    <a href="{{ route('profile.show') }}" class="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-blue-600 transition">
-                        @if(auth()->user()->profile_photo_path)
-                            <img src="{{ Storage::url(auth()->user()->profile_photo_path) }}" alt="Profile" class="h-8 w-8 rounded-full object-cover border border-gray-200">
-                        @else
-                            <div class="h-8 w-8 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-xs">
-                                {{ substr(auth()->user()->name, 0, 1) }}
-                            </div>
-                        @endif
-                        <span class="hidden sm:block">{{ explode(' ', auth()->user()->name)[0] }}</span>
-                    </a>
-                    
-                    <form method="POST" action="{{ route('logout') }}" class="ml-2">
-                        @csrf
-                        <button type="submit" class="text-sm font-medium text-red-600 hover:text-red-800 transition">Log Out</button>
-                    </form>
-                </div>
-            </div>
+    <!-- Top Navbar -->
+    <nav class="bg-white border-b border-[var(--color-dwimik-divider)] shadow-sm h-16 flex items-center justify-between px-6 z-20 shrink-0 relative">
+        <div class="flex items-center gap-3">
+            <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded shrink-0 bg-[var(--color-dwimik-primary)] flex items-center justify-center text-white font-bold text-lg">M</div>
+                <span class="font-bold text-xl tracking-tight hidden sm:block">MockDasher</span>
+            </a>
         </div>
         
-        <!-- Mobile Nav Menu (Simplified) -->
-        <div class="sm:hidden flex justify-around border-t border-gray-100 bg-gray-50 py-2">
-            <a href="{{ route('dashboard') }}" class="text-gray-600 font-medium text-sm {{ request()->routeIs('dashboard') ? 'text-blue-600' : '' }}">Home</a>
-            <a href="{{ route('user.history.index') }}" class="text-gray-600 font-medium text-sm {{ request()->routeIs('user.history.*') ? 'text-blue-600' : '' }}">History</a>
-            <a href="{{ route('profile.show') }}" class="text-gray-600 font-medium text-sm {{ request()->routeIs('profile.show') ? 'text-blue-600' : '' }}">Profile</a>
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-3">
+                @if(auth()->check() && auth()->user()->profile_photo_path)
+                    <img src="{{ Storage::url(auth()->user()->profile_photo_path) }}" alt="Profile" class="h-8 w-8 rounded-full object-cover border border-[var(--color-dwimik-divider)]">
+                @else
+                    <div class="h-8 w-8 rounded-full bg-blue-50 border border-[var(--color-dwimik-divider)] flex items-center justify-center text-sm font-bold text-[var(--color-dwimik-primary)]">
+                        {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                    </div>
+                @endif
+                <a href="{{ route('profile.show') }}" class="text-sm font-medium hidden sm:block hover:text-[var(--color-dwimik-primary)] transition-colors">{{ auth()->user()->name ?? 'Profile' }}</a>
+            </div>
+            
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="text-sm font-medium text-[var(--color-dwimik-error)] hover:opacity-80 transition-opacity">
+                    <i class="fas fa-sign-out-alt mr-1"></i> Logout
+                </button>
+            </form>
         </div>
     </nav>
 
-    <!-- Global Flash Messages -->
-    @if(session('success') || session('error'))
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-        @if(session('success'))
-            <div id="flash-success" class="bg-green-100 border border-green-200 text-green-700 px-4 py-3 rounded shadow-sm flex items-center justify-between transition-all duration-500 ease-in-out">
-                <div class="flex items-center">
-                    <i class="fas fa-check-circle mr-2"></i> {{ session('success') }}
-                </div>
-                <button onclick="this.parentElement.style.opacity='0';setTimeout(()=>this.parentElement.remove(),500)" class="text-green-500 hover:text-green-700 ml-4">
-                    <i class="fas fa-times"></i>
-                </button>
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r border-[var(--color-dwimik-divider)] flex-shrink-0 flex flex-col overflow-y-auto z-10 hidden md:flex">
+            <nav class="flex-1 px-4 py-6 space-y-2">
+                @php
+                    $navItems = [
+                        ['route' => 'dashboard', 'icon' => 'fa-home', 'label' => 'Dashboard', 'pattern' => 'dashboard'],
+                        ['route' => 'user.history.index', 'icon' => 'fa-history', 'label' => 'History & Results', 'pattern' => 'user.history.*'],
+                        ['route' => 'profile.show', 'icon' => 'fa-cog', 'label' => 'Settings', 'pattern' => 'profile.show'],
+                    ];
+                @endphp
+
+                @foreach($navItems as $item)
+                    <a href="{{ route($item['route']) }}" class="flex items-center px-4 py-3 rounded-[var(--radius-dwimik)] text-sm font-medium transition-colors {{ request()->routeIs($item['pattern']) ? 'bg-[var(--color-dwimik-primary)] text-white shadow-sm' : 'text-[var(--color-dwimik-text)] hover:bg-[#F9F8F6]' }}">
+                        <i class="fas {{ $item['icon'] }} w-5 mr-3 {{ request()->routeIs($item['pattern']) ? 'text-white' : 'text-gray-400' }}"></i>
+                        {{ $item['label'] }}
+                    </a>
+                @endforeach
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto bg-[var(--color-dwimik-bg)] p-4 md:p-8">
+            <div class="max-w-7xl mx-auto w-full">
+                <!-- Global Flash Messages -->
+                @if(session('success'))
+                    <x-alert variant="success" class="mb-6 flex justify-between items-center" id="user-flash-success">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-check-circle"></i>
+                            <span>{{ session('success') }}</span>
+                        </div>
+                    </x-alert>
+                @endif
+                @if(session('error'))
+                    <x-alert variant="error" class="mb-6 flex justify-between items-center" id="user-flash-error">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>{{ session('error') }}</span>
+                        </div>
+                    </x-alert>
+                @endif
+
+                <!-- Page Content -->
+                @yield('content')
             </div>
-        @endif
-        @if(session('error'))
-            <div id="flash-error" class="bg-red-100 border border-red-200 text-red-700 px-4 py-3 rounded shadow-sm flex items-center justify-between transition-all duration-500 ease-in-out">
-                <div class="flex items-center">
-                    <i class="fas fa-exclamation-circle mr-2"></i> {{ session('error') }}
+            
+            <!-- Simple Footer -->
+            <footer class="mt-12 py-6 border-t border-[var(--color-dwimik-divider)] text-xs text-gray-500 flex justify-between items-center max-w-7xl mx-auto px-4 md:px-0">
+                <div>&copy; {{ date('Y') }} MockDasher.</div>
+                <div class="flex gap-4">
+                    <a href="#" class="hover:text-[var(--color-dwimik-primary)] transition-colors">Terms</a>
+                    <a href="#" class="hover:text-[var(--color-dwimik-primary)] transition-colors">Privacy</a>
                 </div>
-                <button onclick="this.parentElement.style.opacity='0';setTimeout(()=>this.parentElement.remove(),500)" class="text-red-500 hover:text-red-700 ml-4">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        @endif
+            </footer>
+        </main>
     </div>
+
+    @stack('scripts')
     <script>
         setTimeout(function() {
-            document.querySelectorAll('#flash-success, #flash-error').forEach(function(el) {
+            document.querySelectorAll('#user-flash-success, #user-flash-error').forEach(function(el) {
+                el.style.transition = 'opacity 0.5s ease-out';
                 el.style.opacity = '0';
                 setTimeout(function() { el.remove(); }, 500);
             });
         }, 4000);
     </script>
-    @endif
-
-    <!-- Page Content -->
-    <main class="flex-grow">
-        @yield('content')
-    </main>
-
-    <!-- Simple Footer -->
-    <footer class="bg-white border-t border-gray-200 py-6 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
-            <div class="mb-4 md:mb-0">
-                <span class="font-bold text-gray-700 flex items-center gap-1">
-                    <span class="text-blue-600">Mock</span>Dasher
-                </span>
-                <span class="ml-2">&copy; {{ date('Y') }} All rights reserved.</span>
-            </div>
-            <div class="flex space-x-4">
-                <a href="#" class="hover:text-blue-600 transition">Terms</a>
-                <a href="#" class="hover:text-blue-600 transition">Privacy</a>
-                <a href="mailto:support@mockdasher.test" class="hover:text-blue-600 transition">Support</a>
-            </div>
-        </div>
-    </footer>
-
-    @stack('scripts')
 </body>
 </html>

@@ -1,136 +1,132 @@
 @extends('layouts.app')
 
+@section('title', 'User Dashboard')
+@section('header', 'Welcome back, ' . explode(' ', auth()->user()->name ?? 'User')[0] . '!')
+
 @section('content')
-<div class="py-12 bg-gray-50 min-h-screen">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
-        
-        <!-- Header & Profile Card -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-6 md:flex md:items-center md:justify-between bg-gradient-to-r from-blue-600 to-indigo-700">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 relative">
-                        @if(auth()->user()->profile_photo_path)
-                            <img src="{{ Storage::url(auth()->user()->profile_photo_path) }}" alt="Profile Photo" class="h-20 w-20 rounded-full object-cover border-4 border-white shadow-md">
-                        @else
-                            <div class="h-20 w-20 rounded-full bg-white flex items-center justify-center text-blue-600 font-bold text-3xl border-4 border-white shadow-md shadow-inner">
-                                {{ substr(auth()->user()->name, 0, 1) }}
-                            </div>
-                        @endif
-                    </div>
-                    <div class="ml-6 text-white">
-                        <h2 class="text-2xl font-bold">Welcome back, {{ explode(' ', auth()->user()->name)[0] }}!</h2>
-                        <p class="mt-1 text-blue-100 font-medium opacity-90">Ready to crush your {{ auth()->user()->exam_type ?? 'IELTS' }} goals?</p>
-                    </div>
+<div class="space-y-8">
+    
+    <!-- Header Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <x-card>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-[var(--color-dwimik-text)] opacity-70 mb-1 tracking-wide uppercase">Target Score</p>
+                    <p class="text-[var(--text-dwimik-h3)] font-bold text-[var(--color-dwimik-text)]">{{ auth()->user()->target_band_score ?? 'Not Set' }}</p>
                 </div>
-                <div class="mt-6 md:mt-0 flex gap-3">
-                    <a href="{{ route('profile.show') }}" class="inline-flex items-center px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-md text-sm font-medium text-white transition-colors shadow-sm backdrop-blur-sm">
-                        <i class="fas fa-user-edit mr-2"></i> Edit Profile
-                    </a>
+                <div class="w-12 h-12 bg-blue-50 text-[var(--color-dwimik-primary)] rounded-full flex items-center justify-center text-xl">
+                    <i class="fas fa-bullseye"></i>
                 </div>
             </div>
+        </x-card>
+
+        <x-card>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-[var(--color-dwimik-text)] opacity-70 mb-1 tracking-wide uppercase">Tests Taken</p>
+                    <p class="text-[var(--text-dwimik-h3)] font-bold text-[var(--color-dwimik-text)]">{{ $testsTakenCount ?? collect($recentAttempts ?? [])->count() ?? 0 }}</p>
+                </div>
+                <div class="w-12 h-12 bg-green-50 text-[var(--color-dwimik-success)] rounded-full flex items-center justify-center text-xl">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+            </div>
+        </x-card>
+
+        <x-card>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-[var(--color-dwimik-text)] opacity-70 mb-1 tracking-wide uppercase">Exam Type</p>
+                    <p class="text-[var(--text-dwimik-h3)] font-bold text-[var(--color-dwimik-text)]">{{ auth()->user()->exam_type ?? 'IELTS Academic' }}</p>
+                </div>
+                <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center text-xl">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+            </div>
+        </x-card>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content: Tests -->
+        <div class="lg:col-span-2 space-y-6">
+            <h3 class="text-xl font-bold text-[var(--color-dwimik-text)] tracking-tight">Available Mock Tests</h3>
             
-            <div class="grid grid-cols-2 md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-gray-100 bg-white">
-                <div class="p-4 text-center">
-                    <span class="block text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Target Score</span>
-                    <span class="text-xl font-bold text-gray-900">{{ auth()->user()->target_band_score ?? 'Not Set' }}</span>
-                </div>
-                <div class="p-4 text-center">
-                    <span class="block text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Tests Taken</span>
-                    <span class="text-xl font-bold text-gray-900">{{ $testsTakenCount }}</span>
-                </div>
-                <div class="p-4 text-center">
-                    <span class="block text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Exam Type</span>
-                    <span class="text-xl font-bold text-gray-900">{{ auth()->user()->exam_type ?? 'Any' }}</span>
-                </div>
-                <div class="p-4 flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition duration-150 cursor-pointer text-blue-600 rounded-br-lg md:rounded-tr-none">
-                    <a href="{{ route('user.history.index') }}" class="font-semibold text-sm w-full h-full flex items-center justify-center">
-                        View History <i class="fas fa-arrow-right ml-2 text-xs"></i>
-                    </a>
-                </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                @forelse($tests as $test)
+                    <x-card class="hover:border-[var(--color-dwimik-primary)] transition-colors h-full flex flex-col">
+                        <div class="flex-grow">
+                            <h5 class="font-bold text-lg text-[var(--color-dwimik-text)] mb-2 group-hover:text-[var(--color-dwimik-primary)] transition">{{ $test->title ?? 'IELTS Practice Test' }}</h5>
+                            <p class="text-sm text-gray-500 mb-6 font-medium">Reading, Writing, Listening, Speaking</p>
+                        </div>
+                        <form action="{{ route('user.tests.start', $test->id) }}" method="POST" class="mt-auto pt-4 border-t border-[var(--color-dwimik-divider)]">
+                            @csrf
+                            <x-button variant="primary" type="submit" class="w-full">Start Preparation</x-button>
+                        </form>
+                    </x-card>
+                @empty
+                    <div class="col-span-full">
+                        <x-card class="text-center py-12">
+                            <div class="flex flex-col items-center justify-center text-gray-500">
+                                <i class="fas fa-file-alt text-4xl text-[var(--color-dwimik-divider)] mb-4"></i>
+                                <h4 class="text-lg font-bold text-[var(--color-dwimik-text)]">No Content Available</h4>
+                                <p class="text-sm mt-2">Check back later for new IELTS mock exams.</p>
+                            </div>
+                        </x-card>
+                    </div>
+                @endforelse
             </div>
         </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <!-- Main Content: Tests -->
-            <div class="lg:col-span-2 space-y-6">
-                <div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Available Mock Tests</h3>
-                    
-                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 mb-6 overflow-hidden">
-                        <div class="p-6">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                @forelse($tests as $test)
-                                    <div class="border border-gray-200 rounded p-4 hover:border-blue-400 hover:shadow-sm transition group">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <h5 class="font-semibold text-gray-900 group-hover:text-blue-600 transition">{{ $test->title }}</h5>
-                                        </div>
-                                        <p class="text-xs text-gray-500 mb-4 text-left">4 Modules &bull; Reading, Writing, Listening, Speaking</p>
-                                        
-                                        <form action="{{ route('user.tests.start', $test->id) }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="w-full text-center bg-gray-50 hover:bg-blue-600 text-gray-700 hover:text-white border border-gray-200 hover:border-blue-600 font-medium py-2 px-4 rounded text-sm transition">
-                                                Start Preparation
-                                            </button>
-                                        </form>
-                                    </div>
-                                @empty
-                                    <div class="col-span-full text-center py-12 text-sm text-gray-500 bg-gray-50 rounded">
-                                        <i class="fas fa-books text-gray-300 text-5xl mb-4"></i>
-                                        <h4 class="text-lg font-medium text-gray-900">No Content Available</h4>
-                                        <p class="text-sm text-gray-500 mt-2">Check back later for new IELTS mock exams.</p>
-                                    </div>
-                                @endforelse
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="space-y-6">
+        
+        <!-- Sidebar Content -->
+        <div class="space-y-6">
+            <!-- Recent Activity -->
+            <x-card class="p-0 overflow-hidden" style="padding: 0;">
+                <x-slot name="header">
+                    <h3 class="text-lg font-bold text-[var(--color-dwimik-text)]">Recent Activity</h3>
+                </x-slot>
                 
-                <!-- Recent Activity -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">Recent Activity</h3>
-                    @if($recentAttempts->isEmpty())
-                        <div class="text-center py-6">
-                            <i class="fas fa-history text-gray-300 text-3xl mb-3"></i>
+                <div class="p-6">
+                    @if(empty($recentAttempts) || $recentAttempts->isEmpty())
+                        <div class="text-center py-4">
+                            <i class="fas fa-history text-[var(--color-dwimik-divider)] text-3xl mb-3"></i>
                             <p class="text-sm text-gray-500">You haven't taken any tests yet.</p>
                         </div>
                     @else
-                        <ul class="space-y-4">
+                        <ul class="space-y-6">
                             @foreach($recentAttempts as $attempt)
                                 <li class="flex items-start">
                                     <div class="flex-shrink-0 mt-1">
                                         @if($attempt->status == 'completed')
-                                            <i class="fas fa-check-circle text-green-500"></i>
+                                            <i class="fas fa-check-circle text-[var(--color-dwimik-success)] text-lg"></i>
                                         @else
-                                            <i class="fas fa-clock text-yellow-500"></i>
+                                            <i class="fas fa-clock text-yellow-500 text-lg"></i>
                                         @endif
                                     </div>
-                                    <div class="ml-3">
-                                        <p class="text-sm font-medium text-gray-900">{{ $attempt->test->title ?? 'Unknown Test' }}</p>
-                                        <p class="text-xs text-gray-500">{{ $attempt->created_at->diffForHumans() }} &bull; Band: {{ $attempt->overall_band ?? '-' }}</p>
+                                    <div class="ml-4">
+                                        <p class="text-sm font-bold text-[var(--color-dwimik-text)]">{{ $attempt->test->title ?? 'Practice Test' }}</p>
+                                        <p class="text-xs text-gray-500 mt-1">{{ $attempt->created_at->diffForHumans() }} &bull; Band: {{ $attempt->overall_band ?? '-' }}</p>
                                     </div>
                                 </li>
                             @endforeach
                         </ul>
-                        <div class="mt-4 pt-4 border-t border-gray-100 text-center">
-                            <a href="{{ route('user.history.index') }}" class="text-sm font-medium text-blue-600 hover:text-blue-800">View All History</a>
-                        </div>
                     @endif
                 </div>
+                
+                <x-slot name="footer">
+                    <div class="text-center">
+                        <a href="{{ route('user.history.index') }}" class="text-sm font-medium text-[var(--color-dwimik-primary)] hover:underline">View All History</a>
+                    </div>
+                </x-slot>
+            </x-card>
 
-                <!-- Quick Tips -->
-                <div class="bg-blue-50 rounded-lg shadow-sm border border-blue-100 p-6">
-                    <h3 class="text-lg font-bold text-blue-900 mb-3 flex items-center">
-                        <i class="far fa-lightbulb text-yellow-500 mr-2"></i> Prep Tip
-                    </h3>
-                    <p class="text-sm text-blue-800 mb-4">
-                        Consistent practice is key to a higher band score. Try to complete one full mock exam under timed conditions every week. Focus on your weakest module!
-                    </p>
-                </div>
+            <!-- Quick Tips -->
+            <div class="bg-blue-50 rounded-[var(--radius-dwimik)] border border-blue-100 p-6 shadow-sm">
+                <h3 class="text-sm font-bold text-[var(--color-dwimik-primary)] mb-3 flex items-center uppercase tracking-wide">
+                    <i class="far fa-lightbulb text-yellow-500 mr-2 text-lg"></i> Prep Tip
+                </h3>
+                <p class="text-sm text-[var(--color-dwimik-text)] leading-relaxed">
+                    Consistent practice is key to a higher band score. Try to complete one full mock exam under timed conditions every week. Focus on your weakest module!
+                </p>
             </div>
-            
         </div>
     </div>
 </div>
