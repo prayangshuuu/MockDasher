@@ -16,75 +16,74 @@
         #audio-progress-bar::-webkit-slider-thumb { cursor: default; }
         #audio-progress-bar::-moz-range-thumb   { cursor: default; }
 
-        /* Answered indicator */
-        .q-nav-btn.answered { background: #2563eb; color: white; border-color: #2563eb; }
-        .q-nav-btn.active   { ring: 2px; ring-color: #2563eb; outline: 2px solid #2563eb; }
+        /* Scrollbars */
+        .scroll-panel::-webkit-scrollbar       { width: 7px; }
+        .scroll-panel::-webkit-scrollbar-track { background: #f1f5f9; }
+        .scroll-panel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
-        /* Section lock overlay */
-        .locked-overlay { background: rgba(15,23,42,0.65); backdrop-filter: blur(4px); }
-
-        /* Fade in animation */
-        @keyframes fadeSlideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
-        .fade-in { animation: fadeSlideIn 0.35s ease-out both; }
+        /* Answer-sheet buttons */
+        .ans-btn            { transition: all .15s; position: relative; }
+        .ans-btn.answered   { background: #3b82f6; color: white; border-color: #3b82f6; } 
+        .ans-btn.active-q   { background: #2563eb; color: white; border-color: #1d4ed8; outline: 2px solid #60a5fa; outline-offset: 2px; }
+        
+        /* Flag indicator on button */
+        .ans-btn .flag-icon { position: absolute; top: -4px; right: -4px; color: #ef4444; font-size: 10px; display: none; background: white; border-radius: 50%; width: 12px; height: 12px; line-height: 12px; text-align: center; box-shadow: 0 0 2px rgba(0,0,0,0.3); }
+        .ans-btn.flagged .flag-icon { display: block; }
+        
+        .ans-btn.locked { opacity: 0.3; cursor: not-allowed; }
 
         /* Transfer mode pulse */
         @keyframes pulseBorder { 0%,100% { border-color: #f59e0b; } 50% { border-color: #d97706; } }
         .transfer-pulse { animation: pulseBorder 2s ease-in-out infinite; }
 
-        /* Question highlight */
-        .question-block.active-q { border-left: 3px solid #2563eb; background: #eff6ff; }
+        /* Active question highlight */
+        .question-block.active-q { border-left: 3px solid #3b82f6; background: #eff6ff; }
 
-        /* Scrollbar */
-        .questions-panel::-webkit-scrollbar { width: 6px; }
-        .questions-panel::-webkit-scrollbar-track { background: #f1f5f9; }
-        .questions-panel::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:3px; }
+        @keyframes fadeSlideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+        .fade-in { animation: fadeSlideIn 0.35s ease-out both; }
+        
+        /* Review overlay */
+        .review-overlay { background: rgba(15,23,42,0.85); backdrop-filter: blur(4px); }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen">
+<body class="bg-slate-100 min-h-screen overflow-hidden flex flex-col">
 
 {{-- ════════════════════════════════════════════════════
      TOP BAR – Timer & Test Info
 ════════════════════════════════════════════════════ --}}
-<div id="top-bar" class="sticky top-0 z-50 bg-slate-900 text-white shadow-lg">
-    <div class="flex items-center justify-between px-4 py-2">
-        {{-- Left: Logo + Test Name --}}
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center font-bold text-sm">MD</div>
-            <div>
-                <p class="text-xs text-slate-400 leading-tight">IELTS Listening</p>
-                <p class="text-sm font-semibold leading-tight truncate max-w-[200px]">{{ $test->title }}</p>
+<div id="top-bar" class="z-50 bg-slate-900 text-white shadow-lg h-14 flex items-center justify-between px-4 flex-shrink-0">
+
+    {{-- Left: Brand & Title --}}
+    <div class="flex items-center gap-3 w-1/3">
+        <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center font-bold text-sm">MD</div>
+        <div>
+            <p class="text-[10px] text-slate-400 leading-tight uppercase tracking-wider">IELTS Listening</p>
+            <span class="text-sm font-semibold truncate block max-w-[200px]">{{ $test->title }}</span>
+        </div>
+    </div>
+
+    {{-- Center: Timer & Autosave --}}
+    <div class="flex items-center justify-center gap-4 w-1/3">
+        <div class="flex items-center gap-2 bg-slate-800 border border-slate-700 rounded-lg px-4 py-1.5 shadow-inner">
+            <i class="fas fa-clock text-blue-400 text-sm"></i>
+            <div class="flex items-end gap-2">
+                <p id="timer-value" class="text-base font-bold font-mono leading-none text-white tracking-widest">00:00</p>
+                <p id="timer-label" class="text-[10px] text-slate-400 leading-tight mb-0.5">Elapsed</p>
             </div>
         </div>
-
-        {{-- Center: Section Tabs --}}
-        <div class="hidden md:flex items-center gap-1">
-            @foreach($sections as $s)
-                <button
-                    id="tab-section-{{ $s->section_number }}"
-                    onclick="goToSection({{ $s->section_number }})"
-                    class="px-3 py-1.5 rounded text-xs font-semibold transition-all
-                        {{ $s->section_number == 1 ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600' }}
-                        {{ $attempt->current_section < $s->section_number ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer' }}"
-                    {{ $attempt->current_section < $s->section_number ? 'disabled' : '' }}>
-                    Part {{ $s->section_number }}
-                </button>
-            @endforeach
+        <div id="autosave-status" class="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 bg-slate-800/50 px-2 py-1 rounded-full border border-slate-700/50">
+            <i class="fas fa-check-circle text-green-400 text-[10px]"></i> <span class="tracking-wide">Saved</span>
         </div>
-
-        {{-- Right: Timer --}}
-        <div class="flex items-center gap-4">
-            <div id="timer-display" class="flex items-center gap-2 bg-slate-800 rounded-lg px-3 py-1.5">
-                <i class="fas fa-clock text-blue-400 text-xs"></i>
-                <div>
-                    <p id="timer-label" class="text-xs text-slate-400 leading-tight">Test Time Remaining</p>
-                    <p id="timer-value" class="text-sm font-bold font-mono text-white leading-tight">--:--</p>
-                </div>
-            </div>
-            <div class="text-xs text-slate-400 hidden sm:block">
-                <span id="autosave-status" class="flex items-center gap-1">
-                    <i class="fas fa-circle-dot text-green-400 text-xs"></i> Auto-saved
-                </span>
-            </div>
+    </div>
+    
+    {{-- Right: Progress & Profile --}}
+    <div class="flex items-center justify-end gap-4 w-1/3">
+        <div class="bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-2">
+            <div class="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+            <p class="text-xs text-slate-300 font-medium">Answered: <span id="progress-text" class="text-white font-bold ml-0.5">0 / 0</span></p>
+        </div>
+        <div class="w-8 h-8 rounded-full bg-slate-700 border-2 border-slate-600 flex items-center justify-center text-slate-300 shadow-sm">
+            <i class="fas fa-user text-sm"></i>
         </div>
     </div>
 </div>
@@ -92,22 +91,19 @@
 {{-- ════════════════════════════════════════════════════
      MAIN LAYOUT: Left Audio Panel | Right Questions Panel
 ════════════════════════════════════════════════════ --}}
-<div class="flex h-[calc(100vh-52px)]">
+<div class="flex flex-1 overflow-hidden">
 
     {{-- ──────────────────────────────────────
          LEFT PANEL: Audio Player
     ────────────────────────────────────── --}}
-    <div class="w-72 xl:w-80 flex-shrink-0 bg-slate-900 flex flex-col border-r border-slate-700">
+    <div class="w-72 xl:w-80 flex-shrink-0 bg-slate-900 flex flex-col border-r border-slate-700 shadow-xl z-10">
 
-        {{-- Part indicator --}}
-        <div id="left-part-header" class="px-4 pt-4 pb-3 border-b border-slate-700">
-            <p class="text-xs text-slate-400 uppercase tracking-widest mb-0.5">Now Playing</p>
-            <h2 id="current-part-label" class="text-white text-lg font-bold">Part 1</h2>
-            <p id="current-part-desc" class="text-xs text-slate-400">Conversation — everyday social context</p>
-        </div>
+        {{-- Part indicator & Audio --}}
+        <div class="p-6 border-b border-slate-700 bg-slate-800 flex-1">
+            <p class="text-[10px] text-blue-400 font-bold uppercase tracking-widest mb-1">Now Playing</p>
+            <h2 id="current-part-label" class="text-white text-2xl font-bold mb-1">Part 1</h2>
+            <p id="current-part-desc" class="text-xs text-slate-400 mb-8 font-medium">Conversation — everyday social context</p>
 
-        {{-- Audio player --}}
-        <div class="px-4 py-5 flex-1">
             <audio id="exam-audio" preload="auto" class="hidden">
                 @foreach($sections as $s)
                     @if($s->audio_path)
@@ -117,198 +113,187 @@
             </audio>
 
             {{-- Waveform visual --}}
-            <div class="w-full h-16 mb-4 bg-slate-800 rounded-lg flex items-center justify-center gap-0.5 px-3" id="waveform">
-                @for($i=0;$i<48;$i++)
-                    <div class="waveform-bar bg-blue-500 rounded-full opacity-60 transition-all duration-75"
-                         style="width:3px; height:{{ rand(10,48) }}px;"></div>
+            <div class="w-full h-20 mb-6 bg-slate-900 rounded-xl flex items-center justify-center gap-1.5 px-4 overflow-hidden border border-slate-700/50 shadow-inner" id="waveform">
+                @for($i=0;$i<30;$i++)
+                    <div class="waveform-bar bg-blue-500 rounded-full opacity-50 transition-all duration-75"
+                         style="width:4px; height:{{ rand(10,40) }}px;"></div>
                 @endfor
             </div>
 
             {{-- Play/Pause --}}
-            <div class="flex items-center justify-center mb-4">
+            <div class="flex items-center justify-center mb-6">
                 <button id="play-pause-btn" onclick="togglePlayPause()"
-                    class="w-12 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center transition shadow-lg shadow-blue-900/40">
-                    <i id="play-icon" class="fas fa-play text-lg ml-0.5"></i>
+                    class="w-16 h-16 bg-blue-600 hover:bg-blue-500 text-white rounded-full flex items-center justify-center transition shadow-[0_0_20px_rgba(37,99,235,0.4)]">
+                    <i id="play-icon" class="fas fa-play text-2xl ml-1"></i>
                 </button>
             </div>
 
-            {{-- Time display --}}
-            <div class="flex justify-between text-xs text-slate-400 mb-2 font-mono">
-                <span id="current-time">0:00</span>
-                <span id="total-time">0:00</span>
-            </div>
-
-            {{-- Progress bar --}}
-            <div class="relative mb-5">
-                <div class="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
-                    <div id="audio-played" class="h-full bg-blue-500 rounded-full transition-all duration-300" style="width:0%"></div>
+            {{-- Time display & Progress bar --}}
+            <div class="mb-8">
+                <div class="flex justify-between text-xs text-slate-400 font-mono mb-2 px-1 font-medium">
+                    <span id="current-time">0:00</span>
+                    <span id="total-time">0:00</span>
                 </div>
-                <p class="text-xs text-slate-500 mt-1 text-center">You may pause but cannot skip ahead</p>
+                <div class="relative">
+                    <div class="w-full h-2.5 bg-slate-700 rounded-full overflow-hidden shadow-inner cursor-not-allowed">
+                        <div id="audio-played" class="h-full bg-blue-500 rounded-full transition-all duration-300" style="width:0%"></div>
+                    </div>
+                </div>
+                <p class="text-[10px] text-slate-500 mt-2 text-center uppercase tracking-wider font-semibold">You may pause but cannot skip ahead</p>
             </div>
 
             {{-- Volume --}}
-            <div class="flex items-center gap-2 mb-5">
-                <i class="fas fa-volume-up text-slate-400 text-xs w-4"></i>
+            <div class="flex items-center gap-3 bg-slate-900/50 py-2 px-4 rounded-lg border border-slate-700">
+                <i class="fas fa-volume-up text-slate-400 text-sm"></i>
                 <input type="range" id="volume-control" min="0" max="1" step="0.05" value="1"
                     onchange="document.getElementById('exam-audio').volume=this.value"
-                    class="w-full h-1.5 accent-blue-500 cursor-pointer">
+                    class="w-full h-1.5 accent-blue-500 cursor-pointer bg-slate-700 rounded-lg appearance-none">
             </div>
+        </div>
 
-            {{-- Section status list --}}
+        {{-- Section Navigation Status List --}}
+        <div class="p-6 bg-slate-900 border-t border-slate-800">
+            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Test Progress</h3>
             <div class="space-y-2">
                 @foreach($sections as $s)
                     <div id="section-status-{{ $s->section_number }}"
-                        class="flex items-center gap-2 text-xs rounded p-2
-                            {{ $attempt->current_section > $s->section_number ? 'text-green-400' : ($attempt->current_section == $s->section_number ? 'text-blue-300 bg-slate-800' : 'text-slate-500') }}">
+                        class="flex items-center gap-3 text-sm rounded-lg p-3 transition-colors
+                            {{ $attempt->current_section > $s->section_number ? 'bg-slate-800 text-green-400 border border-slate-700/50' : ($attempt->current_section == $s->section_number ? 'bg-blue-900/40 text-blue-300 border border-blue-800/50 shadow-inner' : 'bg-slate-800/40 text-slate-500 border border-transparent') }}">
                         @if($attempt->current_section > $s->section_number)
-                            <i class="fas fa-check-circle text-green-500"></i>
+                            <i class="fas fa-check-circle text-green-500 w-4 text-center"></i>
                         @elseif($attempt->current_section == $s->section_number)
-                            <i class="fas fa-headphones text-blue-400 animate-pulse"></i>
+                            <div class="w-4 h-4 rounded-full bg-blue-500/20 flex items-center justify-center"><div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div></div>
                         @else
-                            <i class="fas fa-lock text-slate-600"></i>
+                            <i class="fas fa-lock text-slate-600 w-4 text-center"></i>
                         @endif
-                        <span>Part {{ $s->section_number }}</span>
+                        <span class="font-medium">Part {{ $s->section_number }}</span>
                         @if($attempt->current_section > $s->section_number)
-                            <span class="ml-auto text-green-600 font-semibold">Done</span>
+                            <span class="ml-auto text-xs text-green-500 font-bold uppercase tracking-wider">Done</span>
                         @elseif($attempt->current_section == $s->section_number)
-                            <span class="ml-auto font-semibold">Active</span>
+                            <span class="ml-auto text-xs font-bold uppercase tracking-wider text-blue-400">Active</span>
                         @else
-                            <span class="ml-auto">Locked</span>
+                            <span class="ml-auto text-xs uppercase tracking-wider font-semibold">Locked</span>
                         @endif
                     </div>
                 @endforeach
             </div>
-        </div>
-
-        {{-- Transcript toggle --}}
-        <div class="px-4 pb-4">
-            <button onclick="toggleTranscript()"
-                class="w-full text-xs text-slate-400 hover:text-slate-200 border border-slate-700 hover:border-slate-500 rounded py-2 transition flex items-center justify-center gap-2">
-                <i class="fas fa-scroll"></i> Toggle Transcript
-            </button>
         </div>
     </div>
 
     {{-- ──────────────────────────────────────
          RIGHT PANEL: Questions
     ────────────────────────────────────── --}}
-    <div class="flex-1 flex flex-col overflow-hidden bg-white">
+    <div class="flex-1 flex flex-col bg-slate-50 overflow-hidden relative">
+        
+        {{-- Question Toolbar --}}
+        <div class="border-b border-slate-200 bg-white px-6 py-3 flex items-center justify-between shadow-sm z-10 sticky top-0 hidden" id="question-toolbar">
+            <div class="flex items-center gap-3">
+                <span class="text-sm font-semibold text-slate-700">Part <span id="toolbar-part-display">1</span></span>
+                <div class="w-px h-5 bg-slate-300"></div>
+                <span class="text-sm font-semibold text-slate-700">Question</span>
+                <span id="current-question-display" class="w-8 h-8 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center font-bold shadow-sm border border-blue-200">1</span>
+            </div>
+            
+            <button id="flag-btn" onclick="toggleFlag()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-300 bg-white text-slate-600 text-sm font-medium hover:bg-slate-50 hover:border-slate-400 transition-colors shadow-sm">
+                <i class="far fa-flag" id="flag-icon"></i> <span id="flag-text">Flag for review</span>
+            </button>
+        </div>
 
-        {{-- Section instruction banner --}}
-        <div id="instruction-banner" class="border-b border-slate-200 bg-blue-50 px-6 py-3">
-            <p class="text-xs font-semibold text-blue-700 uppercase tracking-wider mb-0.5">Instructions</p>
-            <p id="instruction-text" class="text-sm text-blue-900">
+        {{-- Instruction Banner --}}
+        <div id="instruction-banner" class="border-b border-slate-200 bg-blue-50/50 px-8 py-4 z-10 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-1 h-full bg-blue-400"></div>
+            <p class="text-xs font-bold text-blue-800 uppercase tracking-wider mb-1">Instructions</p>
+            <p id="instruction-text" class="text-sm text-slate-700 font-medium">
                 {{ $sections->firstWhere('section_number', $attempt->current_section)?->instruction_text ?? 'Listen carefully and answer the questions below.' }}
             </p>
         </div>
 
-        {{-- Questions scroll area --}}
-        <div class="questions-panel flex-1 overflow-y-auto px-6 py-5">
+        {{-- Questions Scroll Panel --}}
+        <div class="flex-1 overflow-y-auto relative scroll-panel bg-white" id="questions-container">
             @foreach($sections as $section)
                 <div id="section-questions-{{ $section->section_number }}"
-                    class="{{ $section->section_number != $attempt->current_section ? 'hidden' : '' }} fade-in">
-
-                    <div class="mb-5 flex items-center justify-between">
-                        <div>
-                            <h3 class="text-base font-bold text-slate-800">
-                                Part {{ $section->section_number }}
-                                <span class="ml-2 text-xs font-normal text-slate-500">
-                                    {{ ['','Everyday Social Conversation','Everyday Social Monologue','Educational Conversation','Academic Monologue'][$section->section_number] ?? '' }}
-                                </span>
-                            </h3>
-                        </div>
-                        <span class="text-xs bg-blue-100 text-blue-700 font-semibold px-2 py-1 rounded-full">
-                            {{ $section->questions->count() }} Questions
-                        </span>
-                    </div>
+                    class="px-8 py-8 fade-in {{ $section->section_number != $attempt->current_section ? 'hidden' : '' }}">
 
                     @if($section->questions->isEmpty())
-                        <div class="text-center py-12 text-slate-400">
-                            <i class="fas fa-question-circle text-4xl mb-3"></i>
-                            <p>No questions have been configured for this section yet.</p>
+                        <div class="text-center py-16 text-slate-400 bg-slate-50 rounded-2xl border border-slate-200 border-dashed">
+                            <i class="fas fa-headphones text-4xl mb-4 text-slate-300"></i>
+                            <p class="font-medium text-slate-500">No questions configured for this section yet.</p>
                         </div>
                     @else
                         @php $qNum = $section->section_number == 1 ? 1 : $sections->where('section_number', '<', $section->section_number)->sum(fn($s) => $s->questions->count()) + 1; @endphp
-                        <div class="space-y-5">
+                        <div class="space-y-6">
                             @foreach($section->questions as $qi => $question)
                                 @php $globalNum = $qNum + $qi; @endphp
                                 <div id="question-block-{{ $question->id }}"
-                                    class="question-block border border-slate-200 rounded-lg p-4 transition-all"
-                                    data-question-id="{{ $question->id }}">
+                                     class="question-block border border-slate-200 rounded-xl p-6 mb-4 transition-all bg-white shadow-sm"
+                                     data-question-id="{{ $question->id }}"
+                                     data-qnum="{{ $globalNum }}">
 
-                                    {{-- Question number + type badge --}}
-                                    <div class="flex items-start justify-between mb-3">
-                                        <div class="flex items-center gap-2">
-                                            <span class="flex-shrink-0 w-7 h-7 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
-                                                {{ $globalNum }}
-                                            </span>
-                                            <p class="text-sm font-medium text-slate-800 leading-snug">
+                                    {{-- Q header --}}
+                                    <div class="flex items-start justify-between mb-5">
+                                        <div class="flex items-start gap-4 flex-1">
+                                            <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 flex flex-col items-center justify-center leading-none shadow-sm">
+                                                <span class="text-[10px] text-slate-400 font-semibold mb-0.5 uppercase">Q</span>
+                                                <span class="text-sm font-bold">{{ $globalNum }}</span>
+                                            </div>
+                                            <p class="text-[15px] font-medium text-slate-800 leading-relaxed pt-1.5">
                                                 {!! nl2br(e($question->question_text)) !!}
                                             </p>
                                         </div>
-                                        <span class="ml-3 flex-shrink-0 text-xs text-slate-400 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded">
-                                            {{ ucwords(str_replace('_', ' ', $question->question_type)) }}
-                                        </span>
                                     </div>
 
                                     {{-- Answer Input - varies by type --}}
-                                    @if($question->question_type === 'multiple_choice')
-                                        <div class="space-y-2 ml-9">
-                                            @foreach($question->options as $oi => $opt)
-                                                <label class="flex items-center gap-3 cursor-pointer group hover:bg-blue-50 rounded p-2 -mx-2 transition">
-                                                    <input type="radio"
-                                                        name="answer_{{ $question->id }}"
-                                                        value="{{ $opt->option_text }}"
-                                                        data-question-id="{{ $question->id }}"
-                                                        {{ (($savedAnswers[$question->id] ?? '') === $opt->option_text) ? 'checked' : '' }}
-                                                        onchange="markAnswered({{ $question->id }}); scheduleAutosave();"
-                                                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 flex-shrink-0">
-                                                    <span class="text-sm text-slate-700 group-hover:text-blue-800">
-                                                        <strong class="text-blue-700 mr-1">{{ chr(65+$oi) }}.</strong>
-                                                        {{ $opt->option_text }}
-                                                    </span>
-                                                </label>
-                                            @endforeach
-                                        </div>
+                                    <div class="ml-14">
+                                        @if($question->question_type === 'multiple_choice')
+                                            <div class="space-y-2">
+                                                @foreach($question->options as $oi => $opt)
+                                                    <label class="flex items-center gap-3 cursor-pointer group hover:bg-slate-50 border border-transparent hover:border-slate-200 rounded-lg p-3 transition">
+                                                        <input type="radio"
+                                                            name="answer_{{ $question->id }}"
+                                                            value="{{ $opt->option_text }}"
+                                                            data-question-id="{{ $question->id }}"
+                                                            {{ (($savedAnswers[$question->id] ?? '') === $opt->option_text) ? 'checked' : '' }}
+                                                            onchange="markAnswered({{ $question->id }}); scheduleAutosave();"
+                                                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 flex-shrink-0 cursor-pointer">
+                                                        <span class="text-sm text-slate-700 flex-1 font-medium">
+                                                            <span class="inline-block w-6 text-slate-400 font-bold group-hover:text-blue-500 transition-colors">{{ chr(65+$oi) }}.</span>{{ $opt->option_text }}
+                                                        </span>
+                                                    </label>
+                                                @endforeach
+                                            </div>
 
-                                    @elseif(in_array($question->question_type, ['form_completion', 'table_completion', 'sentence_completion', 'short_answer']))
-                                        <div class="ml-9">
+                                        @elseif(in_array($question->question_type, ['form_completion', 'table_completion', 'sentence_completion', 'short_answer']))
                                             <input type="text"
                                                 id="answer-input-{{ $question->id }}"
                                                 data-question-id="{{ $question->id }}"
                                                 value="{{ $savedAnswers[$question->id] ?? '' }}"
-                                                placeholder="{{ $question->question_type === 'form_completion' ? 'Write your answer here…' : 'Write ONE WORD AND/OR A NUMBER' }}"
+                                                placeholder="{{ $question->question_type === 'form_completion' ? 'Write your answer here...' : 'Write ONE WORD AND/OR A NUMBER' }}"
                                                 oninput="markAnswered({{ $question->id }}); scheduleAutosave();"
-                                                class="w-full max-w-sm border-b-2 border-slate-300 focus:border-blue-500 bg-slate-50 focus:bg-white px-3 py-2 text-sm rounded-t transition outline-none">
-                                        </div>
+                                                class="w-full max-w-md border border-slate-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white px-4 py-3 text-sm rounded-lg shadow-sm transition outline-none">
 
-                                    @elseif($question->question_type === 'matching')
-                                        <div class="ml-9">
+                                        @elseif($question->question_type === 'matching')
                                             <select
                                                 id="answer-input-{{ $question->id }}"
                                                 data-question-id="{{ $question->id }}"
                                                 onchange="markAnswered({{ $question->id }}); scheduleAutosave();"
-                                                class="border border-slate-300 rounded-md text-sm px-3 py-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
-                                                <option value="">— Choose a match —</option>
+                                                class="w-full max-w-sm border border-slate-300 rounded-lg text-sm px-4 py-3 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm cursor-pointer">
+                                                <option value="">— Select your answer —</option>
                                                 @foreach($question->options as $opt)
                                                     <option value="{{ $opt->option_text }}" {{ ($savedAnswers[$question->id] ?? '') === $opt->option_text ? 'selected' : '' }}>
                                                         {{ $opt->option_text }}
                                                     </option>
                                                 @endforeach
                                             </select>
-                                        </div>
-                                    @else
-                                        {{-- Fallback text --}}
-                                        <div class="ml-9">
+                                        @else
                                             <input type="text"
                                                 id="answer-input-{{ $question->id }}"
                                                 data-question-id="{{ $question->id }}"
                                                 value="{{ $savedAnswers[$question->id] ?? '' }}"
-                                                placeholder="Your answer…"
+                                                placeholder="Your answer..."
                                                 oninput="markAnswered({{ $question->id }}); scheduleAutosave();"
-                                                class="w-full max-w-sm border-b-2 border-slate-300 focus:border-blue-500 bg-slate-50 focus:bg-white px-3 py-2 text-sm rounded-t transition outline-none">
-                                        </div>
-                                    @endif
+                                                class="w-full max-w-md border border-slate-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white px-4 py-3 text-sm rounded-lg shadow-sm transition outline-none">
+                                        @endif
+                                    </div>
 
                                 </div>
                             @endforeach
@@ -316,81 +301,153 @@
                     @endif
                 </div>
             @endforeach
-
-            {{-- Transcript section (hidden by default) --}}
-            @foreach($sections as $s)
-                @if($s->passage_text)
-                    <div id="transcript-{{ $s->section_number }}" class="hidden mt-6 p-4 bg-slate-50 border border-slate-200 rounded-lg fade-in">
-                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
-                            Transcript — Part {{ $s->section_number }}
-                        </h4>
-                        <p class="text-sm text-slate-600 whitespace-pre-line leading-relaxed">{{ $s->passage_text }}</p>
-                    </div>
-                @endif
-            @endforeach
+            <div class="h-16"></div> <!-- Padding bottom -->
         </div>
 
-        {{-- ── Bottom Navigation Bar ── --}}
-        <div class="border-t border-slate-200 bg-white px-6 py-3 flex items-center justify-between">
-            {{-- Question Navigator --}}
-            <div class="flex items-center gap-1.5 flex-wrap" id="question-navigator">
-                @php $navNum = 1; @endphp
-                @foreach($sections as $s)
-                    @foreach($s->questions as $q)
-                        <button
-                            id="nav-btn-{{ $q->id }}"
-                            onclick="scrollToQuestion({{ $q->id }})"
-                            class="q-nav-btn w-7 h-7 text-xs font-semibold border border-slate-300 rounded hover:border-blue-500 hover:bg-blue-50 transition
-                                   {{ !empty($savedAnswers[$q->id]) ? 'answered' : 'bg-white text-slate-600' }}
-                                   {{ $s->section_number != $attempt->current_section ? 'opacity-30 cursor-not-allowed' : '' }}">
-                            {{ $navNum++ }}
-                        </button>
-                    @endforeach
-                @endforeach
+        {{-- Next/Prev Toolbar (Hidden initially until first question is selected) --}}
+        <div class="border-t border-slate-200 bg-white px-5 py-3 flex items-center justify-between shadow-[0_-2px_10px_-5px_rgba(0,0,0,0.1)] z-10 sticky bottom-0">
+            <button onclick="navigateQuestion(-1)" class="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 font-medium hover:bg-slate-100 transition-colors">
+                <i class="fas fa-chevron-left text-xs text-slate-400"></i> Previous
+            </button>
+            <div class="flex gap-3">
+                <button type="button" id="next-section-btn" onclick="requestNextSection()" class="hidden bg-slate-800 hover:bg-slate-900 text-white font-semibold px-6 py-2.5 rounded-lg shadow-md transition-colors flex items-center gap-2 border border-slate-700">
+                    Next Part <i class="fas fa-arrow-right text-xs text-slate-400"></i>
+                </button>
             </div>
-
-            {{-- Submit button (only shows in transfer or after audio finishes) --}}
-            <form id="submit-form" action="{{ route('user.listening.submit', $attempt->id) }}" method="POST" onsubmit="return collectAndSubmit();">
-                @csrf
-                <div id="hidden-answers-container"></div>
-                <button type="submit" id="submit-btn"
-                    class="hidden bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2 rounded-lg shadow transition flex items-center gap-2">
-                    <i class="fas fa-paper-plane"></i> Submit Test
-                </button>
-                <button type="button" id="next-section-btn" onclick="requestNextSection()"
-                    class="hidden bg-slate-700 hover:bg-slate-600 text-white text-sm font-semibold px-5 py-2 rounded-lg shadow transition flex items-center gap-2">
-                    <i class="fas fa-arrow-right"></i> Next Part
-                </button>
-            </form>
+            <button onclick="navigateQuestion(1)" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 font-medium hover:bg-blue-100 border border-blue-200 transition-colors shadow-sm">
+                Next <i class="fas fa-chevron-right text-xs text-blue-400"></i>
+            </button>
         </div>
     </div>
 </div>
 
 {{-- ════════════════════════════════════════════════════
-     TRANSFER TIME OVERLAY
+     BOTTOM PANEL: ANSWER SHEET NAVIGATION
 ════════════════════════════════════════════════════ --}}
-<div id="transfer-overlay" class="hidden fixed inset-0 z-50 flex items-center justify-center locked-overlay">
-    <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 text-center transfer-pulse border-2 border-yellow-400">
-        <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i class="fas fa-exchange-alt text-yellow-600 text-2xl"></i>
+<div class="bg-slate-800 text-slate-300 border-t border-slate-700 px-4 py-3 flex items-center justify-between flex-shrink-0 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+    <div class="flex-1 overflow-x-auto scroll-panel pb-1 mr-4">
+        <div class="flex items-center gap-1.5 min-w-max" id="question-nav-chips">
+            @php $globalNum = 1; @endphp
+            @foreach($sections as $s)
+                @foreach($s->questions as $q)
+                    @php 
+                        $isFlagged = !empty($flaggedAnswers[$q->id]);
+                        $isAns = !empty($savedAnswers[$q->id]);
+                        $isLocked = $s->section_number > $attempt->current_section;
+                        $btnClass = "ans-btn relative w-8 h-8 flex items-center justify-center text-xs font-bold border rounded-md transition-colors ";
+                        
+                        // Default vs locked styling
+                        if ($isLocked) {
+                            $btnClass .= "locked bg-slate-700 border-slate-600 text-slate-400";
+                        } else {
+                            $btnClass .= "hover:bg-slate-600 hover:text-white cursor-pointer bg-slate-700 border-slate-600 text-slate-300 ";
+                            if($isAns) $btnClass .= " answered";
+                            if($isFlagged) $btnClass .= " flagged";
+                        }
+                    @endphp
+                    <button id="chip-{{ $q->id }}"
+                        onclick="{{ $isLocked ? 'return false;' : "jumpToQuestion({$q->id}, {$s->section_number}, this)" }}"
+                        class="{{ $btnClass }}"
+                        title="Q{{ $globalNum }}">
+                        {{ $globalNum }}
+                        @if(!$isLocked) <i class="fas fa-flag flag-icon"></i> @endif
+                        @if($isLocked) <i class="fas fa-lock absolute text-[8px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20"></i> @endif
+                    </button>
+                    @php $globalNum++; @endphp
+                @endforeach
+            @endforeach
         </div>
-        <h2 class="text-xl font-bold text-slate-800 mb-2">Answer Transfer Time</h2>
-        <p class="text-sm text-slate-600 mb-4">
-            You have <strong>10 minutes</strong> to review and confirm your answers before they are submitted.
-        </p>
-        <div class="text-4xl font-mono font-bold text-yellow-600 mb-4" id="transfer-countdown">10:00</div>
-        <form id="final-submit-form" action="{{ route('user.listening.submit', $attempt->id) }}" method="POST" onsubmit="return collectAndSubmit('final-submit-form');">
-            @csrf
-            <div id="hidden-answers-container-2"></div>
-            <button type="submit"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition shadow-lg mt-2 flex items-center justify-center gap-2">
-                <i class="fas fa-check-circle"></i> Submit All Answers Now
+    </div>
+</div>
+
+{{-- ════════════════════════════════════════════════════
+     TRANSFER PHASE / REVIEW OVERLAY
+════════════════════════════════════════════════════ --}}
+<div id="transfer-overlay" class="fixed inset-0 z-[100] hidden review-overlay flex flex-col pt-12 transition-opacity">
+    <div class="bg-white w-full max-w-4xl mx-auto rounded-t-2xl flex-1 flex flex-col shadow-2xl relative border border-slate-200">
+        {{-- Custom Header for Transfer Mode --}}
+        <div class="bg-amber-50 border-b border-amber-200 px-8 py-5 flex items-center justify-between sticky top-0 rounded-t-[15px] z-10 transfer-pulse shadow-sm">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 border border-amber-200 shadow-sm">
+                    <i class="fas fa-exchange-alt text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-amber-800">Answer Transfer & Review Phase</h2>
+                    <p class="text-amber-700 text-sm font-medium mt-0.5">Please check and finalize your answers.</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <span class="text-xs text-amber-600 font-bold uppercase tracking-wider block mb-1">Time Remaining</span>
+                <div class="text-3xl font-mono font-bold text-amber-700 bg-amber-100/50 px-4 py-1.5 rounded-lg border border-amber-200/50" id="transfer-countdown">10:00</div>
+            </div>
+        </div>
+        
+        <div class="p-8 flex-1 overflow-y-auto bg-slate-50/50">
+            {{-- Summary Stats --}}
+            <div class="grid grid-cols-3 gap-6 mb-8">
+                <div class="bg-blue-50 border border-blue-100 rounded-xl p-5 flex items-center gap-4 shadow-sm">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl border border-blue-200 shadow-inner"><i class="fas fa-check"></i></div>
+                    <div>
+                        <p class="text-3xl font-bold text-blue-800" id="review-answered-count">0</p>
+                        <p class="text-blue-600 font-semibold text-sm">Answered</p>
+                    </div>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 flex items-center gap-4 shadow-sm">
+                    <div class="w-12 h-12 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-xl border border-slate-300 shadow-inner"><i class="fas fa-minus"></i></div>
+                    <div>
+                        <p class="text-3xl font-bold text-slate-700" id="review-unanswered-count">0</p>
+                        <p class="text-slate-500 font-semibold text-sm">Not Answered</p>
+                    </div>
+                </div>
+                <div class="bg-red-50 border border-red-100 rounded-xl p-5 flex items-center gap-4 shadow-sm">
+                    <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xl border border-red-200 shadow-inner"><i class="fas fa-flag"></i></div>
+                    <div>
+                        <p class="text-3xl font-bold text-red-700" id="review-flagged-count">0</p>
+                        <p class="text-red-600 font-semibold text-sm">Flagged</p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Grid of all questions --}}
+            <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                <div class="bg-slate-50 px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+                    <h3 class="font-bold text-slate-700 flex items-center gap-2"><i class="fas fa-list-check text-slate-400"></i> All Questions</h3>
+                    <div class="flex items-center gap-5 text-xs font-semibold">
+                        <span class="flex items-center gap-1.5 text-slate-600"><span class="w-3 h-3 block rounded shadow-sm bg-blue-500 border border-blue-600"></span> Answered</span>
+                        <span class="flex items-center gap-1.5 text-slate-600"><span class="w-3 h-3 block rounded shadow-sm bg-slate-50 border border-slate-300"></span> Not Answered</span>
+                        <span class="flex items-center gap-1.5 text-slate-600"><span class="w-3 h-3 block rounded shadow-sm bg-white border border-red-300 text-red-500 flex items-center justify-center text-[8px]"><i class="fas fa-flag"></i></span> Flagged</span>
+                    </div>
+                </div>
+                <div class="p-8 bg-slate-50/30">
+                    <div class="grid grid-cols-5 md:grid-cols-8 lg:grid-cols-10 gap-4" id="review-grid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 bg-amber-50 border border-amber-200 rounded-xl p-5 flex gap-4 hidden shadow-sm" id="unanswered-warning">
+                <i class="fas fa-exclamation-triangle text-amber-500 text-xl mt-0.5"></i>
+                <div>
+                    <h4 class="font-bold text-amber-800">You have unanswered questions</h4>
+                    <p class="text-sm text-amber-700 mt-1 pb-1 font-medium">You will not lose points for incorrect answers. It is recommended to make an educated guess for all questions before the transfer time ends.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="border-t border-slate-200 px-8 py-5 bg-white rounded-b-2xl flex items-center justify-between sticky bottom-0 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+            <button onclick="closeTransfer()" class="px-6 py-3 rounded-xl border border-slate-300 bg-white text-slate-700 font-semibold hover:bg-slate-50 hover:border-slate-400 transition-colors flex items-center gap-2 shadow-sm">
+                <i class="fas fa-arrow-left text-slate-400"></i> Return to Answers
             </button>
-        </form>
-        <button onclick="closeTransfer()"
-            class="mt-3 text-sm text-slate-500 hover:text-slate-700 underline">
-            Return to review answers
-        </button>
+            <form id="final-submit-form" action="{{ route('user.listening.submit', $attempt->id) }}" method="POST" onsubmit="return collectAndSubmit('final-submit-form');">
+                @csrf
+                <div id="hidden-answers-container-2"></div>
+                <div id="hidden-flags-container"></div>
+                <button type="submit" id="final-submit-btn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 rounded-xl shadow-md transition-colors flex items-center gap-2">
+                    <i class="fas fa-paper-plane mr-1 text-blue-200"></i> Final Submit Now
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -414,9 +471,9 @@ const SECTIONS_DATA = {!! json_encode($sections->map(fn($s) => [
 ])) !!};
 const TRANSFER_REMAINING = {{ $transferRemainingSeconds ?? 'null' }};
 const ALL_QUESTION_IDS   = {!! json_encode($sections->flatMap(fn($s) => $s->questions->pluck('id'))) !!};
-
-// Pre-seeded saved answers
-const SAVED_ANSWERS = {!! json_encode($savedAnswers ?? []) !!};
+const TOTAL_QUESTIONS    = ALL_QUESTION_IDS.length;
+const SAVED_ANSWERS      = {!! json_encode($savedAnswers ?? []) !!};
+const FLAGGED_ANSWERS    = {!! json_encode($flaggedAnswers ?? []) !!};
 </script>
 
 <script>
@@ -424,21 +481,17 @@ const SAVED_ANSWERS = {!! json_encode($savedAnswers ?? []) !!};
 // STATE
 // ════════════════════════════════════════════════════
 let currentSection = CURRENT_SEC;
-let maxReachedAudio = 0;   // Max playback position allowed (prevents skipping)
+let currentQuestionId = null;
+let currentQuestionIndex = -1;
 let autosaveTimer  = null;
+let autosavePending = false;
 let transferInterval = null;
 let isAudioPlayed  = false;
-let answers = {};          // { questionId: answerText }
+let maxReachedAudio = 0;
 let isSectionAudioDone = false;
-
-// Init saved answers
-Object.assign(answers, SAVED_ANSWERS);
+let flaggedState = {...FLAGGED_ANSWERS};
 
 const audio = document.getElementById('exam-audio');
-
-// ════════════════════════════════════════════════════
-// AUDIO SYSTEM
-// ════════════════════════════════════════════════════
 const partDescriptions = {
     1: 'Conversation — everyday social context',
     2: 'Monologue — everyday social context',
@@ -446,6 +499,9 @@ const partDescriptions = {
     4: 'Monologue — academic subject',
 };
 
+// ════════════════════════════════════════════════════
+// AUDIO SYSTEM
+// ════════════════════════════════════════════════════
 function loadSectionAudio(sectionNum) {
     const sec = SECTIONS_DATA.find(s => s.number === sectionNum);
     if (!sec || !sec.audio_path) {
@@ -472,46 +528,37 @@ function togglePlayPause() {
 }
 
 audio.addEventListener('play', () => {
-    document.getElementById('play-icon').className = 'fas fa-pause text-lg';
+    document.getElementById('play-icon').className = 'fas fa-pause text-2xl';
     animateWaveform(true);
 });
 audio.addEventListener('pause', () => {
-    document.getElementById('play-icon').className = 'fas fa-play text-lg ml-0.5';
+    document.getElementById('play-icon').className = 'fas fa-play text-2xl ml-1';
     animateWaveform(false);
 });
 
 audio.addEventListener('timeupdate', () => {
     const cur = audio.currentTime;
     const dur = audio.duration || 1;
-
-    // Track max played position
     if (cur > maxReachedAudio) maxReachedAudio = cur;
 
-    // Update progress bar
     const pct = (cur / dur) * 100;
     document.getElementById('audio-played').style.width = pct + '%';
-
-    // Update time display
     document.getElementById('current-time').textContent = formatTime(cur);
     document.getElementById('total-time').textContent   = formatTime(dur);
 });
 
 audio.addEventListener('seeking', () => {
-    // Prevent skipping forward beyond max played
     if (audio.currentTime > maxReachedAudio + 1) {
         audio.currentTime = maxReachedAudio;
     }
 });
 
-audio.addEventListener('ended', () => {
-    markSectionAudioDone();
-});
+audio.addEventListener('ended', () => markSectionAudioDone());
 
 audio.addEventListener('loadedmetadata', () => {
     document.getElementById('total-time').textContent = formatTime(audio.duration);
 });
 
-// Waveform animation
 let waveformAnimFrame = null;
 function animateWaveform(isPlaying) {
     const bars = document.querySelectorAll('.waveform-bar');
@@ -522,9 +569,9 @@ function animateWaveform(isPlaying) {
     }
     function step() {
         bars.forEach(b => {
-            const h = 0.3 + Math.random() * 0.7;
+            const h = 0.4 + Math.random() * 0.8;
             b.style.transform = `scaleY(${h})`;
-            b.style.opacity = '0.4 + Math.random() * 0.6';
+            b.style.opacity = 0.5 + Math.random() * 0.5;
         });
         waveformAnimFrame = requestAnimationFrame(() => setTimeout(step, 80));
     }
@@ -533,37 +580,116 @@ function animateWaveform(isPlaying) {
 
 function markSectionAudioDone() {
     isSectionAudioDone = true;
-    // Show next-section or submit button
     const isLastSection = currentSection >= SECTIONS_DATA.length;
     if (isLastSection) {
-        // Trigger answer transfer phase
-        startTransferPhase();
+        // Trigger answer transfer phase remotely or automatically 
+        requestNextSection(); // Complete final part
     } else {
         document.getElementById('next-section-btn').classList.remove('hidden');
     }
 }
 
 // ════════════════════════════════════════════════════
-// SECTION NAVIGATION
+// NAVIGATION LOGIC
 // ════════════════════════════════════════════════════
-function goToSection(num) {
-    if (num > currentSection) return; // Locked
-    if (num === currentSection) return;
-
-    // Show correct question panel
-    document.querySelectorAll('[id^="section-questions-"]').forEach(el => el.classList.add('hidden'));
-    const target = document.getElementById(`section-questions-${num}`);
-    if (target) { target.classList.remove('hidden'); target.classList.add('fade-in'); }
-
-    // Update instruction
-    const sec = SECTIONS_DATA.find(s => s.number === num);
-    if (sec) document.getElementById('instruction-text').textContent = sec.instruction || '';
-
-    currentSection = num;
-    updateSectionTabs();
-    loadSectionAudio(num);
+function jumpToQuestion(qId, sectionNum, btnElement) {
+    if(sectionNum > currentSection) return; // Locked
+    
+    // Switch UI panels if section changes
+    if(sectionNum !== currentSection) {
+        document.querySelectorAll('[id^="section-questions-"]').forEach(el => el.classList.add('hidden'));
+        const target = document.getElementById(`section-questions-${sectionNum}`);
+        if(target) { target.classList.remove('hidden'); target.classList.add('fade-in'); }
+    }
+    
+    currentQuestionId = qId;
+    currentQuestionIndex = ALL_QUESTION_IDS.indexOf(qId);
+    
+    // Expose Toolbar
+    document.getElementById('question-toolbar').classList.remove('hidden');
+    
+    // Update active state in bottom nav
+    document.querySelectorAll('.ans-btn').forEach(b => b.classList.remove('active-q'));
+    const chip = document.getElementById(`chip-${qId}`);
+    if (chip) chip.classList.add('active-q');
+    
+    // Scroll to question
+    setTimeout(() => {
+        const block = document.getElementById(`question-block-${qId}`);
+        if (!block) return;
+        document.querySelectorAll('.question-block').forEach(b => b.classList.remove('active-q'));
+        block.classList.add('active-q');
+        
+        const container = document.getElementById('questions-container');
+        const headerOffset = 60; // Approximate height of the toolbar and instruction banner
+        const elementPosition = block.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + container.scrollTop - container.getBoundingClientRect().top - headerOffset - 20;
+        
+        container.scrollTo({ top: offsetPosition, behavior: "smooth" });
+        updateQuestionToolbar(sectionNum);
+    }, 50);
 }
 
+function navigateQuestion(direction) {
+    const newIndex = currentQuestionIndex + direction;
+    if (newIndex >= 0 && newIndex < TOTAL_QUESTIONS) {
+        const targetQid = ALL_QUESTION_IDS[newIndex];
+        const secData = SECTIONS_DATA.find(s => s.question_ids.includes(targetQid));
+        if (secData && secData.number <= currentSection) {
+            jumpToQuestion(targetQid, secData.number, document.getElementById(`chip-${targetQid}`));
+        }
+    }
+}
+
+function updateQuestionToolbar(sectionNum) {
+    const qNum = currentQuestionIndex + 1;
+    document.getElementById('current-question-display').textContent = qNum;
+    document.getElementById('toolbar-part-display').textContent = sectionNum;
+    
+    // Load instruction for the question's section
+    const secData = SECTIONS_DATA.find(s => s.number === sectionNum);
+    if(secData) {
+        document.getElementById('instruction-text').textContent = secData.instruction;
+    }
+    
+    // Flag Button State
+    const flagBtn = document.getElementById('flag-btn');
+    const flagIcon = document.getElementById('flag-icon');
+    const flagText = document.getElementById('flag-text');
+    
+    if (flaggedState[currentQuestionId]) {
+        flagBtn.classList.add('bg-red-50', 'border-red-200', 'text-red-600');
+        flagBtn.classList.remove('bg-white', 'border-slate-300', 'text-slate-600', 'hover:bg-slate-50');
+        flagIcon.classList.remove('far');
+        flagIcon.classList.add('fas');
+        flagText.textContent = 'Flagged';
+    } else {
+        flagBtn.classList.remove('bg-red-50', 'border-red-200', 'text-red-600');
+        flagBtn.classList.add('bg-white', 'border-slate-300', 'text-slate-600', 'hover:bg-slate-50');
+        flagIcon.classList.remove('fas');
+        flagIcon.classList.add('far');
+        flagText.textContent = 'Flag for review';
+    }
+}
+
+function toggleFlag() {
+    if(!currentQuestionId) return;
+    flaggedState[currentQuestionId] = !flaggedState[currentQuestionId];
+    
+    const chip = document.getElementById(`chip-${currentQuestionId}`);
+    if (chip) {
+        if (flaggedState[currentQuestionId]) chip.classList.add('flagged');
+        else chip.classList.remove('flagged');
+    }
+    
+    const secData = SECTIONS_DATA.find(s => s.question_ids.includes(currentQuestionId));
+    if(secData) updateQuestionToolbar(secData.number);
+    scheduleAutosave();
+}
+
+// ════════════════════════════════════════════════════
+// SECTION UNLOCKING & COMPLETION
+// ════════════════════════════════════════════════════
 function requestNextSection() {
     if (!isSectionAudioDone) return;
     autosaveNow();
@@ -575,78 +701,82 @@ function requestNextSection() {
     })
     .then(r => r.json())
     .then(data => {
-        if (data.status === 'next') {
-            unlockSection(data.next_section);
-        } else if (data.status === 'transfer') {
-            startTransferPhase(data.transfer_seconds);
-        }
+        if (data.status === 'next') unlockSection(data.next_section);
+        else if (data.status === 'transfer') startTransferPhase(data.transfer_seconds);
     });
 }
 
 function unlockSection(nextNum) {
     currentSection = nextNum;
 
-    // Update section status icons
-    const prev = nextNum - 1;
-    const prevStatus = document.getElementById(`section-status-${prev}`);
+    // Update left panel status
+    const prevStatus = document.getElementById(`section-status-${nextNum-1}`);
     if (prevStatus) {
-        prevStatus.className = 'flex items-center gap-2 text-xs rounded p-2 text-green-400';
-        prevStatus.innerHTML = `<i class="fas fa-check-circle text-green-500"></i><span>Part ${prev}</span><span class="ml-auto text-green-600 font-semibold">Done</span>`;
+        prevStatus.className = 'flex items-center gap-3 text-sm rounded-lg p-3 transition-colors bg-slate-800 text-green-400 border border-slate-700/50';
+        prevStatus.innerHTML = `<i class="fas fa-check-circle text-green-500 w-4 text-center"></i><span class="font-medium">Part ${nextNum-1}</span><span class="ml-auto text-xs text-green-500 font-bold uppercase tracking-wider">Done</span>`;
     }
     const curStatus = document.getElementById(`section-status-${nextNum}`);
     if (curStatus) {
-        curStatus.className = 'flex items-center gap-2 text-xs rounded p-2 text-blue-300 bg-slate-800';
-        curStatus.innerHTML = `<i class="fas fa-headphones text-blue-400 animate-pulse"></i><span>Part ${nextNum}</span><span class="ml-auto font-semibold">Active</span>`;
+        curStatus.className = 'flex items-center gap-3 text-sm rounded-lg p-3 transition-colors bg-blue-900/40 text-blue-300 border border-blue-800/50 shadow-inner';
+        curStatus.innerHTML = `<div class="w-4 h-4 rounded-full bg-blue-500/20 flex items-center justify-center"><div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div></div><span class="font-medium">Part ${nextNum}</span><span class="ml-auto text-xs font-bold uppercase tracking-wider text-blue-400">Active</span>`;
     }
 
-    // Show new section questions
+    // Refresh chips (unlock)
+    const secData = SECTIONS_DATA.find(s => s.number === nextNum);
+    if(secData) {
+        secData.question_ids.forEach(qId => {
+            const chip = document.getElementById(`chip-${qId}`);
+            if(chip) {
+                chip.classList.remove('locked', 'bg-slate-700', 'border-slate-600', 'text-slate-400');
+                chip.classList.add('hover:bg-slate-600', 'hover:text-white', 'cursor-pointer', 'text-slate-300', 'bg-slate-700', 'border-slate-600');
+                chip.setAttribute('onclick', `jumpToQuestion(${qId}, ${nextNum}, this)`);
+                const lockIcon = chip.querySelector('.fa-lock');
+                if(lockIcon) lockIcon.remove();
+                chip.innerHTML += `<i class="fas fa-flag flag-icon"></i>`;
+                
+                // If it was somehow answered before or retrieved
+                if(getAnswerValue(qId)) chip.classList.add('answered');
+                if(flaggedState[qId]) chip.classList.add('flagged');
+            }
+        });
+    }
+
+    // Switch panels
     document.querySelectorAll('[id^="section-questions-"]').forEach(el => el.classList.add('hidden'));
     const target = document.getElementById(`section-questions-${nextNum}`);
     if (target) { target.classList.remove('hidden'); target.classList.add('fade-in'); }
-
-    // Update instruction text
-    const sec = SECTIONS_DATA.find(s => s.number === nextNum);
-    if (sec) document.getElementById('instruction-text').textContent = sec.instruction || '';
+    
+    // Update toolbar if there's an active question. Let's select the first question of new section
+    if(secData && secData.question_ids.length > 0) {
+        jumpToQuestion(secData.question_ids[0], nextNum, document.getElementById(`chip-${secData.question_ids[0]}`));
+    } else {
+        document.getElementById('question-toolbar').classList.add('hidden');
+    }
 
     isSectionAudioDone = false;
     document.getElementById('next-section-btn').classList.add('hidden');
-    document.getElementById('submit-btn').classList.add('hidden');
-
-    // Re-enable nav buttons for new section
-    updateSectionTabs();
     loadSectionAudio(nextNum);
 }
 
-function updateSectionTabs() {
-    SECTIONS_DATA.forEach(s => {
-        const tab = document.getElementById(`tab-section-${s.number}`);
-        if (!tab) return;
-        if (s.number === currentSection) {
-            tab.className = tab.className.replace('bg-slate-700 text-slate-300', 'bg-blue-600 text-white');
-        } else if (s.number < currentSection) {
-            tab.className = tab.className.replace('bg-blue-600 text-white', 'bg-slate-700 text-slate-300');
-            tab.removeAttribute('disabled');
-            tab.classList.remove('opacity-50', 'cursor-not-allowed');
-            tab.classList.add('cursor-pointer');
-        }
-    });
-}
-
 // ════════════════════════════════════════════════════
-// TRANSFER MODE
+// TRANSFER MODE / REVIEW OVERLAY
 // ════════════════════════════════════════════════════
 function startTransferPhase(seconds) {
     const totalSecs = seconds || 600;
-    document.getElementById('transfer-overlay').classList.remove('hidden');
-    document.getElementById('timer-label').textContent = 'Transfer Time Remaining';
+    
+    // Change timer text in header
+    document.getElementById('timer-label').textContent = 'Transfer Time';
     document.getElementById('timer-value').style.color = '#f59e0b';
-
-    // Show submit button behind overlay too
-    document.getElementById('submit-btn').classList.remove('hidden');
-
+    
     let remaining = totalSecs;
     document.getElementById('transfer-countdown').textContent = formatTimer(remaining);
-
+    
+    // Hide audio-specific controls in left panel
+    document.getElementById('play-pause-btn').classList.add('hidden');
+    document.getElementById('waveform').classList.add('hidden');
+    document.getElementById('current-part-label').textContent = "Transfer Phase";
+    document.getElementById('current-part-desc').innerHTML = "<i class='fas fa-exclamation-triangle text-amber-500'></i> Audio has ended.";
+    
     transferInterval = setInterval(() => {
         remaining--;
         document.getElementById('transfer-countdown').textContent = formatTimer(remaining);
@@ -656,27 +786,83 @@ function startTransferPhase(seconds) {
             document.getElementById('final-submit-form').submit();
         }
     }, 1000);
+    
+    // Prepare and show Review page
+    showTransferReviewPage();
+}
+
+function showTransferReviewPage() {
+    const grid = document.getElementById('review-grid');
+    grid.innerHTML = '';
+    
+    let answeredCount = 0;
+    let flaggedCount = 0;
+    
+    ALL_QUESTION_IDS.forEach((id, index) => {
+        const qNum = index + 1;
+        const isAns = getAnswerValue(id) !== '';
+        const isFlag = !!flaggedState[id];
+        
+        if (isAns) answeredCount++;
+        if (isFlag) flaggedCount++;
+        
+        let btnClasses = "relative w-full aspect-square flex flex-col items-center justify-center font-bold text-sm rounded-xl border-2 transition-transform hover:scale-105 cursor-pointer shadow-sm";
+        let iconHtml = "";
+        
+        if (isAns) btnClasses += " bg-blue-50 border-blue-500 text-blue-700";
+        else btnClasses += " bg-white border-slate-200 text-slate-500";
+        
+        if (isFlag) {
+            iconHtml = '<div class="absolute -top-1.5 -right-1.5 w-5 h-5 bg-white border border-slate-200 rounded-full flex items-center justify-center text-red-500 text-[10px] shadow-sm"><i class="fas fa-flag"></i></div>';
+            if(!isAns) btnClasses = btnClasses.replace("border-slate-200", "border-red-300");
+        }
+        
+        grid.innerHTML += `
+            <div onclick="returnToQuestion(${id})" class="${btnClasses}">
+                ${qNum}
+                ${iconHtml}
+            </div>
+        `;
+    });
+    
+    document.getElementById('review-answered-count').textContent = answeredCount;
+    document.getElementById('review-unanswered-count').textContent = TOTAL_QUESTIONS - answeredCount;
+    document.getElementById('review-flagged-count').textContent = flaggedCount;
+    
+    const warningEl = document.getElementById('unanswered-warning');
+    if (answeredCount < TOTAL_QUESTIONS) {
+        warningEl.classList.remove('hidden');
+    } else {
+        warningEl.classList.add('hidden');
+    }
+    
+    const overlay = document.getElementById('transfer-overlay');
+    overlay.classList.remove('hidden');
+    setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+    document.body.style.overflow = 'hidden';
 }
 
 function closeTransfer() {
     document.getElementById('transfer-overlay').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+function returnToQuestion(qId) {
+    closeTransfer();
+    const secData = SECTIONS_DATA.find(s => s.question_ids.includes(qId));
+    if (secData) {
+        jumpToQuestion(qId, secData.number, document.getElementById(`chip-${qId}`));
+    }
 }
 
 // ════════════════════════════════════════════════════
 // ANSWERS & AUTOSAVE
 // ════════════════════════════════════════════════════
-function markAnswered(qId) {
-    const btn = document.getElementById(`nav-btn-${qId}`);
-    if (btn) { btn.classList.add('answered'); btn.classList.remove('bg-white', 'text-slate-600'); }
-}
-
 function getAnswerValue(qId) {
-    // Radio
     const radio = document.querySelector(`input[name="answer_${qId}"]:checked`);
     if (radio) return radio.value;
-    // Text/Select
     const inp = document.getElementById(`answer-input-${qId}`);
-    if (inp) return inp.value;
+    if (inp) return inp.value.trim();
     return '';
 }
 
@@ -689,60 +875,61 @@ function collectAllAnswers() {
     return out;
 }
 
-let autosavePending = false;
+function markAnswered(qId) {
+    const chip = document.getElementById(`chip-${qId}`);
+    if (chip) {
+        const val = getAnswerValue(qId);
+        if (val !== '') chip.classList.add('answered');
+        else chip.classList.remove('answered');
+    }
+    updateProgressTracker();
+}
+
+function updateProgressTracker() {
+    let answeredCount = 0;
+    ALL_QUESTION_IDS.forEach(id => {
+        if (getAnswerValue(id) !== '') answeredCount++;
+    });
+    document.getElementById('progress-text').textContent = `${answeredCount} / ${TOTAL_QUESTIONS}`;
+}
+
 function scheduleAutosave() {
     if (autosavePending) return;
     autosavePending = true;
-    autosaveTimer = setTimeout(autosaveNow, 7000); // 7 second debounce
+    autosaveTimer = setTimeout(autosaveNow, 5000);
 }
 
 function autosaveNow() {
     clearTimeout(autosaveTimer);
     autosavePending = false;
-    const payload = collectAllAnswers();
-    if (Object.keys(payload).length === 0) return;
+    const answersPayload = collectAllAnswers();
+    
+    if (Object.keys(answersPayload).length === 0 && Object.keys(flaggedState).length === 0) return;
 
-    document.getElementById('autosave-status').innerHTML =
-        '<i class="fas fa-circle-notch fa-spin text-yellow-400 text-xs"></i> Saving…';
+    const ind = document.getElementById('autosave-status');
+    ind.classList.remove('hidden');
+    ind.innerHTML = '<i class="fas fa-circle-notch fa-spin text-yellow-400 text-[10px]"></i> <span class="tracking-wide">Saving...</span>';
 
     fetch(AUTOSAVE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
-        body: JSON.stringify({ answers: payload }),
+        body: JSON.stringify({ answers: answersPayload, flagged: flaggedState }),
     })
     .then(r => r.json())
     .then(data => {
         if (data.success) {
-            document.getElementById('autosave-status').innerHTML =
-                `<i class="fas fa-check-circle text-green-400 text-xs"></i> Saved ${data.saved_at}`;
+            ind.innerHTML = `<i class="fas fa-check-circle text-green-400 text-[10px]"></i> <span class="tracking-wide text-slate-300">Saved</span>`;
+            setTimeout(() => { if(!autosavePending) ind.classList.add('hidden'); }, 3000);
         }
     })
-    .catch(() => {
-        document.getElementById('autosave-status').innerHTML =
-            '<i class="fas fa-exclamation-circle text-red-400 text-xs"></i> Save failed';
-    });
+    .catch(() => ind.innerHTML = '<i class="fas fa-exclamation-circle text-red-400 text-[10px]"></i> <span class="text-red-400">Failed</span>');
 }
 
-// Periodic autosave every 10s
-setInterval(autosaveNow, 10000);
+setInterval(autosaveNow, 20000);
 
-// ════════════════════════════════════════════════════
-// QUESTION NAVIGATION
-// ════════════════════════════════════════════════════
-function scrollToQuestion(qId) {
-    const block = document.getElementById(`question-block-${qId}`);
-    if (!block) return;
-    document.querySelectorAll('.question-block').forEach(b => b.classList.remove('active-q'));
-    block.classList.add('active-q');
-    block.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-// ════════════════════════════════════════════════════
-// FORM SUBMISSION
-// ════════════════════════════════════════════════════
 function collectAndSubmit(formId) {
     const form = document.getElementById(formId || 'submit-form');
-    const container = form.querySelector('[id^="hidden-answers-container"]');
+    let container = form.querySelector('[id^="hidden-answers-container"]');
     container.innerHTML = '';
     const answers = collectAllAnswers();
     Object.entries(answers).forEach(([qId, val]) => {
@@ -752,20 +939,25 @@ function collectAndSubmit(formId) {
         inp.value = val;
         container.appendChild(inp);
     });
+    
+    let flagContainer = form.querySelector('#hidden-flags-container');
+    if(flagContainer) {
+        flagContainer.innerHTML = '';
+        Object.entries(flaggedState).forEach(([qId, val]) => {
+            if(val) {
+                const inp = document.createElement('input');
+                inp.type = 'hidden';
+                inp.name = `flagged[${qId}]`;
+                inp.value = "1";
+                flagContainer.appendChild(inp);
+            }
+        });
+    }
     return true;
 }
 
 // ════════════════════════════════════════════════════
-// TRANSCRIPT TOGGLE
-// ════════════════════════════════════════════════════
-function toggleTranscript() {
-    const t = document.getElementById(`transcript-${currentSection}`);
-    if (t) t.classList.toggle('hidden');
-}
-
-// ════════════════════════════════════════════════════
-// TIMER (overall listening test — no hard limit for now; managed by server)
-// We display a counting-up timer so user can track duration.
+// TIMER & INIT
 // ════════════════════════════════════════════════════
 let elapsedSeconds = 0;
 const timerEl = document.getElementById('timer-value');
@@ -774,9 +966,6 @@ setInterval(() => {
     timerEl.textContent = formatTimer(elapsedSeconds);
 }, 1000);
 
-// ════════════════════════════════════════════════════
-// HELPERS
-// ════════════════════════════════════════════════════
 function formatTime(s) {
     if (isNaN(s)) return '0:00';
     const mins = Math.floor(s / 60);
@@ -790,39 +979,35 @@ function formatTimer(s) {
     return `${m}:${ss}`;
 }
 
-// ════════════════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
-    // If we're in transfer mode (page refresh)
     if (ATTEMPT_STATUS === 'transfer' && TRANSFER_REMAINING !== null) {
         startTransferPhase(TRANSFER_REMAINING);
+        
+        // Show questions panel for final part just in case they return
+        document.querySelectorAll('[id^="section-questions-"]').forEach(el => el.classList.add('hidden'));
+        if(SECTIONS_DATA.length > 0) {
+            const finalPart = SECTIONS_DATA[SECTIONS_DATA.length - 1].number;
+            const target = document.getElementById(`section-questions-${finalPart}`);
+            if (target) { target.classList.remove('hidden'); target.classList.add('fade-in'); }
+        }
     } else if (ATTEMPT_STATUS === 'completed') {
         window.location = '{{ route("dashboard") }}';
     } else {
-        // Load audio for current section
         loadSectionAudio(currentSection);
     }
 
-    // Pre-mark answered buttons
-    ALL_QUESTION_IDS.forEach(id => {
-        if (SAVED_ANSWERS[id]) markAnswered(id);
-    });
-
-    // Timer label (just show as elapsed)
-    document.getElementById('timer-label').textContent = 'Test Time Elapsed';
-
-    // Pre-populate answer inputs from saved state
     ALL_QUESTION_IDS.forEach(id => {
         const saved = SAVED_ANSWERS[id];
-        if (!saved) return;
-        // Text inputs
-        const inp = document.getElementById(`answer-input-${id}`);
-        if (inp) inp.value = saved;
-        // Radio
-        const radio = document.querySelector(`input[name="answer_${id}"][value="${saved}"]`);
-        if (radio) radio.checked = true;
+        if (saved) {
+            const inp = document.getElementById(`answer-input-${id}`);
+            if (inp) inp.value = saved;
+            const radio = document.querySelector(`input[name="answer_${id}"][value="${CSS.escape ? CSS.escape(saved) : saved}"]`);
+            if (radio) radio.checked = true;
+            markAnswered(id);
+        }
     });
+    
+    updateProgressTracker();
 });
 </script>
 
