@@ -9,9 +9,9 @@
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans antialiased overflow-hidden">
+<body class="bg-dwimik-bg text-dwimik-text font-sans antialiased overflow-hidden">
     <!-- Navbar -->
-    <nav class="bg-blue-800 text-white shadow-md fixed w-full z-10 top-0 h-16">
+    <nav class="bg-dwimik-primary text-white shadow-sm fixed w-full z-10 top-0 h-16">
         <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
@@ -21,7 +21,7 @@
                     <span class="text-sm font-medium">{{ auth()->user()->name ?? 'Admin' }}</span>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition duration-150">
+                        <button type="submit" class="bg-transparent border border-white hover:bg-white hover:text-dwimik-primary text-white px-3 py-1.5 rounded-dwimik text-sm font-medium transition duration-150">
                             <i class="fas fa-sign-out-alt mr-1"></i> Logout
                         </button>
                     </form>
@@ -33,16 +33,16 @@
     <!-- Sidebar & Content -->
     <div class="flex h-screen pt-16">
         <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-lg flex-shrink-0 h-full overflow-y-auto border-r border-gray-200">
+        <aside class="w-64 bg-white flex-shrink-0 h-full overflow-y-auto border-r border-dwimik-divider">
             <div class="py-6 px-4">
                 <nav class="space-y-1">
-                    <a href="{{ route('admin.dashboard') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('admin.dashboard') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }} transition">
-                        <i class="fas fa-home w-6 text-center mr-2 {{ request()->routeIs('admin.dashboard') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}"></i>
+                    <a href="{{ route('admin.dashboard') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-dwimik {{ request()->routeIs('admin.dashboard') ? 'bg-dwimik-primary text-white' : 'text-dwimik-text hover:bg-dwimik-bg hover:text-dwimik-primary' }} transition">
+                        <i class="fas fa-home w-6 text-center mr-2 {{ request()->routeIs('admin.dashboard') ? 'text-white' : 'text-gray-400 group-hover:text-dwimik-primary' }}"></i>
                         Dashboard
                     </a>
 
-                    <a href="{{ route('admin.tests.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('admin.tests.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }} transition">
-                        <i class="fas fa-file-alt w-6 text-center mr-2 {{ request()->routeIs('admin.tests.*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}"></i>
+                    <a href="{{ route('admin.tests.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-dwimik {{ request()->routeIs('admin.tests.*') ? 'bg-dwimik-primary text-white' : 'text-dwimik-text hover:bg-dwimik-bg hover:text-dwimik-primary' }} transition">
+                        <i class="fas fa-file-alt w-6 text-center mr-2 {{ request()->routeIs('admin.tests.*') ? 'text-white' : 'text-gray-400 group-hover:text-dwimik-primary' }}"></i>
                         Tests
                     </a>
                     
@@ -50,20 +50,20 @@
                         <span class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">Modules Management</span>
                     </div>
 
-                    <a href="{{ route('admin.tests.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('admin.writing-tasks.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }} transition">
-                        <i class="fas fa-pen-nib w-6 text-center mr-2 {{ request()->routeIs('admin.writing-tasks.*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}"></i>
+                    <a href="{{ route('admin.tests.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-dwimik text-dwimik-text hover:bg-dwimik-bg hover:text-dwimik-primary transition">
+                        <i class="fas fa-pen-nib w-6 text-center mr-2 text-gray-400 group-hover:text-dwimik-primary"></i>
                         Writing Tasks
                     </a>
-                    <a href="{{ route('admin.tests.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('admin.speaking-questions.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }} transition">
-                        <i class="fas fa-microphone w-6 text-center mr-2 {{ request()->routeIs('admin.speaking-questions.*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}"></i>
+                    <a href="{{ route('admin.tests.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-dwimik text-dwimik-text hover:bg-dwimik-bg hover:text-dwimik-primary transition">
+                        <i class="fas fa-microphone w-6 text-center mr-2 text-gray-400 group-hover:text-dwimik-primary"></i>
                         Speaking Module
                     </a>
-                    <a href="{{ route('admin.tests.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('admin.listening-sections.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }} transition">
-                        <i class="fas fa-headphones w-6 text-center mr-2 {{ request()->routeIs('admin.listening-sections.*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}"></i>
+                    <a href="{{ route('admin.tests.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-dwimik text-dwimik-text hover:bg-dwimik-bg hover:text-dwimik-primary transition">
+                        <i class="fas fa-headphones w-6 text-center mr-2 text-gray-400 group-hover:text-dwimik-primary"></i>
                         Listening Module
                     </a>
-                    <a href="{{ route('admin.tests.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('admin.reading-passages.*', 'admin.reading-question-groups.*', 'admin.questions.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }} transition">
-                        <i class="fas fa-book-open w-6 text-center mr-2 {{ request()->routeIs('admin.reading-passages.*', 'admin.reading-question-groups.*', 'admin.questions.*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}"></i>
+                    <a href="{{ route('admin.tests.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-dwimik text-dwimik-text hover:bg-dwimik-bg hover:text-dwimik-primary transition">
+                        <i class="fas fa-book-open w-6 text-center mr-2 text-gray-400 group-hover:text-dwimik-primary"></i>
                         Reading Module
                     </a>
 
@@ -71,12 +71,12 @@
                         <span class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">System</span>
                     </div>
 
-                    <a href="{{ route('admin.users.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('admin.users.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }} transition">
-                        <i class="fas fa-users w-6 text-center mr-2 {{ request()->routeIs('admin.users.*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}"></i>
+                    <a href="{{ route('admin.users.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-dwimik {{ request()->routeIs('admin.users.*') ? 'bg-dwimik-primary text-white' : 'text-dwimik-text hover:bg-dwimik-bg hover:text-dwimik-primary' }} transition">
+                        <i class="fas fa-users w-6 text-center mr-2 {{ request()->routeIs('admin.users.*') ? 'text-white' : 'text-gray-400 group-hover:text-dwimik-primary' }}"></i>
                         Users
                     </a>
-                    <a href="{{ route('admin.results.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('admin.results.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }} transition">
-                        <i class="fas fa-chart-bar w-6 text-center mr-2 {{ request()->routeIs('admin.results.*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}"></i>
+                    <a href="{{ route('admin.results.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-dwimik {{ request()->routeIs('admin.results.*') ? 'bg-dwimik-primary text-white' : 'text-dwimik-text hover:bg-dwimik-bg hover:text-dwimik-primary' }} transition">
+                        <i class="fas fa-chart-bar w-6 text-center mr-2 {{ request()->routeIs('admin.results.*') ? 'text-white' : 'text-gray-400 group-hover:text-dwimik-primary' }}"></i>
                         Results
                     </a>
                 </nav>
@@ -84,12 +84,12 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto bg-gray-50 pb-20">
+        <main class="flex-1 overflow-y-auto bg-dwimik-bg pb-20">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <!-- Header -->
-                <div class="mb-6 flex justify-between items-center border-b border-gray-200 pb-4">
+                <div class="mb-6 flex justify-between items-center border-b border-dwimik-divider pb-4">
                     <div>
-                        <h1 class="text-3xl font-bold text-gray-900">@yield('header', 'Dashboard')</h1>
+                        <h1 class="text-3xl font-bold text-dwimik-text">@yield('header', 'Dashboard')</h1>
                         @if(View::hasSection('subheader'))
                             <p class="mt-1 text-sm text-gray-500">@yield('subheader')</p>
                         @endif
