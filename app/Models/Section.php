@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Section extends Model
 {
-    protected $fillable = ['test_id', 'name'];
+    protected $fillable = ['test_set_id', 'name'];
 
-    public function test()
+    public function testSet()
     {
-        return $this->belongsTo(Test::class);
+        return $this->belongsTo(TestSet::class);
     }
 }

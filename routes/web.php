@@ -40,32 +40,32 @@ Route::middleware(['auth'])->group(function () {
 
     // Admin Routes
     Route::middleware([\App\Http\Middleware\RoleMiddleware::class.':Admin'])->prefix('admin')->name('admin.')->group(function () {
-        Route::resource('collections', \App\Http\Controllers\Admin\IeltsCollectionController::class);
-        
         Route::resource('tests', \App\Http\Controllers\Admin\TestController::class);
         
         Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('dashboard');
 
-        Route::get('/tests/{test}/writing-tasks/create', [\App\Http\Controllers\Admin\WritingTaskController::class, 'create'])->name('writing-tasks.create');
-        Route::post('/tests/{test}/writing-tasks', [\App\Http\Controllers\Admin\WritingTaskController::class, 'store'])->name('writing-tasks.store');
+        Route::get('/test_sets/{test_set}', [\App\Http\Controllers\Admin\TestSetController::class, 'show'])->name('test_sets.show');
+
+        Route::get('/test_sets/{test_set}/writing-tasks/create', [\App\Http\Controllers\Admin\WritingTaskController::class, 'create'])->name('writing-tasks.create');
+        Route::post('/test_sets/{test_set}/writing-tasks', [\App\Http\Controllers\Admin\WritingTaskController::class, 'store'])->name('writing-tasks.store');
         Route::get('/writing-tasks/{writing_task}/edit', [\App\Http\Controllers\Admin\WritingTaskController::class, 'edit'])->name('writing-tasks.edit');
         Route::put('/writing-tasks/{writing_task}', [\App\Http\Controllers\Admin\WritingTaskController::class, 'update'])->name('writing-tasks.update');
         Route::delete('/writing-tasks/{writing_task}', [\App\Http\Controllers\Admin\WritingTaskController::class, 'destroy'])->name('writing-tasks.destroy');
 
-        Route::get('/tests/{test}/speaking-questions/create', [\App\Http\Controllers\Admin\SpeakingQuestionController::class, 'create'])->name('speaking-questions.create');
-        Route::post('/tests/{test}/speaking-questions', [\App\Http\Controllers\Admin\SpeakingQuestionController::class, 'store'])->name('speaking-questions.store');
+        Route::get('/test_sets/{test_set}/speaking-questions/create', [\App\Http\Controllers\Admin\SpeakingQuestionController::class, 'create'])->name('speaking-questions.create');
+        Route::post('/test_sets/{test_set}/speaking-questions', [\App\Http\Controllers\Admin\SpeakingQuestionController::class, 'store'])->name('speaking-questions.store');
         Route::get('/speaking-questions/{speaking_question}/edit', [\App\Http\Controllers\Admin\SpeakingQuestionController::class, 'edit'])->name('speaking-questions.edit');
         Route::put('/speaking-questions/{speaking_question}', [\App\Http\Controllers\Admin\SpeakingQuestionController::class, 'update'])->name('speaking-questions.update');
         Route::delete('/speaking-questions/{speaking_question}', [\App\Http\Controllers\Admin\SpeakingQuestionController::class, 'destroy'])->name('speaking-questions.destroy');
 
-        Route::get('/tests/{test}/listening-sections/create', [\App\Http\Controllers\Admin\ListeningSectionController::class, 'create'])->name('listening-sections.create');
-        Route::post('/tests/{test}/listening-sections', [\App\Http\Controllers\Admin\ListeningSectionController::class, 'store'])->name('listening-sections.store');
+        Route::get('/test_sets/{test_set}/listening-sections/create', [\App\Http\Controllers\Admin\ListeningSectionController::class, 'create'])->name('listening-sections.create');
+        Route::post('/test_sets/{test_set}/listening-sections', [\App\Http\Controllers\Admin\ListeningSectionController::class, 'store'])->name('listening-sections.store');
         Route::get('/listening-sections/{listening_section}/edit', [\App\Http\Controllers\Admin\ListeningSectionController::class, 'edit'])->name('listening-sections.edit');
         Route::put('/listening-sections/{listening_section}', [\App\Http\Controllers\Admin\ListeningSectionController::class, 'update'])->name('listening-sections.update');
         Route::delete('/listening-sections/{listening_section}', [\App\Http\Controllers\Admin\ListeningSectionController::class, 'destroy'])->name('listening-sections.destroy');
 
-        Route::get('/tests/{test}/reading-passages/create', [\App\Http\Controllers\Admin\ReadingPassageController::class, 'create'])->name('reading-passages.create');
-        Route::post('/tests/{test}/reading-passages', [\App\Http\Controllers\Admin\ReadingPassageController::class, 'store'])->name('reading-passages.store');
+        Route::get('/test_sets/{test_set}/reading-passages/create', [\App\Http\Controllers\Admin\ReadingPassageController::class, 'create'])->name('reading-passages.create');
+        Route::post('/test_sets/{test_set}/reading-passages', [\App\Http\Controllers\Admin\ReadingPassageController::class, 'store'])->name('reading-passages.store');
         Route::get('/reading-passages/{reading_passage}/edit', [\App\Http\Controllers\Admin\ReadingPassageController::class, 'edit'])->name('reading-passages.edit');
         Route::put('/reading-passages/{reading_passage}', [\App\Http\Controllers\Admin\ReadingPassageController::class, 'update'])->name('reading-passages.update');
         Route::delete('/reading-passages/{reading_passage}', [\App\Http\Controllers\Admin\ReadingPassageController::class, 'destroy'])->name('reading-passages.destroy');

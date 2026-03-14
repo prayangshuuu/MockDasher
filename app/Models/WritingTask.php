@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 class WritingTask extends Model
 {
     protected $fillable = [
-        'test_id', 'task_number', 'task_title', 'task_description', 
+        'test_set_id', 'task_number', 'task_title', 'task_description', 
         'task_prompt', 'instruction_text', 'minimum_word_count'
     ];
 
-    public function test()
+    public function testSet()
     {
-        return $this->belongsTo(Test::class);
+        return $this->belongsTo(TestSet::class);
     }
 
     public function images()

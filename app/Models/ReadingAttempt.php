@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ReadingAttempt extends Model
 {
-    protected $fillable = ['user_id', 'test_id', 'status', 'started_at', 'completed_at'];
+    protected $fillable = ['user_id', 'test_set_id', 'status', 'started_at', 'completed_at'];
 
     protected function casts(): array
     {
@@ -21,9 +21,9 @@ class ReadingAttempt extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function test()
+    public function testSet()
     {
-        return $this->belongsTo(Test::class);
+        return $this->belongsTo(TestSet::class);
     }
 
     public function answers()

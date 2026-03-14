@@ -7,15 +7,15 @@ use Illuminate\Http\Request;
 
 class ReadingPassageController extends Controller
 {
-    public function create($testId)
+    public function create($testSetId)
     {
-        $test = \App\Models\Test::findOrFail($testId);
-        return view('admin.reading-passages.create', compact('test'));
+        $testSet = \App\Models\TestSet::findOrFail($testSetId);
+        return view('admin.reading-passages.create', compact('testSet'));
     }
 
-    public function store(Request $request, $testId)
+    public function store(Request $request, $testSetId)
     {
-        $test = \App\Models\Test::findOrFail($testId);
+        $testSet = \App\Models\TestSet::findOrFail($testSetId);
 
         $validated = $request->validate([
             'passage_number' => 'required|in:1,2,3',
@@ -23,9 +23,9 @@ class ReadingPassageController extends Controller
             'content' => 'required|string',
         ]);
 
-        $test->readingPassages()->create($validated);
+        $testSet->readingPassages()->create($validated);
 
-        return redirect()->route('admin.tests.show', $testId)->with('success', 'Reading passage added successfully.');
+        return redirect()->route('admin.test_sets.show', $testSetId)->with('success', 'Reading passage added successfully.');
     }
 
     public function edit(\App\Models\ReadingPassage $reading_passage)
@@ -43,14 +43,14 @@ class ReadingPassageController extends Controller
 
         $reading_passage->update($validated);
 
-        return redirect()->route('admin.tests.show', $reading_passage->test_id)->with('success', 'Reading passage updated successfully.');
+        return redirect()->route('admin.test_sets.show', $reading_passage->test_set_id)->with('success', 'Reading passage updated successfully.');
     }
 
     public function destroy(\App\Models\ReadingPassage $reading_passage)
     {
-        $testId = $reading_passage->test_id;
+        $testSetId = $reading_passage->test_set_id;
         $reading_passage->delete();
 
-        return redirect()->route('admin.tests.show', $testId)->with('success', 'Reading passage deleted successfully.');
+        return redirect()->route('admin.test_sets.show', $testSetId)->with('success', 'Reading passage deleted successfully.');
     }
 }

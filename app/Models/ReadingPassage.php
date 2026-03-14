@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class ReadingPassage extends Model
 {
-    protected $fillable = ['test_id', 'passage_number', 'title', 'content'];
+    protected $fillable = ['test_set_id', 'passage_number', 'title', 'content'];
 
-    public function test()
+    public function testSet()
     {
-        return $this->belongsTo(Test::class);
+        return $this->belongsTo(TestSet::class);
     }
 
     // Legacy direct questions (still works for existing data)

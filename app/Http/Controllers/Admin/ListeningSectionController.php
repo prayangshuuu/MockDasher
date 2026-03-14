@@ -7,15 +7,15 @@ use Illuminate\Http\Request;
 
 class ListeningSectionController extends Controller
 {
-    public function create($testId)
+    public function create($testSetId)
     {
-        $test = \App\Models\Test::findOrFail($testId);
-        return view('admin.listening-sections.create', compact('test'));
+        $testSet = \App\Models\TestSet::findOrFail($testSetId);
+        return view('admin.listening-sections.create', compact('testSet'));
     }
 
-    public function store(Request $request, $testId)
+    public function store(Request $request, $testSetId)
     {
-        $test = \App\Models\Test::findOrFail($testId);
+        $testSet = \App\Models\TestSet::findOrFail($testSetId);
 
         $validated = $request->validate([
             'section_number'   => 'required|in:1,2,3,4',
@@ -30,9 +30,9 @@ class ListeningSectionController extends Controller
             $data['audio_path'] = $request->file('audio_file')->store('listening_audio', 'public');
         }
 
-        $test->listeningSections()->create($data);
+        $testSet->listeningSections()->create($data);
 
-        return redirect()->route('admin.tests.show', $testId)->with('success', 'Listening section added successfully.');
+        return redirect()->route('admin.test_sets.show', $testSetId)->with('success', 'Listening section added successfully.');
     }
 
     public function edit(\App\Models\ListeningSection $listening_section)
@@ -60,17 +60,17 @@ class ListeningSectionController extends Controller
 
         $listening_section->update($data);
 
-        return redirect()->route('admin.tests.show', $listening_section->test_id)->with('success', 'Listening section updated successfully.');
+        return redirect()->route('admin.test_sets.show', $listening_section->test_set_id)->with('success', 'Listening section updated successfully.');
     }
 
     public function destroy(\App\Models\ListeningSection $listening_section)
     {
-        $testId = $listening_section->test_id;
+        $testSetId = $listening_section->test_set_id;
         if ($listening_section->audio_path) {
             \Illuminate\Support\Facades\Storage::disk('public')->delete($listening_section->audio_path);
         }
         $listening_section->delete();
 
-        return redirect()->route('admin.tests.show', $testId)->with('success', 'Listening section deleted successfully.');
+        return redirect()->route('admin.test_sets.show', $testSetId)->with('success', 'Listening section deleted successfully.');
     }
 }

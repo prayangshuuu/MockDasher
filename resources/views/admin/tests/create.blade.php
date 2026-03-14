@@ -14,20 +14,7 @@
     <div class="max-w-3xl">
         <form action="{{ route('admin.tests.store') }}" method="POST" class="bg-white shadow-sm border border-gray-200 rounded-lg p-8">
             @csrf
-            
-            @if(request()->has('collection'))
-                <input type="hidden" name="from_collection" value="1">
-            @endif
 
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-semibold mb-2">Collection (Optional)</label>
-                <select name="ielts_collection_id" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                    <option value="">-- None (Standalone Test) --</option>
-                    @foreach($collections as $col)
-                        <option value="{{ $col->id }}" {{ $selectedCollectionId == $col->id ? 'selected' : '' }}>{{ $col->title }}</option>
-                    @endforeach
-                </select>
-            </div>
 
             <div class="mb-6">
                 <label class="block text-gray-700 text-sm font-semibold mb-2">Test Title</label>

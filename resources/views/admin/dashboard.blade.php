@@ -7,72 +7,29 @@
 @section('content')
     <!-- Dashboard Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <!-- Stats Card 1 -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center hover:shadow-md transition">
-            <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
-                <i class="fas fa-folder-open text-2xl"></i>
-            </div>
-            <div>
-                <p class="text-sm font-medium text-gray-500">Collections</p>
-                <p class="text-2xl font-bold text-gray-900">{{ $stats['collections'] }}</p>
-            </div>
+        <div class="bg-[#F6F3EE] rounded-[8px] border border-[#D8D4CC] p-6 flex flex-col justify-center">
+            <p class="text-sm font-medium text-[#1A1A1A] opacity-70 mb-1">Total Tests</p>
+            <p class="text-[28px] font-bold text-[#1A1A1A]">{{ $stats['total_tests'] }}</p>
         </div>
 
         <!-- Stats Card 2 -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center hover:shadow-md transition">
-            <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
-                <i class="fas fa-file-alt text-2xl"></i>
-            </div>
-            <div>
-                <p class="text-sm font-medium text-gray-500">Tests</p>
-                <p class="text-2xl font-bold text-gray-900">{{ $stats['published_tests'] }} <span class="text-sm font-normal text-gray-400">/ {{ $stats['total_tests'] }} total</span></p>
-            </div>
+        <div class="bg-[#F6F3EE] rounded-[8px] border border-[#D8D4CC] p-6 flex flex-col justify-center">
+            <p class="text-sm font-medium text-[#1A1A1A] opacity-70 mb-1">Total Test Sets</p>
+            <p class="text-[28px] font-bold text-[#1A1A1A]">{{ $stats['total_test_sets'] }}</p>
         </div>
 
         <!-- Stats Card 3 -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center hover:shadow-md transition">
-            <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
-                <i class="fas fa-users text-2xl"></i>
-            </div>
-            <div>
-                <p class="text-sm font-medium text-gray-500">Active Users</p>
-                <p class="text-2xl font-bold text-gray-900">{{ $stats['users'] }}</p>
-            </div>
+        <div class="bg-[#F6F3EE] rounded-[8px] border border-[#D8D4CC] p-6 flex flex-col justify-center">
+            <p class="text-sm font-medium text-[#1A1A1A] opacity-70 mb-1">Total Users</p>
+            <p class="text-[28px] font-bold text-[#1A1A1A]">{{ $stats['users'] }}</p>
         </div>
 
         <!-- Stats Card 4 -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center hover:shadow-md transition">
-            <div class="p-3 rounded-full bg-orange-100 text-orange-600 mr-4">
-                <i class="fas fa-chart-line text-2xl"></i>
-            </div>
-            <div>
-                <p class="text-sm font-medium text-gray-500">Total Attempts</p>
-                <p class="text-2xl font-bold text-gray-900">{{ $stats['attempts'] + $stats['listening_attempts'] + $stats['reading_attempts'] }}</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Module Content Stats -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200 p-4 text-center hover:shadow-sm transition">
-            <i class="fas fa-pen-nib text-blue-600 text-lg mb-2"></i>
-            <p class="text-2xl font-bold text-blue-800">{{ $stats['writing_tasks'] }}</p>
-            <p class="text-xs font-medium text-blue-600 uppercase tracking-wider">Writing Tasks</p>
-        </div>
-        <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200 p-4 text-center hover:shadow-sm transition">
-            <i class="fas fa-microphone text-green-600 text-lg mb-2"></i>
-            <p class="text-2xl font-bold text-green-800">{{ $stats['speaking_questions'] }}</p>
-            <p class="text-xs font-medium text-green-600 uppercase tracking-wider">Speaking Questions</p>
-        </div>
-        <div class="bg-gradient-to-br from-teal-50 to-teal-100 rounded-lg border border-teal-200 p-4 text-center hover:shadow-sm transition">
-            <i class="fas fa-headphones text-teal-600 text-lg mb-2"></i>
-            <p class="text-2xl font-bold text-teal-800">{{ $stats['listening_sections'] }}</p>
-            <p class="text-xs font-medium text-teal-600 uppercase tracking-wider">Listening Sections</p>
-        </div>
-        <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg border border-orange-200 p-4 text-center hover:shadow-sm transition">
-            <i class="fas fa-book-open text-orange-600 text-lg mb-2"></i>
-            <p class="text-2xl font-bold text-orange-800">{{ $stats['reading_passages'] }}</p>
-            <p class="text-xs font-medium text-orange-600 uppercase tracking-wider">Reading Passages</p>
+        <div class="bg-[#F6F3EE] rounded-[8px] border border-[#D8D4CC] p-6 flex flex-col justify-center">
+            <p class="text-sm font-medium text-[#1A1A1A] opacity-70 mb-1">Total Attempts</p>
+            <p class="text-[28px] font-bold text-[#1A1A1A]">{{ $stats['attempts'] }}</p>
         </div>
     </div>
 
@@ -88,7 +45,7 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Test Info</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Collection</th>
+
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th scope="col" class="relative px-6 py-3">
                             <span class="sr-only">Actions</span>
@@ -102,9 +59,7 @@
                                 <div class="text-sm font-medium text-gray-900">{{ $test->title }}</div>
                                 <div class="text-sm text-gray-500">Test #{{ $test->number }}</div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-700">{{ optional($test->collection)->title ?? '—' }}</div>
-                            </td>
+
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $test->status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
                                     {{ ucfirst($test->status) }}

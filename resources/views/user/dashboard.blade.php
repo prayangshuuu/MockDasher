@@ -52,74 +52,39 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <!-- Main Content: Collections -->
+            <!-- Main Content: Tests -->
             <div class="lg:col-span-2 space-y-6">
                 <div>
                     <h3 class="text-xl font-bold text-gray-900 mb-4">Available Mock Tests</h3>
                     
-                    @forelse($collections as $collection)
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 mb-6 overflow-hidden">
-                            <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
-                                <div>
-                                    <h4 class="text-lg font-bold text-gray-800">{{ $collection->title }}</h4>
-                                    <p class="text-xs text-gray-500 mt-1">{{ $collection->exam_type ?? 'Academic/General' }} &bull; {{ $collection->year ?? 'Latest' }}</p>
-                                </div>
-                                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-blue-200">{{ $collection->tests->count() }} Tests</span>
-                            </div>
-                            <div class="p-6">
-                                @if($collection->description)
-                                    <p class="text-sm text-gray-600 mb-4">{{ $collection->description }}</p>
-                                @endif
-                                
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    @forelse($collection->tests as $test)
-                                        <div class="border border-gray-200 rounded p-4 hover:border-blue-400 hover:shadow-sm transition group">
-                                            <div class="flex justify-between items-start mb-2">
-                                                <h5 class="font-semibold text-gray-900 group-hover:text-blue-600 transition">{{ $test->title }}</h5>
-                                            </div>
-                                            <p class="text-xs text-gray-500 mb-4 text-left">4 Modules &bull; Reading, Writing, Listening, Speaking</p>
-                                            
-                                            <form action="{{ route('user.tests.start', $test->id) }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="w-full text-center bg-gray-50 hover:bg-blue-600 text-gray-700 hover:text-white border border-gray-200 hover:border-blue-600 font-medium py-2 px-4 rounded text-sm transition">
-                                                    Start Preparation
-                                                </button>
-                                            </form>
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 mb-6 overflow-hidden">
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                @forelse($tests as $test)
+                                    <div class="border border-gray-200 rounded p-4 hover:border-blue-400 hover:shadow-sm transition group">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h5 class="font-semibold text-gray-900 group-hover:text-blue-600 transition">{{ $test->title }}</h5>
                                         </div>
-                                    @empty
-                                        <div class="col-span-full text-center py-4 text-sm text-gray-500 bg-gray-50 rounded">
-                                            No tests available in this collection yet.
-                                        </div>
-                                    @endforelse
-                                </div>
+                                        <p class="text-xs text-gray-500 mb-4 text-left">4 Modules &bull; Reading, Writing, Listening, Speaking</p>
+                                        
+                                        <form action="{{ route('user.tests.start', $test->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="w-full text-center bg-gray-50 hover:bg-blue-600 text-gray-700 hover:text-white border border-gray-200 hover:border-blue-600 font-medium py-2 px-4 rounded text-sm transition">
+                                                Start Preparation
+                                            </button>
+                                        </form>
+                                    </div>
+                                @empty
+                                    <div class="col-span-full text-center py-12 text-sm text-gray-500 bg-gray-50 rounded">
+                                        <i class="fas fa-books text-gray-300 text-5xl mb-4"></i>
+                                        <h4 class="text-lg font-medium text-gray-900">No Content Available</h4>
+                                        <p class="text-sm text-gray-500 mt-2">Check back later for new IELTS mock exams.</p>
+                                    </div>
+                                @endforelse
                             </div>
                         </div>
-                    @empty
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-                            <i class="fas fa-books text-gray-300 text-5xl mb-4"></i>
-                            <h4 class="text-lg font-medium text-gray-900">No Content Available</h4>
-                            <p class="text-sm text-gray-500 mt-2">Check back later for new IELTS collections and mock exams.</p>
-                        </div>
-                    @endforelse
-                </div>
-
-                @if($standaloneTests->isNotEmpty())
-                    <h3 class="text-xl font-bold text-gray-900 mb-4 mt-8">More Tests</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        @foreach($standaloneTests as $test)
-                            <div class="bg-white border border-gray-200 rounded-lg p-5 hover:border-blue-400 hover:shadow-md transition group">
-                                <h5 class="font-semibold text-gray-900 group-hover:text-blue-600 transition mb-1">{{ $test->title }}</h5>
-                                <p class="text-xs text-gray-500 mb-4">4 Modules &bull; Reading, Writing, Listening, Speaking</p>
-                                <form action="{{ route('user.tests.start', $test->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="w-full text-center bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white border border-blue-200 hover:border-blue-600 font-medium py-2 px-4 rounded text-sm transition">
-                                        Start Preparation
-                                    </button>
-                                </form>
-                            </div>
-                        @endforeach
                     </div>
-                @endif
+                </div>
             </div>
             <div class="space-y-6">
                 

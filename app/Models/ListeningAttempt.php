@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ListeningAttempt extends Model
 {
     protected $fillable = [
-        'user_id', 'test_id', 'current_section', 'status',
+        'user_id', 'test_set_id', 'current_section', 'status',
         'started_at', 'transfer_started_at', 'completed_at'
     ];
 
@@ -25,9 +25,9 @@ class ListeningAttempt extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function test()
+    public function testSet()
     {
-        return $this->belongsTo(Test::class);
+        return $this->belongsTo(TestSet::class);
     }
 
     public function answers()

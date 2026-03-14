@@ -40,10 +40,7 @@
                         <i class="fas fa-home w-6 text-center mr-2 {{ request()->routeIs('admin.dashboard') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}"></i>
                         Dashboard
                     </a>
-                    <a href="{{ route('admin.collections.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('admin.collections.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }} transition">
-                        <i class="fas fa-layer-group w-6 text-center mr-2 {{ request()->routeIs('admin.collections.*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}"></i>
-                        IELTS Collections
-                    </a>
+
                     <a href="{{ route('admin.tests.index') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-md {{ request()->routeIs('admin.tests.*') ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700' }} transition">
                         <i class="fas fa-file-alt w-6 text-center mr-2 {{ request()->routeIs('admin.tests.*') ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600' }}"></i>
                         Tests

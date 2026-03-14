@@ -6,35 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Test extends Model
 {
-    protected $fillable = ['ielts_collection_id', 'title', 'number', 'status'];
+    protected $fillable = ['book_number', 'year', 'exam_type', 'status'];
 
-    public function collection()
+    public function testSets()
     {
-        return $this->belongsTo(IeltsCollection::class, 'ielts_collection_id');
+        return $this->hasMany(TestSet::class);
     }
 
-    public function sections()
+    public function getTitleAttribute()
     {
-        return $this->hasMany(Section::class);
-    }
-
-    public function writingTasks()
-    {
-        return $this->hasMany(WritingTask::class);
-    }
-
-    public function speakingQuestions()
-    {
-        return $this->hasMany(SpeakingQuestion::class);
-    }
-
-    public function listeningSections()
-    {
-        return $this->hasMany(ListeningSection::class);
-    }
-
-    public function readingPassages()
-    {
-        return $this->hasMany(ReadingPassage::class);
+        return "IELTS {$this->book_number} {$this->exam_type} {$this->year}";
     }
 }
