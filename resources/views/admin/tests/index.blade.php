@@ -11,9 +11,9 @@
 @endsection
 
 @section('content')
-<x-card>
+<x-card class="mb-[24px]">
     <!-- Toolbar (Search & Filters) -->
-    <div class="pb-[24px] mb-[24px] border-b border-[var(--color-divider)] flex flex-col md:flex-row gap-[16px] justify-between items-center">
+    <div class="flex flex-col md:flex-row gap-[16px] justify-between items-center">
         <form method="GET" action="{{ route('admin.tests.index') }}" class="w-full md:w-96 relative">
             <div class="absolute inset-y-0 left-0 pl-[16px] flex items-center pointer-events-none">
                 <i class="fas fa-search text-[var(--color-text)] opacity-50"></i>
@@ -32,6 +32,7 @@
             </x-button>
         </div>
     </div>
+</x-card>
 
     <!-- Grouped Book Cards -->
     @if($tests->isEmpty())
