@@ -15,42 +15,42 @@
 
         /* Scrollbars */
         .scroll-panel::-webkit-scrollbar       { width: 7px; }
-        .scroll-panel::-webkit-scrollbar-track { background: var(--color-dwimik-bg); }
-        .scroll-panel::-webkit-scrollbar-thumb { background: var(--color-dwimik-divider); border-radius: 4px; }
+        .scroll-panel::-webkit-scrollbar-track { background: var(--color-bg); }
+        .scroll-panel::-webkit-scrollbar-thumb { background: var(--color-divider); border-radius: 4px; }
 
         /* Answer-sheet buttons */
         .ans-btn            { transition: all .15s; position: relative; }
-        .ans-btn.answered   { background: var(--color-dwimik-primary); color: white; border-color: var(--color-dwimik-primary); }
-        .ans-btn.active-q   { background: var(--color-dwimik-primary); color: white; border-color: var(--color-dwimik-primary); outline: 2px solid var(--color-dwimik-primary); outline-offset: 2px; }
+        .ans-btn.answered   { background: var(--color-primary); color: white; border-color: var(--color-primary); }
+        .ans-btn.active-q   { background: var(--color-primary); color: white; border-color: var(--color-primary); outline: 2px solid var(--color-primary); outline-offset: 2px; }
         
         /* Flag indicator on button */
-        .ans-btn .flag-icon { position: absolute; top: -4px; right: -4px; color: var(--color-dwimik-error); font-size: 10px; display: none; background: white; border-radius: 50%; width: 12px; height: 12px; line-height: 12px; text-align: center; box-shadow: 0 0 2px rgba(0,0,0,0.3); }
+        .ans-btn .flag-icon { position: absolute; top: -4px; right: -4px; color: var(--color-error); font-size: 10px; display: none; background: white; border-radius: 50%; width: 12px; height: 12px; line-height: 12px; text-align: center; box-shadow: 0 0 2px rgba(0,0,0,0.3); }
         .ans-btn.flagged .flag-icon { display: block; }
 
         /* Active question highlight */
-        .question-block.active-q { border-left: 3px solid var(--color-dwimik-primary); background: #fdfbf7; }
+        .question-block.active-q { border-left: 3px solid var(--color-primary); background: #fdfbf7; }
 
         @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
         .fade-in { animation: fadeIn .3s ease-out both; }
 
         /* Timer warning */
-        .timer-warning { color: var(--color-dwimik-error); animation: pulse 1s ease-in-out infinite; }
+        .timer-warning { color: var(--color-error); animation: pulse 1s ease-in-out infinite; }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
         
         /* Review overlay */
         .review-overlay { background: rgba(26,26,26,0.85); backdrop-filter: blur(4px); }
     </style>
 </head>
-<body class="bg-[var(--color-dwimik-bg)] text-[var(--color-dwimik-text)] min-h-screen overflow-hidden flex flex-col">
+<body class="bg-[var(--color-bg)] text-[var(--color-text)] min-h-screen overflow-hidden flex flex-col">
 
 {{-- ═══════════════════════════════════════════════
      TOP BAR
 ═══════════════════════════════════════════════ --}}
-<div id="top-bar" class="z-50 bg-white border-b border-[var(--color-dwimik-divider)] text-[var(--color-dwimik-text)] shadow-sm h-16 flex items-center justify-between px-6 flex-shrink-0">
+<div id="top-bar" class="z-50 bg-white border-b border-[var(--color-divider)] text-[var(--color-text)] shadow-sm h-16 flex items-center justify-between px-6 flex-shrink-0">
 
     {{-- Left: Brand & Title --}}
     <div class="flex items-center gap-4 w-1/3">
-        <div class="w-10 h-10 bg-[var(--color-dwimik-primary)] rounded-md flex items-center justify-center font-bold text-white text-lg">M</div>
+        <div class="w-10 h-10 bg-[var(--color-primary)] rounded-md flex items-center justify-center font-bold text-white text-lg">M</div>
         <div>
             <p class="text-[10px] text-gray-500 font-bold leading-tight uppercase tracking-wider">IELTS Reading</p>
             <span class="text-sm font-bold truncate block max-w-[200px]">{{ $test->title }}</span>
@@ -59,25 +59,25 @@
 
     {{-- Center: Timer & Autosave --}}
     <div class="flex items-center justify-center gap-6 w-1/3">
-        <div class="flex items-center gap-2 bg-[var(--color-dwimik-bg)] border border-[var(--color-dwimik-divider)] rounded-[var(--radius-dwimik)] px-4 py-2 shadow-sm">
-            <i class="fas fa-clock text-[var(--color-dwimik-primary)] text-sm"></i>
+        <div class="flex items-center gap-2 bg-[var(--color-bg)] border border-[var(--color-divider)] rounded-[var(--radius-base)] px-4 py-2 shadow-sm">
+            <i class="fas fa-clock text-[var(--color-primary)] text-sm"></i>
             <div class="flex items-end gap-2">
-                <p id="timer-display" class="text-lg font-bold font-mono leading-none tracking-widest text-[var(--color-dwimik-text)]">60:00</p>
+                <p id="timer-display" class="text-lg font-bold font-mono leading-none tracking-widest text-[var(--color-text)]">60:00</p>
                 <p class="text-[10px] text-gray-500 font-medium leading-tight mb-0.5">Left</p>
             </div>
         </div>
-        <div id="autosave-indicator" class="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 bg-[var(--color-dwimik-bg)] px-3 py-1.5 rounded-full border border-[var(--color-dwimik-divider)] shadow-sm">
-            <i class="fas fa-check-circle text-[var(--color-dwimik-success)] text-[10px]"></i> <span class="font-medium tracking-wide">Saved</span>
+        <div id="autosave-indicator" class="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 bg-[var(--color-bg)] px-3 py-1.5 rounded-full border border-[var(--color-divider)] shadow-sm">
+            <i class="fas fa-check-circle text-[var(--color-success)] text-[10px]"></i> <span class="font-medium tracking-wide">Saved</span>
         </div>
     </div>
     
     {{-- Right: Progress & Profile --}}
     <div class="flex items-center justify-end gap-4 w-1/3">
-        <div class="bg-[var(--color-dwimik-bg)] px-4 py-2 rounded-[var(--radius-dwimik)] border border-[var(--color-dwimik-divider)] flex items-center gap-2 shadow-sm">
-            <div class="w-2.5 h-2.5 rounded-full bg-[var(--color-dwimik-primary)]"></div>
-            <p class="text-xs text-gray-500 font-medium">Answered: <span id="progress-text" class="text-[var(--color-dwimik-text)] font-bold ml-1">0 / 0</span></p>
+        <div class="bg-[var(--color-bg)] px-4 py-2 rounded-[var(--radius-base)] border border-[var(--color-divider)] flex items-center gap-2 shadow-sm">
+            <div class="w-2.5 h-2.5 rounded-full bg-[var(--color-primary)]"></div>
+            <p class="text-xs text-gray-500 font-medium">Answered: <span id="progress-text" class="text-[var(--color-text)] font-bold ml-1">0 / 0</span></p>
         </div>
-        <div class="w-10 h-10 rounded-full bg-blue-50 border border-[var(--color-dwimik-divider)] flex items-center justify-center font-bold text-[var(--color-dwimik-primary)] shadow-sm">
+        <div class="w-10 h-10 rounded-full bg-blue-50 border border-[var(--color-divider)] flex items-center justify-center font-bold text-[var(--color-primary)] shadow-sm">
             {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
         </div>
     </div>
@@ -292,7 +292,7 @@
 {{-- ═══════════════════════════════════════════════
      BOTTOM PANEL: ANSWER SHEET NAVIGATION
 ═══════════════════════════════════════════════ --}}
-<div class="bg-white border-t border-[var(--color-dwimik-divider)] px-6 py-4 flex items-center justify-between flex-shrink-0 z-20 shadow-[0_-2px_10px_-5px_rgba(0,0,0,0.05)]">
+<div class="bg-white border-t border-[var(--color-divider)] px-6 py-4 flex items-center justify-between flex-shrink-0 z-20 shadow-[0_-2px_10px_-5px_rgba(0,0,0,0.05)]">
     <div class="flex-1 overflow-x-auto scroll-panel pb-2 mr-6">
         <div class="flex items-center gap-2 min-w-max" id="question-nav-chips">
             @php $globalNum = 1; @endphp
@@ -302,7 +302,7 @@
                         @php 
                             $isFlagged = !empty($flaggedAnswers[$q->id]);
                             $isAns = !empty($savedAnswers[$q->id]);
-                            $btnClass = "ans-btn relative w-9 h-9 flex items-center justify-center text-sm font-bold border rounded-[var(--radius-dwimik)] hover:bg-[var(--color-dwimik-bg)] hover:text-[var(--color-dwimik-text)] cursor-pointer bg-white border-[var(--color-dwimik-divider)] text-[var(--color-dwimik-text)] transition-colors shadow-sm";
+                            $btnClass = "ans-btn relative w-9 h-9 flex items-center justify-center text-sm font-bold border rounded-[var(--radius-base)] hover:bg-[var(--color-bg)] hover:text-[var(--color-text)] cursor-pointer bg-white border-[var(--color-divider)] text-[var(--color-text)] transition-colors shadow-sm";
                             if($isAns) $btnClass .= " answered";
                             if($isFlagged) $btnClass .= " flagged";
                         @endphp
@@ -320,9 +320,9 @@
         </div>
     </div>
     
-    <div class="flex items-center gap-3 flex-shrink-0 border-l border-[var(--color-dwimik-divider)] pl-6">
-        <button onclick="showReviewPage()" class="px-6 py-2.5 rounded-[var(--radius-dwimik)] bg-[var(--color-dwimik-bg)] text-[var(--color-dwimik-text)] font-bold hover:bg-[#e8e4dc] transition-colors border border-[var(--color-dwimik-divider)] flex items-center gap-2 shadow-sm">
-            <i class="fas fa-list-check text-[var(--color-dwimik-primary)]"></i> Review & Submit
+    <div class="flex items-center gap-3 flex-shrink-0 border-l border-[var(--color-divider)] pl-6">
+        <button onclick="showReviewPage()" class="px-6 py-2.5 rounded-[var(--radius-base)] bg-[var(--color-bg)] text-[var(--color-text)] font-bold hover:bg-[#e8e4dc] transition-colors border border-[var(--color-divider)] flex items-center gap-2 shadow-sm">
+            <i class="fas fa-list-check text-[var(--color-primary)]"></i> Review & Submit
         </button>
     </div>
 </div>

@@ -4,13 +4,13 @@
 ])
 
 @php
-    $baseClasses = 'inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-[var(--radius-dwimik)] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
+    $baseClasses = 'inline-flex items-center justify-center px-[16px] py-[8px] text-[16px] font-medium rounded-[var(--radius-base)] transition-opacity focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed';
 
     $variants = [
-        'primary' => 'bg-[var(--color-dwimik-primary)] text-white hover:bg-opacity-90 focus:ring-[var(--color-dwimik-primary)]',
-        'secondary' => 'bg-transparent border border-[var(--color-dwimik-divider)] text-[var(--color-dwimik-text)] hover:bg-gray-50 focus:ring-[var(--color-dwimik-divider)]',
-        'danger' => 'bg-[var(--color-dwimik-error)] text-white hover:bg-opacity-90 focus:ring-[var(--color-dwimik-error)]',
-        'success' => 'bg-[var(--color-dwimik-success)] text-white hover:bg-opacity-90 focus:ring-[var(--color-dwimik-success)]',
+        'primary' => 'bg-[var(--color-primary)] text-[var(--color-white)] hover:opacity-90',
+        'secondary' => 'bg-transparent border border-[var(--color-divider)] text-[var(--color-text)] hover:opacity-90',
+        'danger' => 'bg-[var(--color-error)] text-[var(--color-white)] hover:opacity-90',
+        'success' => 'bg-[var(--color-success)] text-[var(--color-white)] hover:opacity-90',
     ];
 
     $classes = $baseClasses . ' ' . ($variants[$variant] ?? $variants['primary']);

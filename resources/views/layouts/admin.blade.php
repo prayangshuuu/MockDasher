@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-[var(--color-dwimik-bg)] font-sans antialiased text-[var(--color-dwimik-text)]">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-[var(--color-bg)] font-sans antialiased text-[var(--color-text)]">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,26 +11,26 @@
 <body class="h-full overflow-hidden flex flex-col">
 
     <!-- Top Navbar -->
-    <nav class="bg-white border-b border-[var(--color-dwimik-divider)] shadow-sm h-16 flex items-center justify-between px-6 z-20 shrink-0 relative">
-        <div class="flex items-center gap-3">
-            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded shrink-0 bg-[var(--color-dwimik-primary)] flex items-center justify-center text-white font-bold text-lg">M</div>
-                <span class="font-bold text-xl tracking-tight hidden sm:block">MockDasher <span class="text-sm font-normal text-gray-500 ml-2">CMS</span></span>
+    <nav class="bg-[var(--color-bg)] border-b border-[var(--color-divider)] h-[64px] flex items-center justify-between px-[24px] z-20 shrink-0 relative">
+        <div class="flex items-center gap-[16px]">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-[16px]">
+                <div class="w-[32px] h-[32px] rounded-[var(--radius-base)] shrink-0 bg-[var(--color-primary)] flex items-center justify-center text-[var(--color-white)] font-bold text-[18px]">M</div>
+                <span class="font-bold text-[24px] tracking-tight hidden sm:block">MockDasher <span class="text-[14px] font-normal text-[var(--color-text)] opacity-70 ml-[8px]">CMS</span></span>
             </a>
         </div>
         
-        <div class="flex items-center gap-6">
-            <div class="flex items-center gap-3">
-                <div class="h-8 w-8 rounded-full bg-blue-50 border border-[var(--color-dwimik-divider)] flex items-center justify-center text-sm font-bold text-[var(--color-dwimik-primary)]">
+        <div class="flex items-center gap-[24px]">
+            <div class="flex items-center gap-[16px]">
+                <div class="h-[32px] w-[32px] rounded-[var(--radius-base)] bg-[var(--color-bg)] border border-[var(--color-divider)] flex items-center justify-center text-[14px] font-bold text-[var(--color-primary)]">
                     {{ substr(auth()->user()->name ?? 'A', 0, 1) }}
                 </div>
-                <span class="text-sm font-medium hidden sm:block">{{ auth()->user()->name ?? 'Admin' }}</span>
+                <span class="text-[14px] font-medium hidden sm:block">{{ auth()->user()->name ?? 'Admin' }}</span>
             </div>
             
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="text-sm font-medium text-[var(--color-dwimik-error)] hover:opacity-80 transition-opacity">
-                    <i class="fas fa-sign-out-alt mr-1"></i> Logout
+                <button type="submit" class="text-[14px] font-medium text-[var(--color-error)] hover:opacity-80 transition-opacity">
+                    <i class="fas fa-sign-out-alt mr-[8px]"></i> Logout
                 </button>
             </form>
         </div>
@@ -38,8 +38,8 @@
 
     <div class="flex flex-1 overflow-hidden">
         <!-- Sidebar -->
-        <aside class="w-64 bg-white border-r border-[var(--color-dwimik-divider)] flex-shrink-0 flex flex-col overflow-y-auto z-10 hidden md:flex">
-            <nav class="flex-1 px-4 py-6 space-y-2">
+        <aside class="w-[256px] bg-[var(--color-bg)] border-r border-[var(--color-divider)] flex-shrink-0 flex flex-col overflow-y-auto z-10 hidden md:flex">
+            <nav class="flex-1 px-[16px] py-[24px] space-y-[8px]">
                 @php
                     $navItems = [
                         ['route' => 'admin.dashboard', 'icon' => 'fa-home', 'label' => 'Dashboard', 'pattern' => 'admin.dashboard'],
@@ -50,8 +50,8 @@
                 @endphp
 
                 @foreach($navItems as $item)
-                    <a href="{{ route($item['route']) }}" class="flex items-center px-4 py-3 rounded-[var(--radius-dwimik)] text-sm font-medium transition-colors {{ request()->routeIs($item['pattern']) ? 'bg-[var(--color-dwimik-primary)] text-white shadow-sm' : 'text-[var(--color-dwimik-text)] hover:bg-[#F9F8F6]' }}">
-                        <i class="fas {{ $item['icon'] }} w-5 mr-3 {{ request()->routeIs($item['pattern']) ? 'text-white' : 'text-gray-400' }}"></i>
+                    <a href="{{ route($item['route']) }}" class="flex items-center px-[16px] py-[16px] rounded-[var(--radius-base)] text-[14px] font-medium transition-colors {{ request()->routeIs($item['pattern']) ? 'bg-[var(--color-primary)] text-[var(--color-white)]' : 'text-[var(--color-text)] hover:opacity-80' }}">
+                        <i class="fas {{ $item['icon'] }} w-[24px] mr-[16px] {{ request()->routeIs($item['pattern']) ? 'text-[var(--color-white)]' : 'text-[var(--color-text)] opacity-60' }}"></i>
                         {{ $item['label'] }}
                     </a>
                 @endforeach
@@ -59,14 +59,14 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto bg-[var(--color-dwimik-bg)] p-4 md:p-8">
+        <main class="flex-1 overflow-y-auto bg-[var(--color-bg)] p-[16px] md:p-[32px]">
             <div class="max-w-7xl mx-auto w-full">
                 <!-- Header -->
-                <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="mb-[32px] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-[16px]">
                     <div>
-                        <h1 class="text-[var(--text-dwimik-h2)] font-bold tracking-tight text-[var(--color-dwimik-text)]">@yield('header', 'Dashboard')</h1>
+                        <h1 class="text-[36px] font-bold tracking-tight text-[var(--color-text)]">@yield('header', 'Dashboard')</h1>
                         @if(View::hasSection('subheader'))
-                            <p class="mt-2 text-sm text-gray-500">@yield('subheader')</p>
+                            <p class="mt-[8px] text-[14px] text-[var(--color-text)] opacity-70">@yield('subheader')</p>
                         @endif
                     </div>
                     <div>
@@ -76,16 +76,16 @@
 
                 <!-- Global Flash Messages -->
                 @if(session('success'))
-                    <x-alert variant="success" class="mb-6 flex justify-between items-center" id="admin-flash-success">
-                        <div class="flex items-center gap-3">
+                    <x-alert variant="success" class="mb-[24px] flex justify-between items-center" id="admin-flash-success">
+                        <div class="flex items-center gap-[16px]">
                             <i class="fas fa-check-circle"></i>
                             <span>{{ session('success') }}</span>
                         </div>
                     </x-alert>
                 @endif
                 @if(session('error'))
-                    <x-alert variant="error" class="mb-6 flex justify-between items-center" id="admin-flash-error">
-                        <div class="flex items-center gap-3">
+                    <x-alert variant="error" class="mb-[24px] flex justify-between items-center" id="admin-flash-error">
+                        <div class="flex items-center gap-[16px]">
                             <i class="fas fa-exclamation-circle"></i>
                             <span>{{ session('error') }}</span>
                         </div>

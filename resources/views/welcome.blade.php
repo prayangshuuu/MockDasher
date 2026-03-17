@@ -11,30 +11,30 @@
     <!-- Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="antialiased bg-[var(--color-dwimik-bg)] text-[var(--color-dwimik-text)] selection:bg-[var(--color-dwimik-primary)] selection:text-white flex flex-col min-h-screen">
+<body class="antialiased bg-[var(--color-bg)] text-[var(--color-text)] flex flex-col min-h-screen">
 
     <!-- Navigation -->
-    <nav class="bg-white border-b border-[var(--color-dwimik-divider)] sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <a href="/" class="flex items-center gap-3 group">
-                    <div class="w-10 h-10 bg-[var(--color-dwimik-primary)] text-white rounded-[var(--radius-dwimik)] flex items-center justify-center font-bold text-xl shadow-sm transition-transform group-hover:scale-105">
+    <nav class="bg-[var(--color-bg)] border-b border-[var(--color-divider)] sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-[24px] h-[80px] flex items-center justify-between">
+            <div class="flex items-center gap-[16px]">
+                <a href="/" class="flex items-center gap-[16px] group">
+                    <div class="w-[40px] h-[40px] bg-[var(--color-primary)] text-[var(--color-white)] rounded-[var(--radius-base)] flex items-center justify-center font-bold text-[20px] transition-transform group-hover:scale-105">
                         M
                     </div>
-                    <span class="font-bold text-2xl tracking-tight text-[var(--color-dwimik-text)]">MockDasher</span>
+                    <span class="font-bold text-[24px] tracking-tight text-[var(--color-text)]">MockDasher</span>
                 </a>
             </div>
-            <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-[24px]">
                 @if (Route::has('login'))
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="text-sm font-semibold text-gray-600 hover:text-[var(--color-dwimik-primary)] transition">Dashboard</a>
-                        <a href="{{ route('profile.show') }}" class="text-sm font-semibold text-gray-600 hover:text-[var(--color-dwimik-primary)] transition">Profile</a>
+                        <a href="{{ url('/dashboard') }}" class="text-[14px] font-bold text-[var(--color-text)] opacity-70 hover:opacity-100 transition">Dashboard</a>
+                        <a href="{{ route('profile.show') }}" class="text-[14px] font-bold text-[var(--color-text)] opacity-70 hover:opacity-100 transition">Profile</a>
                         <form method="POST" action="{{ route('logout') }}" class="inline">
                             @csrf
-                            <button type="submit" class="text-sm font-semibold text-[var(--color-dwimik-error)] hover:opacity-80 transition">Log Out</button>
+                            <button type="submit" class="text-[14px] font-bold text-[var(--color-error)] hover:opacity-80 transition">Log Out</button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="text-sm font-bold text-gray-600 hover:text-[var(--color-dwimik-primary)] transition">Log in</a>
+                        <a href="{{ route('login') }}" class="text-[14px] font-bold text-[var(--color-text)] hover:opacity-80 transition">Log in</a>
                         @if (Route::has('register'))
                             <x-button variant="primary" onclick="window.location.href='{{ route('register') }}'">Register Now</x-button>
                         @endif
@@ -48,54 +48,54 @@
     <main class="flex-grow">
         
         <!-- Hero Section -->
-        <div class="relative bg-white overflow-hidden border-b border-[var(--color-dwimik-divider)]">
-            <div class="max-w-7xl mx-auto px-6 py-24 sm:py-32 lg:flex lg:items-center lg:gap-x-10">
+        <div class="relative bg-[var(--color-bg)] overflow-hidden border-b border-[var(--color-divider)]">
+            <div class="max-w-7xl mx-auto px-[24px] py-[64px] sm:py-[128px] lg:flex lg:items-center lg:gap-x-[40px]">
                 <div class="mx-auto max-w-2xl lg:mx-0 lg:max-w-xl lg:flex-shrink-0">
-                    <div class="mb-6">
-                        <x-badge variant="primary" class="text-sm px-4 py-1.5"><i class="fas fa-rocket mr-2"></i> Real Exam Simulation Engine</x-badge>
+                    <div class="mb-[24px]">
+                        <x-badge variant="neutral" class="text-[14px] px-[16px] py-[8px] bg-transparent"><i class="fas fa-rocket mr-[8px]"></i> Real Exam Simulation Engine</x-badge>
                     </div>
-                    <h1 class="mt-4 text-4xl font-extrabold tracking-tight text-[var(--color-dwimik-text)] sm:text-6xl leading-tight">
-                        Master the IELTS Exam with <span class="text-[var(--color-dwimik-primary)]">Confidence</span>
+                    <h1 class="mt-[16px]">
+                        Master the IELTS Exam with <span class="text-[var(--color-primary)]">Confidence</span>
                     </h1>
-                    <p class="mt-6 text-lg leading-8 text-gray-500">
+                    <p class="mt-[24px] text-[18px] opacity-70">
                         A clean, distraction-free environment mirroring the computer-delivered IELTS format. Complete rigorous mock tests, track your progress, and get your target band score.
                     </p>
-                    <div class="mt-10 flex items-center gap-x-6">
-                        <x-button variant="primary" onclick="window.location.href='{{ route('register') }}'" class="px-8 py-4 text-lg shadow-lg shadow-[#3F37C9]/30">
-                            Start Practicing It's Free <i class="fas fa-arrow-right ml-2 text-sm"></i>
+                    <div class="mt-[40px] flex items-center gap-x-[24px]">
+                        <x-button variant="primary" onclick="window.location.href='{{ route('register') }}'">
+                            Start Practicing It's Free <i class="fas fa-arrow-right ml-[8px] text-[14px]"></i>
                         </x-button>
-                        <a href="#features" class="text-sm font-bold leading-6 text-gray-900 group">
+                        <a href="#features" class="text-[14px] font-bold leading-6 text-[var(--color-text)] group">
                             Explore Features <span aria-hidden="true" class="transition-transform inline-block group-hover:translate-x-1">→</span>
                         </a>
                     </div>
                 </div>
                 
-                <div class="mx-auto mt-16 lg:mt-0 flex max-w-2xl justify-center sm:pl-20">
+                <div class="mx-auto mt-[64px] lg:mt-0 flex max-w-2xl justify-center sm:pl-[64px]">
                     <!-- Abstract Representation of UI -->
-                    <div class="w-full max-w-lg bg-[var(--color-dwimik-bg)] rounded-2xl shadow-2xl border border-[var(--color-dwimik-divider)] overflow-hidden relative transform -rotate-2 hover:rotate-0 transition duration-500">
-                        <div class="h-10 bg-white border-b border-[var(--color-dwimik-divider)] flex items-center px-4 space-x-2">
-                            <div class="w-3 h-3 rounded-full bg-[var(--color-dwimik-error)] opacity-80"></div>
-                            <div class="w-3 h-3 rounded-full bg-yellow-400 opacity-80"></div>
-                            <div class="w-3 h-3 rounded-full bg-[var(--color-dwimik-success)] opacity-80"></div>
+                    <div class="w-full max-w-lg bg-[var(--color-bg)] rounded-[var(--radius-base)] border border-[var(--color-divider)] overflow-hidden relative">
+                        <div class="h-[40px] border-b border-[var(--color-divider)] flex items-center px-[16px] space-x-[8px]">
+                            <div class="w-[12px] h-[12px] rounded-[var(--radius-base)] bg-[var(--color-error)]"></div>
+                            <div class="w-[12px] h-[12px] rounded-[var(--radius-base)] bg-[#EAB308]"></div>
+                            <div class="w-[12px] h-[12px] rounded-[var(--radius-base)] bg-[var(--color-success)]"></div>
                         </div>
-                        <div class="p-8">
-                            <div class="flex items-center justify-between mb-8">
-                                <div class="h-6 bg-white rounded-md border border-[var(--color-dwimik-divider)] w-1/3"></div>
-                                <div class="w-24 h-8 bg-blue-100 rounded-full"></div>
+                        <div class="p-[32px]">
+                            <div class="flex items-center justify-between mb-[32px]">
+                                <div class="h-[24px] border border-[var(--color-divider)] rounded-[var(--radius-base)] w-1/3"></div>
+                                <div class="w-[96px] h-[32px] bg-[var(--color-primary)] rounded-[var(--radius-base)] opacity-20"></div>
                             </div>
-                            <div class="space-y-6">
-                                <div class="flex items-start space-x-4">
-                                    <div class="w-10 h-10 bg-white border border-[var(--color-dwimik-divider)] rounded-lg flex-shrink-0 shadow-sm"></div>
-                                    <div class="flex-1 space-y-3 mt-1">
-                                        <div class="h-3 bg-white border border-[var(--color-dwimik-divider)] rounded w-3/4"></div>
-                                        <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+                            <div class="space-y-[24px]">
+                                <div class="flex items-start space-x-[16px]">
+                                    <div class="w-[40px] h-[40px] border border-[var(--color-divider)] rounded-[var(--radius-base)] flex-shrink-0"></div>
+                                    <div class="flex-1 space-y-[12px] mt-[4px]">
+                                        <div class="h-[12px] border border-[var(--color-divider)] rounded w-3/4"></div>
+                                        <div class="h-[12px] bg-[var(--color-divider)] rounded w-1/2 opacity-50"></div>
                                     </div>
                                 </div>
-                                <div class="h-32 bg-white shadow-sm border border-[var(--color-dwimik-divider)] rounded-xl mt-6 p-4">
-                                    <div class="h-4 w-1/4 bg-gray-100 rounded mb-4"></div>
-                                    <div class="flex gap-2">
-                                        <div class="h-8 w-8 rounded-full bg-blue-50 border border-blue-200 text-center flex items-center justify-center"><i class="fas fa-check text-blue-500 text-[10px]"></i></div>
-                                        <div class="h-8 w-8 rounded-full bg-gray-50 border border-gray-200"></div>
+                                <div class="h-[128px] border border-[var(--color-divider)] rounded-[var(--radius-base)] mt-[24px] p-[16px]">
+                                    <div class="h-[16px] w-1/4 bg-[var(--color-divider)] rounded mb-[16px] opacity-30"></div>
+                                    <div class="flex gap-[8px]">
+                                        <div class="h-[32px] w-[32px] rounded-[var(--radius-base)] border border-[var(--color-primary)] text-center flex items-center justify-center"><i class="fas fa-check text-[var(--color-primary)] text-[10px]"></i></div>
+                                        <div class="h-[32px] w-[32px] rounded-[var(--radius-base)] border border-[var(--color-divider)]"></div>
                                     </div>
                                 </div>
                             </div>
@@ -106,58 +106,57 @@
         </div>
 
         <!-- Features Section -->
-        <div id="features" class="py-24 bg-[var(--color-dwimik-bg)]">
-            <div class="max-w-7xl mx-auto px-6">
-                <div class="text-center max-w-3xl mx-auto mb-20">
-                    <h2 class="text-base font-bold text-[var(--color-dwimik-primary)] tracking-widest uppercase mb-3">MockDasher Engine</h2>
-                    <p class="text-4xl font-extrabold tracking-tight text-[var(--color-dwimik-text)] sm:text-5xl">
+        <div id="features" class="py-[128px] bg-[var(--color-bg)]">
+            <div class="max-w-7xl mx-auto px-[24px]">
+                <div class="text-center max-w-3xl mx-auto mb-[64px]">
+                    <h2 class="text-[16px] font-bold text-[var(--color-primary)] tracking-widest uppercase mb-[16px]">MockDasher Engine</h2>
+                    <h2 class="text-[48px] font-bold tracking-tight text-[var(--color-text)]">
                         Everything you need to score a Band 9
-                    </p>
+                    </h2>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[32px]">
                     
-                    <x-card class="hover:-translate-y-1 transition-transform duration-300 shadow-sm border-gray-200">
-                        <div class="w-14 h-14 rounded-xl bg-blue-50 text-[var(--color-dwimik-primary)] flex items-center justify-center text-2xl mb-6 shadow-sm border border-blue-100">
+                    <x-card class="transition-transform duration-300">
+                        <div class="w-[56px] h-[56px] rounded-[var(--radius-base)] bg-[var(--color-primary)] text-[var(--color-white)] flex items-center justify-center text-[24px] mb-[24px]">
                             <i class="fas fa-desktop"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-[var(--color-dwimik-text)] mb-3">Real IELTS Interface</h3>
-                        <p class="text-gray-500 text-sm leading-relaxed">Experience a testing environment that closely mirrors the official computer-based IELTS exam, reducing test-day anxiety.</p>
+                        <h3 class="text-[24px] font-bold text-[var(--color-text)] mb-[16px]">Real IELTS Interface</h3>
+                        <p class="text-[16px] opacity-70 leading-relaxed">Experience a testing environment that closely mirrors the official computer-based IELTS exam, reducing test-day anxiety.</p>
                     </x-card>
 
-                    <x-card class="hover:-translate-y-1 transition-transform duration-300 shadow-sm border-gray-200">
-                        <div class="w-14 h-14 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-2xl mb-6 shadow-sm border border-orange-100">
+                    <x-card class="transition-transform duration-300">
+                        <div class="w-[56px] h-[56px] rounded-[var(--radius-base)] bg-[var(--color-text)] text-[var(--color-white)] flex items-center justify-center text-[24px] mb-[24px]">
                             <i class="fas fa-pen-nib"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-[var(--color-dwimik-text)] mb-3">Writing with Word Counter</h3>
-                        <p class="text-gray-500 text-sm leading-relaxed">Practice your task 1 and task 2 essays with an integrated live word counter and clean rich-text layout.</p>
+                        <h3 class="text-[24px] font-bold text-[var(--color-text)] mb-[16px]">Writing with Counter</h3>
+                        <p class="text-[16px] opacity-70 leading-relaxed">Practice your task 1 and task 2 essays with an integrated live word counter and clean rich-text layout.</p>
                     </x-card>
 
-                    <x-card class="hover:-translate-y-1 transition-transform duration-300 shadow-sm border-gray-200">
-                        <div class="w-14 h-14 rounded-xl bg-teal-50 text-[var(--color-dwimik-success)] flex items-center justify-center text-2xl mb-6 shadow-sm border border-teal-100">
+                    <x-card class="transition-transform duration-300">
+                        <div class="w-[56px] h-[56px] rounded-[var(--radius-base)] bg-[var(--color-success)] text-[var(--color-white)] flex items-center justify-center text-[24px] mb-[24px]">
                             <i class="fas fa-microphone-alt"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-[var(--color-dwimik-text)] mb-3">Speaking Practice</h3>
-                        <p class="text-gray-500 text-sm leading-relaxed">Listen to automated examiner prompts and seamlessly record your vocal responses directly within the browser.</p>
+                        <h3 class="text-[24px] font-bold text-[var(--color-text)] mb-[16px]">Speaking Practice</h3>
+                        <p class="text-[16px] opacity-70 leading-relaxed">Listen to automated examiner prompts and seamlessly record your vocal responses directly within the browser.</p>
                     </x-card>
 
-                    <x-card class="hover:-translate-y-1 transition-transform duration-300 shadow-sm border-gray-200">
-                        <div class="w-14 h-14 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl mb-6 shadow-sm border border-purple-100">
+                    <x-card class="transition-transform duration-300">
+                        <div class="w-[56px] h-[56px] rounded-[var(--radius-base)] border border-[var(--color-text)] text-[var(--color-text)] flex items-center justify-center text-[24px] mb-[24px]">
                             <i class="fas fa-headphones"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-[var(--color-dwimik-text)] mb-3">Listening & Reading</h3>
-                        <p class="text-gray-500 text-sm leading-relaxed">Full multi-part listening audio tracks and comprehensive reading passages with dynamic inline question styles.</p>
+                        <h3 class="text-[24px] font-bold text-[var(--color-text)] mb-[16px]">Listening & Reading</h3>
+                        <p class="text-[16px] opacity-70 leading-relaxed">Full multi-part listening audio tracks and comprehensive reading passages with dynamic inline question styles.</p>
                     </x-card>
 
-                    <x-card class="hover:-translate-y-1 transition-transform duration-300 shadow-sm border-gray-200 lg:col-span-2 bg-[#3F37C9] text-white overflow-hidden relative border-none">
-                        <div class="absolute -right-20 -top-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-                        <div class="relative z-10 flex flex-col sm:flex-row items-center gap-8">
-                            <div class="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-4xl mb-4 sm:mb-0 backdrop-blur-md border border-white/30">
-                                <i class="fas fa-chart-pie text-white"></i>
+                    <x-card class="transition-transform duration-300 lg:col-span-2 bg-[var(--color-primary)] text-[var(--color-white)] relative !border-none">
+                        <div class="relative z-10 flex flex-col sm:flex-row items-center gap-[32px]">
+                            <div class="w-[80px] h-[80px] rounded-[var(--radius-base)] border border-[var(--color-divider)] opacity-80 flex items-center justify-center text-[36px] mb-[16px] sm:mb-0">
+                                <i class="fas fa-chart-pie"></i>
                             </div>
                             <div class="text-center sm:text-left">
-                                <h3 class="text-2xl font-bold mb-3 text-white">Track Your Progress</h3>
-                                <p class="text-blue-100 leading-relaxed text-lg">Detailed dashboard insights showing your test history, band score improvements, and module-specific weaknesses allowing you to target your study time efficiently.</p>
+                                <h3 class="text-[28px] font-bold mb-[16px]">Track Your Progress</h3>
+                                <p class="opacity-90 leading-relaxed text-[18px]">Detailed dashboard insights showing your test history, band score improvements, and module-specific weaknesses allowing you to target your study time efficiently.</p>
                             </div>
                         </div>
                     </x-card>
@@ -167,15 +166,15 @@
         </div>
 
         <!-- CTA Section -->
-        <div class="bg-white border-t border-b border-[var(--color-dwimik-divider)]">
-            <div class="max-w-4xl mx-auto py-24 px-6 text-center">
-                <h2 class="text-4xl font-extrabold tracking-tight text-[var(--color-dwimik-text)] mb-6">
+        <div class="bg-[var(--color-bg)] border-t border-b border-[var(--color-divider)]">
+            <div class="max-w-4xl mx-auto py-[128px] px-[24px] text-center">
+                <h2 class="text-[48px] font-bold tracking-tight text-[var(--color-text)] mb-[24px]">
                     Ready to boost your score?
                 </h2>
-                <p class="text-xl text-gray-500 mb-10">
+                <p class="text-[24px] opacity-70 mb-[40px]">
                     Join thousands of test-takers and experience the most authentic IELTS simulation platform.
                 </p>
-                <x-button variant="primary" onclick="window.location.href='{{ route('register') }}'" class="px-10 py-4 text-xl shadow-xl shadow-[#3F37C9]/20">
+                <x-button variant="primary" onclick="window.location.href='{{ route('register') }}'">
                     Create Your Free Account Now
                 </x-button>
             </div>
@@ -184,28 +183,28 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-50 text-[var(--color-dwimik-text)] border-t border-[var(--color-dwimik-divider)] pt-16 pb-8">
-        <div class="max-w-7xl mx-auto px-6">
-            <div class="md:flex md:items-center md:justify-between border-b border-[var(--color-dwimik-divider)] pb-10 mb-8">
-                <div class="flex justify-center md:justify-start mb-6 md:mb-0">
-                    <a href="/" class="flex items-center gap-3">
-                        <div class="w-8 h-8 bg-[var(--color-dwimik-primary)] text-white rounded-[var(--radius-dwimik)] flex items-center justify-center font-bold text-sm shadow-sm">
+    <footer class="bg-[var(--color-bg)] text-[var(--color-text)] border-t border-[var(--color-divider)] pt-[64px] pb-[32px]">
+        <div class="max-w-7xl mx-auto px-[24px]">
+            <div class="md:flex md:items-center md:justify-between border-b border-[var(--color-divider)] pb-[40px] mb-[32px]">
+                <div class="flex justify-center md:justify-start mb-[24px] md:mb-0">
+                    <a href="/" class="flex items-center gap-[16px]">
+                        <div class="w-[32px] h-[32px] bg-[var(--color-primary)] text-[var(--color-white)] rounded-[var(--radius-base)] flex items-center justify-center font-bold text-[14px]">
                             M
                         </div>
-                        <span class="font-bold text-xl tracking-tight text-[var(--color-dwimik-text)]">MockDasher Engine</span>
+                        <span class="font-bold text-[24px] tracking-tight text-[var(--color-text)]">MockDasher Engine</span>
                     </a>
                 </div>
-                <div class="flex justify-center space-x-8 text-sm font-semibold text-gray-500">
-                    <a href="{{ route('login') }}" class="hover:text-[var(--color-dwimik-primary)] transition">Login to Studio</a>
-                    <a href="{{ route('register') }}" class="hover:text-[var(--color-dwimik-primary)] transition">Create Account</a>
+                <div class="flex justify-center space-x-[32px] text-[16px] font-bold opacity-70">
+                    <a href="{{ route('login') }}" class="hover:opacity-100 transition">Login to Studio</a>
+                    <a href="{{ route('register') }}" class="hover:opacity-100 transition">Create Account</a>
                 </div>
             </div>
             
-            <div class="text-center md:text-left">
-                <p class="text-sm font-semibold text-gray-500">
+            <div class="text-center md:text-left opacity-70">
+                <p class="text-[14px] font-bold">
                     &copy; {{ date('Y') }} MockDasher Engine. All rights reserved. Built with precision.
                 </p>
-                <p class="text-xs text-gray-400 mt-3 max-w-3xl">
+                <p class="text-[14px] mt-[16px] max-w-3xl leading-relaxed">
                     IELTS is a registered trademark of University of Cambridge ESOL, the British Council, and IDP Education Australia. MockDasher is not affiliated, approved or endorsed by the University of Cambridge ESOL, the British Council, and IDP Education Australia.
                 </p>
             </div>

@@ -9,13 +9,13 @@
     <!-- Alpine.js for lightweight interactions -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-[var(--color-dwimik-bg)] font-sans antialiased text-[var(--color-dwimik-text)]" x-data="writingTest({{ $remainingSeconds }}, '{{ route('user.writing.autosave', $attempt->id) }}', '{{ route('user.writing.submit', $attempt->id) }}')">
+<body class="bg-[var(--color-bg)] font-sans antialiased text-[var(--color-text)]" x-data="writingTest({{ $remainingSeconds }}, '{{ route('user.writing.autosave', $attempt->id) }}', '{{ route('user.writing.submit', $attempt->id) }}')">
     
     <!-- Top Bar -->
-    <div class="bg-white shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border-b border-[var(--color-dwimik-divider)] sticky top-0 z-50">
+    <div class="bg-white shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border-b border-[var(--color-divider)] sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-[var(--color-dwimik-primary)] rounded-md flex items-center justify-center font-bold text-white text-lg shadow-sm">M</div>
+                <div class="w-10 h-10 bg-[var(--color-primary)] rounded-md flex items-center justify-center font-bold text-white text-lg shadow-sm">M</div>
                 <div>
                     <p class="text-[10px] text-gray-500 font-bold leading-tight uppercase tracking-wider">IELTS Writing</p>
                     <span class="text-sm font-bold truncate block max-w-[200px]">{{ $test->title }}</span>
@@ -24,16 +24,16 @@
             
             <div class="flex items-center space-x-6">
                 <!-- Timer -->
-                <div class="flex items-center gap-2 bg-[var(--color-dwimik-bg)] border border-[var(--color-dwimik-divider)] rounded-[var(--radius-dwimik)] px-4 py-2 shadow-sm" :class="timeRemaining <= 300 ? 'text-[var(--color-dwimik-error)] font-bold animate-pulse' : 'text-[var(--color-dwimik-text)]'">
-                    <i class="fas fa-clock" :class="timeRemaining <= 300 ? 'text-[var(--color-dwimik-error)]' : 'text-[var(--color-dwimik-primary)]'"></i>
+                <div class="flex items-center gap-2 bg-[var(--color-bg)] border border-[var(--color-divider)] rounded-[var(--radius-base)] px-4 py-2 shadow-sm" :class="timeRemaining <= 300 ? 'text-[var(--color-error)] font-bold animate-pulse' : 'text-[var(--color-text)]'">
+                    <i class="fas fa-clock" :class="timeRemaining <= 300 ? 'text-[var(--color-error)]' : 'text-[var(--color-primary)]'"></i>
                     <div class="flex items-end gap-2">
                         <span class="text-lg font-bold font-mono leading-none tracking-widest" x-text="formattedTime"></span>
                         <p class="text-[10px] text-gray-500 font-medium leading-tight mb-0.5">Left</p>
                     </div>
                 </div>
                 
-                <button type="button" @click="submitTest" class="bg-[var(--color-dwimik-bg)] hover:bg-[#e8e4dc] text-[var(--color-dwimik-text)] border border-[var(--color-dwimik-divider)] px-6 py-2 rounded-[var(--radius-dwimik)] font-bold transition-colors shadow-sm flex items-center gap-2">
-                    <i class="fas fa-paper-plane text-[var(--color-dwimik-primary)]"></i> Submit Exam
+                <button type="button" @click="submitTest" class="bg-[var(--color-bg)] hover:bg-[#e8e4dc] text-[var(--color-text)] border border-[var(--color-divider)] px-6 py-2 rounded-[var(--radius-base)] font-bold transition-colors shadow-sm flex items-center gap-2">
+                    <i class="fas fa-paper-plane text-[var(--color-primary)]"></i> Submit Exam
                 </button>
             </div>
         </div>
@@ -48,15 +48,15 @@
             <!-- Tasks Container -->
             <div class="space-y-12">
                 @foreach($tasks as $task)
-                <div class="bg-white rounded-[var(--radius-dwimik)] shadow-sm border border-[var(--color-dwimik-divider)] p-8 mb-8" x-data="wordCounter('{{ $answers[$task->id]->answer_text ?? '' }}', {{ $task->minimum_word_count }})">
+                <div class="bg-white rounded-[var(--radius-base)] shadow-sm border border-[var(--color-divider)] p-8 mb-8" x-data="wordCounter('{{ $answers[$task->id]->answer_text ?? '' }}', {{ $task->minimum_word_count }})">
                     
-                    <div class="border-b border-[var(--color-dwimik-divider)] pb-4 mb-6">
-                        <h2 class="text-2xl font-bold text-[var(--color-dwimik-text)]">Writing Task {{ $task->task_number }}</h2>
+                    <div class="border-b border-[var(--color-divider)] pb-4 mb-6">
+                        <h2 class="text-2xl font-bold text-[var(--color-text)]">Writing Task {{ $task->task_number }}</h2>
                         <span class="text-sm text-gray-500 mt-1 block font-medium">Recommended minimum words: {{ $task->minimum_word_count }}</span>
                     </div>
 
                     @if($task->instruction_text)
-                    <div class="bg-[var(--color-dwimik-bg)] text-[var(--color-dwimik-text)] p-5 rounded-[var(--radius-dwimik)] mb-6 text-sm font-medium border border-[var(--color-dwimik-divider)] border-l-4 border-l-[var(--color-dwimik-primary)]">
+                    <div class="bg-[var(--color-bg)] text-[var(--color-text)] p-5 rounded-[var(--radius-base)] mb-6 text-sm font-medium border border-[var(--color-divider)] border-l-4 border-l-[var(--color-primary)]">
                         <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Instructions</p>
                         {{ $task->instruction_text }}
                     </div>
@@ -100,7 +100,7 @@
                                 name="answers[{{ $task->id }}]"
                                 x-model="text"
                                 @input="updateCount"
-                                class="writing-answer-input w-full flex-grow min-h-[400px] p-5 border border-[var(--color-dwimik-divider)] rounded-[var(--radius-dwimik)] focus:ring-1 focus:ring-[var(--color-dwimik-primary)] focus:border-[var(--color-dwimik-primary)] bg-white resize-y text-[var(--color-dwimik-text)] leading-relaxed outline-none transition-colors shadow-sm"
+                                class="writing-answer-input w-full flex-grow min-h-[400px] p-5 border border-[var(--color-divider)] rounded-[var(--radius-base)] focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] bg-white resize-y text-[var(--color-text)] leading-relaxed outline-none transition-colors shadow-sm"
                                 placeholder="Start typing your answer here..."
                             ></textarea>
                         </div>

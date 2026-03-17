@@ -64,7 +64,7 @@ $maxWidth = [
     <!-- Modal Card -->
     <div
         x-show="show"
-        class="bg-[var(--color-dwimik-bg)] rounded-[var(--radius-dwimik)] overflow-hidden shadow-xl transform transition-all sm:w-full {{ $maxWidth }} sm:mx-auto relative border border-[var(--color-dwimik-divider)]"
+        class="bg-[var(--color-bg)] rounded-[var(--radius-base)] overflow-hidden transform transition-all sm:w-full {{ $maxWidth }} sm:mx-auto relative border border-[var(--color-divider)] p-[24px]"
         x-transition:enter="ease-out duration-300"
         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
