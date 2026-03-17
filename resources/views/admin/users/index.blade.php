@@ -1,109 +1,93 @@
 @extends('layouts.admin')
 
-@section('title', 'Users Management')
+@section('title', 'Students Management')
+
+@section('breadcrumbs')
+<nav class="flex items-center gap-2 text-sm">
+    <span class="font-semibold text-slate-900 dark:text-white">Students</span>
+</nav>
+@endsection
 
 @section('content')
-<!-- Top Navbar -->
-<header class="sticky top-0 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 z-40">
-    <form method="GET" action="{{ route('admin.users.index') }}" class="relative w-full max-w-md">
-        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
-        <input name="search" value="{{ request('search') }}" class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl pl-10 pr-10 py-2 text-sm focus:ring-2 focus:ring-primary/20 placeholder:text-slate-400" placeholder="Search users by name or email..." type="text"/>
-        @if(request('search'))
-            <a href="{{ route('admin.users.index') }}" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500">
-                <span class="material-symbols-outlined text-xl">close</span>
-            </a>
-        @endif
-    </form>
-    <div class="flex items-center gap-4 hidden sm:flex">
-        <button class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors">
-            <span class="material-symbols-outlined">notifications</span>
-        </button>
-        <button class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors">
-            <span class="material-symbols-outlined">help</span>
-        </button>
-    </div>
-</header>
-
-<!-- Page Body -->
-<div class="p-4 sm:p-8 max-w-7xl mx-auto space-y-6 sm:space-y-8">
-    
+<div class="max-w-7xl mx-auto space-y-10">
     <!-- Page Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Users Management</h2>
-            <p class="text-slate-500 dark:text-slate-400 mt-1 text-sm sm:text-base">Manage and audit your organization's user access and permissions.</p>
+            <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Student Management</h2>
+            <p class="text-slate-500 dark:text-slate-400 text-base">Manage student accounts, monitor progress, and audit system access.</p>
         </div>
-        <a href="{{ route('admin.users.create') }}" class="primary-gradient text-white px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-primary/20 flex items-center justify-center gap-2 hover:opacity-90 transition-opacity whitespace-nowrap">
-            <span class="material-symbols-outlined">person_add</span>
-            Add New User
-        </a>
+        <div class="flex items-center gap-4">
+            <form method="GET" action="{{ route('admin.users.index') }}" class="relative group">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors">search</span>
+                <input name="search" value="{{ request('search') }}" class="pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm w-64 focus:ring-2 focus:ring-primary/20 shadow-sm" placeholder="Search by name or email...">
+            </form>
+            <a href="{{ route('admin.users.create') }}" class="inline-flex items-center gap-2 bg-primary text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+                <span class="material-symbols-outlined text-lg">person_add</span>
+                Add Student
+            </a>
+        </div>
     </div>
 
     <!-- Users Table -->
-    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+    <div class="glass-card rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse min-w-[800px]">
                 <thead>
-                    <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Name &amp; Email</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Role</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Joined Date</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+                    <tr class="bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-800">
+                        <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Student Information</th>
+                        <th class="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Role</th>
+                        <th class="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
+                        <th class="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Enrollment Date</th>
+                        <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
                     @forelse($users as $user)
                         @php
                             $isAdmin = $user->roles->contains('name', 'Admin');
-                            $initials = strtoupper(substr($user->name, 0, 2));
-                            if(str_contains($user->name, ' ')) {
-                                $parts = explode(' ', $user->name);
-                                $initials = strtoupper(substr($parts[0], 0, 1) . substr($parts[1], 0, 1));
-                            }
-                            // Randomize avatar colors based on ID for visual variety
-                            $colors = ['bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400', 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400', 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400', 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400', 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'];
+                            $initials = strtoupper(substr($user->name, 0, 1));
+                            $colors = ['bg-indigo-50 text-indigo-600', 'bg-blue-50 text-blue-600', 'bg-purple-50 text-purple-600', 'bg-emerald-50 text-emerald-600', 'bg-orange-50 text-orange-600'];
                             $colorClass = $colors[$user->id % count($colors)];
                         @endphp
-                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden font-bold {{ $colorClass }}">
+                        <tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                            <td class="px-10 py-6">
+                                <div class="flex items-center gap-4">
+                                    <div class="size-12 rounded-2xl flex items-center justify-center font-black text-xl {{ $colorClass }} group-hover:scale-110 transition-transform">
                                         {{ $initials }}
                                     </div>
-                                    <div class="min-w-0">
-                                        <p class="text-sm font-semibold text-slate-900 dark:text-white truncate" title="{{ $user->name }}">{{ $user->name }}</p>
-                                        <p class="text-xs text-slate-500 truncate" title="{{ $user->email }}">{{ $user->email }}</p>
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-slate-900 dark:text-white">{{ $user->name }}</span>
+                                        <span class="text-xs font-medium text-slate-400">{{ $user->email }}</span>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-6">
                                 @if($isAdmin)
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-primary/10 text-primary border border-primary/20">Admin</span>
+                                    <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary border border-primary/20">Administrator</span>
                                 @else
-                                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">User</span>
+                                    <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-100 dark:bg-slate-800 text-slate-400 border border-slate-200 dark:border-slate-700">Candidate</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-1.5">
-                                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                                    <span class="text-sm font-medium text-emerald-600">Active</span>
+                            <td class="px-6 py-6 text-center">
+                                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/20">
+                                    <div class="size-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                                    <span class="text-[10px] font-black uppercase tracking-widest text-emerald-600">Active</span>
                                 </div>
                             </td>
-                            <td class="px-6 py-4 text-sm text-slate-500">
+                            <td class="px-6 py-6 text-xs font-bold text-slate-500 tracking-tight">
                                 {{ $user->created_at->format('M d, Y') }}
                             </td>
-                            <td class="px-6 py-4 text-right">
-                                <div class="flex justify-end gap-2">
-                                    <a href="{{ route('admin.users.edit', $user->id) }}" class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-slate-400 transition-colors inline-block">
+                            <td class="px-10 py-6 text-right">
+                                <div class="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <a href="{{ route('admin.users.edit', $user->id) }}" class="size-10 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-400 hover:text-primary rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm transition-all hover:-translate-y-1">
                                         <span class="material-symbols-outlined text-lg">edit</span>
                                     </a>
                                     @if(auth()->id() !== $user->id)
-                                        <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Delete this user?');">
+                                        <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Expel this student from the system?');">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg text-slate-400 hover:text-red-500 transition-colors cursor-pointer">
-                                                <span class="material-symbols-outlined text-lg">delete</span>
+                                            <button type="submit" class="size-10 flex items-center justify-center bg-white dark:bg-slate-800 text-slate-400 hover:text-red-500 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm transition-all hover:-translate-y-1">
+                                                <span class="material-symbols-outlined text-lg">person_remove</span>
                                             </button>
                                         </form>
                                     @endif
@@ -112,12 +96,11 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center">
-                                <div class="flex flex-col items-center justify-center text-slate-500">
-                                    <span class="material-symbols-outlined text-4xl mb-3 text-slate-300">search_off</span>
-                                    <h3 class="font-bold text-slate-900 dark:text-white mb-1">No users found</h3>
-                                    <p class="text-sm max-w-sm mx-auto">We couldn't find any users matching your criteria.</p>
-                                    <a href="{{ route('admin.users.index') }}" class="mt-4 text-primary font-medium text-sm hover:underline">Clear search filter</a>
+                            <td colspan="5" class="px-10 py-24 text-center">
+                                <div class="flex flex-col items-center justify-center max-w-sm mx-auto opacity-40">
+                                    <span class="material-symbols-outlined text-6xl mb-4">person_search</span>
+                                    <h4 class="font-black text-xs uppercase tracking-widest">No candidates found</h4>
+                                    <p class="text-sm font-medium mt-1">We couldn't find any users matching your criteria.</p>
                                 </div>
                             </td>
                         </tr>
@@ -128,44 +111,44 @@
         
         <!-- Pagination -->
         @if($users->hasPages())
-            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-slate-200 dark:border-slate-800">
-                <p class="text-sm text-slate-500 hidden sm:block">Showing {{ $users->firstItem() ?? 0 }} to {{ $users->lastItem() ?? 0 }} of {{ $users->total() }} users</p>
-                <div class="w-full sm:w-auto">
+            <div class="px-10 py-6 bg-slate-50/50 dark:bg-slate-800/30 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Page {{ $users->currentPage() }} of {{ $users->lastPage() }}</p>
+                <div class="scale-90">
                     {{ $users->links() }}
                 </div>
             </div>
         @endif
     </div>
 
-    <!-- Summary Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-5">
-            <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                <span class="material-symbols-outlined">groups</span>
+    <!-- Enrollment Insights -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="glass-card p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-soft flex items-center gap-6 group hover:border-primary/50 transition-all">
+            <div class="size-16 rounded-[1.5rem] bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                <span class="material-symbols-outlined text-3xl">groups</span>
             </div>
             <div>
-                <p class="text-sm font-medium text-slate-500">Total Users</p>
-                <p class="text-2xl font-bold">{{ number_format($users->total()) }}</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Enrolled</p>
+                <p class="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">{{ number_format($users->total()) }}</p>
             </div>
         </div>
         
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-5">
-            <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600">
-                <span class="material-symbols-outlined">online_prediction</span>
+        <div class="glass-card p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-soft flex items-center gap-6 group hover:border-emerald-500/30 transition-all">
+            <div class="size-16 rounded-[1.5rem] bg-emerald-50 flex items-center justify-center text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                <span class="material-symbols-outlined text-3xl">bolt</span>
             </div>
             <div>
-                <p class="text-sm font-medium text-slate-500">Active Sessions</p>
-                <p class="text-2xl font-bold">1</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Weekly Growth</p>
+                <p class="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">+14.2%</p>
             </div>
         </div>
         
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-5">
-            <div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600">
-                <span class="material-symbols-outlined">admin_panel_settings</span>
+        <div class="glass-card p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-soft flex items-center gap-6 group hover:border-blue-500/30 transition-all">
+            <div class="size-16 rounded-[1.5rem] bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                <span class="material-symbols-outlined text-3xl">shield_person</span>
             </div>
             <div>
-                <p class="text-sm font-medium text-slate-500">System Roles</p>
-                <p class="text-2xl font-bold">2</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Secure Profiles</p>
+                <p class="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">100%</p>
             </div>
         </div>
     </div>

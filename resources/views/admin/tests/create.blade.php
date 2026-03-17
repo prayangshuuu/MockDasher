@@ -2,116 +2,124 @@
 
 @section('title', 'Create New Test')
 
+@section('breadcrumbs')
+<nav class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+    <a href="{{ route('admin.tests.index') }}" class="hover:text-primary transition-colors">Tests</a>
+    <span class="material-symbols-outlined text-sm">chevron_right</span>
+    <span class="text-slate-900 dark:text-slate-100 font-medium">Create Test</span>
+</nav>
+@endsection
+
 @section('content')
-<!-- Top Navbar -->
-<header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 flex items-center justify-between sticky top-0 z-40">
-    <div class="flex items-center gap-2 sm:gap-4 overflow-x-auto whitespace-nowrap hide-scrollbar">
-        <nav class="flex items-center text-xs sm:text-sm font-medium">
-            <a class="text-slate-500 hover:text-primary transition-colors" href="{{ route('admin.tests.index') }}">Tests</a>
-            <span class="material-symbols-outlined text-slate-400 mx-1 sm:mx-2 text-base">chevron_right</span>
-            <span class="text-slate-900 dark:text-white">Create New Test</span>
-        </nav>
+<div class="max-w-4xl mx-auto">
+    <!-- Page Header -->
+    <div class="mb-10 text-center sm:text-left">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Create New Test</h2>
+        <p class="text-slate-500 dark:text-slate-400 mt-1 text-base">Enter the details to initiate a new IELTS book volume and test sets.</p>
     </div>
-    <div class="flex flex-shrink-0 items-center gap-3 sm:gap-6 ml-4">
-        <div class="relative hidden lg:block">
-            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
-            <input class="bg-slate-50 dark:bg-slate-800 border-none rounded-full pl-10 pr-4 py-2 text-sm w-48 xl:w-64 focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-slate-500" placeholder="Search tests..." type="text"/>
-        </div>
-        <button class="relative text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
-            <span class="material-symbols-outlined">notifications</span>
-            <span class="absolute top-0 right-0 h-2 w-2 bg-rose-500 rounded-full border-2 border-white dark:border-slate-900"></span>
-        </button>
-    </div>
-</header>
 
-<!-- Content Area -->
-<div class="flex-1 overflow-y-auto p-4 sm:p-8">
-    <div class="max-w-4xl mx-auto">
-        <!-- Title Section -->
-        <div class="mb-6 sm:mb-8">
-            <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Create New Test</h2>
-            <p class="text-slate-500 mt-1 text-sm sm:text-base">Enter the details to generate a new IELTS simulation test set.</p>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Sidebar Info -->
+        <div class="lg:col-span-1 space-y-6">
+            <div class="bg-primary/5 dark:bg-primary/10 p-8 rounded-[2.5rem] border border-primary/20">
+                <h4 class="text-primary font-black text-xs uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-lg">auto_awesome</span>
+                    Auto-Generation
+                </h4>
+                <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                    Once created, the system will automatically generate <b>4 complete mock sets</b>. You can customize the modules and tasks for each set individually.
+                </p>
+            </div>
+
+            <div class="glass-card p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-soft">
+                <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Quick Stats</h4>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-slate-500">Modules/Set</span>
+                        <span class="font-bold text-slate-900 dark:text-white">4</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-slate-500">Total Tasks</span>
+                        <span class="font-bold text-slate-900 dark:text-white">16+</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Main Form Card -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] border border-slate-200 dark:border-slate-800 overflow-hidden">
-            <form action="{{ route('admin.tests.store') }}" method="POST">
-                @csrf
-                <div class="p-6 sm:p-8 space-y-6 sm:space-y-8">
-                    <!-- Grid Layout -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-2">
-                            <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Book Number</label>
-                            <input name="book_number" value="{{ old('book_number') }}" required min="1" type="number"
-                                class="w-full bg-slate-50 dark:bg-slate-800 border {{ $errors->has('book_number') ? 'border-red-500 ring-1 ring-red-500/20' : 'border-slate-200 dark:border-slate-700' }} rounded-lg px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none" 
-                                placeholder="e.g., 20"/>
-                            @error('book_number') <p class="text-red-500 text-xs font-semibold mt-1">{{ $message }}</p> @enderror
+        <!-- Form Card -->
+        <div class="lg:col-span-2">
+            <div class="glass-card rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden">
+                <form action="{{ route('admin.tests.store') }}" method="POST" class="p-8 sm:p-10 space-y-8">
+                    @csrf
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                        <!-- Field: Book Number -->
+                        <div class="space-y-3">
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Book Number</label>
+                            <input type="number" name="book_number" value="{{ old('book_number') }}" 
+                                   class="w-full px-5 py-3.5 rounded-2xl border {{ $errors->has('book_number') ? 'border-red-500' : 'border-slate-200 dark:border-slate-700' }} bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm" 
+                                   placeholder="e.g. 18" required>
+                            @error('book_number') <p class="text-red-500 text-[10px] font-black uppercase tracking-widest mt-1 ml-1">{{ $message }}</p> @enderror
                         </div>
                         
-                        <div class="space-y-2">
-                            <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Year</label>
-                            <input name="year" value="{{ old('year', date('Y')) }}" required min="1990" type="number"
-                                class="w-full bg-slate-50 dark:bg-slate-800 border {{ $errors->has('year') ? 'border-red-500 ring-1 ring-red-500/20' : 'border-slate-200 dark:border-slate-700' }} rounded-lg px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none" 
-                                placeholder="e.g., {{ date('Y') }}"/>
-                            @error('year') <p class="text-red-500 text-xs font-semibold mt-1">{{ $message }}</p> @enderror
+                        <!-- Field: Year -->
+                        <div class="space-y-3">
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Year</label>
+                            <input type="number" name="year" value="{{ old('year', date('Y')) }}" 
+                                   class="w-full px-5 py-3.5 rounded-2xl border {{ $errors->has('year') ? 'border-red-500' : 'border-slate-200 dark:border-slate-700' }} bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm" 
+                                   required>
+                            @error('year') <p class="text-red-500 text-[10px] font-black uppercase tracking-widest mt-1 ml-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <!-- Field: Exam Type -->
+                        <div class="space-y-3">
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Exam Type</label>
+                            <select name="exam_type" class="w-full px-5 py-3.5 rounded-2xl border {{ $errors->has('exam_type') ? 'border-red-500' : 'border-slate-200 dark:border-slate-700' }} bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm cursor-pointer" required>
+                                <option value="" disabled {{ !old('exam_type') ? 'selected' : '' }}>Select Type</option>
+                                <option value="Academic" {{ old('exam_type') === 'Academic' ? 'selected' : '' }}>Academic</option>
+                                <option value="General" {{ old('exam_type') === 'General' ? 'selected' : '' }}>General Training</option>
+                            </select>
+                            @error('exam_type') <p class="text-red-500 text-[10px] font-black uppercase tracking-widest mt-1 ml-1">{{ $message }}</p> @enderror
+                        </div>
+
+                        <!-- Field: Status -->
+                        <div class="space-y-3">
+                            <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Initial Status</label>
+                            <select name="status" class="w-full px-5 py-3.5 rounded-2xl border {{ $errors->has('status') ? 'border-red-500' : 'border-slate-200 dark:border-slate-700' }} bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm cursor-pointer">
+                                <option value="draft" {{ old('status') === 'draft' ? 'selected' : '' }}>Draft Mode</option>
+                                <option value="published" {{ old('status') === 'published' ? 'selected' : '' }}>Live / Published</option>
+                            </select>
+                            @error('status') <p class="text-red-500 text-[10px] font-black uppercase tracking-widest mt-1 ml-1">{{ $message }}</p> @enderror
                         </div>
                     </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-2">
-                            <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Exam Type</label>
-                            <div class="relative">
-                                <select name="exam_type" required
-                                    class="w-full appearance-none bg-slate-50 dark:bg-slate-800 border {{ $errors->has('exam_type') ? 'border-red-500 ring-1 ring-red-500/20' : 'border-slate-200 dark:border-slate-700' }} rounded-lg px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all pr-10 outline-none">
-                                    <option value="" disabled {{ !old('exam_type') ? 'selected' : '' }}>Select Exam Type...</option>
-                                    <option value="Academic" {{ old('exam_type') === 'Academic' ? 'selected' : '' }}>Academic</option>
-                                    <option value="General" {{ old('exam_type') === 'General' ? 'selected' : '' }}>General Training</option>
-                                </select>
-                                <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">expand_more</span>
-                            </div>
-                            @error('exam_type') <p class="text-red-500 text-xs font-semibold mt-1">{{ $message }}</p> @enderror
-                        </div>
-                        
-                        <div class="space-y-2">
-                            <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Status</label>
-                            <div class="relative">
-                                <select name="status"
-                                    class="w-full appearance-none bg-slate-50 dark:bg-slate-800 border {{ $errors->has('status') ? 'border-red-500 ring-1 ring-red-500/20' : 'border-slate-200 dark:border-slate-700' }} rounded-lg px-4 py-3 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all pr-10 outline-none">
-                                    <option value="draft" {{ old('status') === 'draft' ? 'selected' : '' }}>Draft (Hidden from users)</option>
-                                    <option value="published" {{ old('status') === 'published' ? 'selected' : '' }}>Published (Visible to users)</option>
-                                </select>
-                                <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">expand_more</span>
-                            </div>
-                            @error('status') <p class="text-red-500 text-xs font-semibold mt-1">{{ $message }}</p> @enderror
-                        </div>
-                    </div>
-                    
+
                     <!-- Info Box -->
-                    <div class="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800/50 rounded-lg p-4 flex items-start gap-3">
+                    <div class="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6 border border-slate-100 dark:border-slate-800 flex items-start gap-4">
                         <span class="material-symbols-outlined text-primary shrink-0">info</span>
-                        <p class="text-sm text-indigo-700 dark:text-indigo-300 font-medium">
-                            4 Test Sets will be auto-generated upon saving. Each set will include Listening, Reading, Writing, and Speaking modules.
+                        <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">
+                            Upon clicking "Save & Initialize", the platform will prepare the test infrastructure. You can then begin populating question data for each module.
                         </p>
                     </div>
-                </div>
-                
-                <!-- Action Footer -->
-                <div class="bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 px-6 sm:px-8 py-5 flex flex-col sm:flex-row items-center justify-end gap-3 sm:gap-4">
-                    <a href="{{ route('admin.tests.index') }}" class="w-full sm:w-auto text-center px-6 py-2.5 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-transparent">
-                        Cancel
-                    </a>
-                    <button type="submit" class="w-full sm:w-auto primary-gradient px-8 py-2.5 rounded-lg text-sm font-bold text-white shadow-lg shadow-primary/20 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-primary/30 transition-all flex items-center justify-center gap-2 active:scale-95 border border-transparent">
-                        <span class="material-symbols-outlined text-sm">save</span>
-                        Save Test
-                    </button>
-                </div>
-            </form>
-        </div>
 
-        <!-- Help / Secondary Info -->
-        <div class="mt-8 text-center pb-8">
-            <p class="text-slate-400 text-sm">Need help? Check our <a href="#" class="text-primary hover:underline font-medium focus:outline-none focus:ring-2 focus:ring-primary/50 rounded">documentation</a> on creating test simulations.</p>
+                    <div class="pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-end gap-5">
+                        <a href="{{ route('admin.tests.index') }}" 
+                           class="px-8 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+                            Cancel
+                        </a>
+                        <button type="submit" class="px-10 py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-black uppercase tracking-widest rounded-2xl shadow-xl hover:scale-[1.05] active:scale-100 transition-all">
+                            Save & Initialize
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
+    </div>
+    
+    <!-- Footer Docs -->
+    <div class="mt-12 text-center pb-12">
+        <p class="text-slate-400 font-bold text-xs uppercase tracking-widest">
+            Need guidance? <a href="#" class="text-primary hover:underline ml-1">Read the Exam Builder Manual</a>
+        </p>
     </div>
 </div>
 @endsection
