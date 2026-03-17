@@ -53,8 +53,8 @@
                 @endphp
 
                 @foreach($navItems as $item)
-                    <a href="{{ route($item['route']) }}" class="flex items-center px-[16px] py-[16px] rounded-[var(--radius-base)] text-[14px] font-medium transition-colors {{ request()->routeIs($item['pattern']) ? 'bg-[var(--color-primary)] text-[var(--color-white)]' : 'text-[var(--color-text)] hover:opacity-80' }}">
-                        <i class="fas {{ $item['icon'] }} w-[24px] mr-[16px] {{ request()->routeIs($item['pattern']) ? 'text-[var(--color-white)]' : 'text-[var(--color-text)] opacity-60' }}"></i>
+                    <a href="{{ route($item['route']) }}" class="flex items-center px-[16px] py-[8px] rounded-[var(--radius-base)] text-[14px] font-medium transition-colors {{ request()->routeIs($item['pattern']) ? 'bg-[var(--color-primary)] text-[var(--color-white)]' : 'text-[var(--color-text)] hover:bg-black/5' }}">
+                        <i class="fas {{ $item['icon'] }} w-[24px] mr-[8px] {{ request()->routeIs($item['pattern']) ? 'text-[var(--color-white)]' : 'text-[var(--color-text)] opacity-70' }}"></i>
                         {{ $item['label'] }}
                     </a>
                 @endforeach

@@ -33,67 +33,78 @@
         </div>
     </div>
 
-    <!-- Table -->
+    <!-- Grouped Book Cards -->
     @if($tests->isEmpty())
-        <div class="px-[24px]">
-            <x-empty-state 
-                icon="fas fa-file-alt" 
-                title="No tests available" 
-                message="Get started by creating your first test." 
-                actionText="Create Test" 
-                actionRoute="{{ route('admin.tests.create') }}" />
-        </div>
+        <x-card>
+            <div class="px-[24px]">
+                <x-empty-state 
+                    icon="fas fa-file-alt" 
+                    title="No tests available" 
+                    message="Get started by creating your first test." 
+                    actionText="Create Test" 
+                    actionRoute="{{ route('admin.tests.create') }}" />
+            </div>
+        </x-card>
     @else
-        <div class="w-full">
-            <x-table>
-                <x-slot name="header">
-                    <x-tr>
-                        <x-th>Book</x-th>
-                        <x-th>Year</x-th>
-                        <x-th>Exam Type</x-th>
-                        <x-th>Test Sets</x-th>
-                        <x-th>Status</x-th>
-                        <x-th class="text-right">Actions</x-th>
-                    </x-tr>
-                </x-slot>
-                
-                @foreach($tests as $test)
-                    <x-tr>
-                        <x-td>
-                            <span class="font-bold text-[var(--color-text)]">IELTS Book {{ $test->book_number }}</span>
-                        </x-td>
-                        <x-td>{{ $test->year }}</x-td>
-                        <x-td>{{ $test->exam_type }}</x-td>
-                        <x-td>
-                            <x-badge variant="neutral" class="bg-[var(--color-bg)] border-[var(--color-divider)]">
-                                <i class="fas fa-layer-group mr-[8px] opacity-60"></i> {{ $test->test_sets_count ?? collect($test->testSets ?? [])->count() ?? 0 }}
-                            </x-badge>
-                        </x-td>
-                        <x-td>
-                            <x-badge variant="{{ $test->status === 'published' ? 'success' : 'neutral' }}">
-                                {{ ucfirst($test->status) }}
-                            </x-badge>
-                        </x-td>
-                        <x-td class="text-right whitespace-nowrap">
-                            <div class="flex gap-[8px] justify-end">
-                                <x-button variant="secondary" onclick="window.location.href='{{ route('admin.tests.show', $test->id) }}'">
-                                    Manage
-                                </x-button>
-                                <x-button variant="secondary" onclick="window.location.href='{{ route('admin.tests.edit', $test->id) }}'">
-                                    <i class="fas fa-edit"></i>
-                                </x-button>
-                                <form action="{{ route('admin.tests.destroy', $test->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this test?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <x-button variant="danger" type="submit">
-                                        <i class="fas fa-trash"></i>
-                                    </x-button>
-                                </form>
+        <div class="space-y-[24px]">
+            @foreach($tests as $test)
+                <x-card class="!p-0 overflow-hidden">
+                    <!-- Book Header -->
+                    <div class="p-[24px] border-b border-[var(--color-divider)] flex flex-col md:flex-row md:items-center justify-between gap-[16px] bg-[var(--color-bg)]">
+                        <div>
+                            <div class="flex items-center gap-[12px] mb-[4px]">
+                                <h3 class="text-[18px] font-bold text-[var(--color-text)]">IELTS Book {{ $test->book_number }}</h3>
+                                <x-badge variant="{{ $test->status === 'published' ? 'success' : 'neutral' }}">
+                                    {{ ucfirst($test->status) }}
+                                </x-badge>
                             </div>
-                        </x-td>
-                    </x-tr>
-                @endforeach
-            </x-table>
+                            <div class="text-[14px] text-[var(--color-text)] opacity-70 flex items-center gap-[12px]">
+                                <span>{{ $test->year }}</span>
+                                <span>&bull;</span>
+                                <span>{{ $test->exam_type }}</span>
+                                <span>&bull;</span>
+                                <span>{{ $test->testSets->count() }} Test{{ $test->testSets->count() !== 1 ? 's' : '' }}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-[8px]">
+                            <x-button variant="secondary" onclick="window.location.href='{{ route('admin.tests.show', $test->id) }}'">
+                                Manage Book
+                            </x-button>
+                            <x-button variant="secondary" onclick="window.location.href='{{ route('admin.tests.edit', $test->id) }}'">
+                                <i class="fas fa-edit"></i>
+                            </x-button>
+                            <form action="{{ route('admin.tests.destroy', $test->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this complete book?');">
+                                @csrf
+                                @method('DELETE')
+                                <x-button variant="danger" type="submit">
+                                    <i class="fas fa-trash"></i>
+                                </x-button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <!-- Children Test Sets -->
+                    @if($test->testSets->isNotEmpty())
+                        <div class="divide-y divide-[var(--color-divider)] bg-[var(--color-bg)]">
+                            @foreach($test->testSets as $set)
+                                <div class="px-[24px] py-[16px] flex justify-between items-center transition-ui hover:bg-black/5 cursor-pointer" onclick="window.location.href='{{ route('admin.tests.show', $test->id) }}'">
+                                    <div class="flex items-center gap-[16px]">
+                                        <div class="w-[32px] h-[32px] rounded-[var(--radius-base)] border border-[var(--color-divider)] flex items-center justify-center text-[12px] font-bold text-[var(--color-text)] opacity-60 bg-[var(--color-bg)] shrink-0">
+                                            {{ $set->set_number }}
+                                        </div>
+                                        <span class="text-[14px] font-medium text-[var(--color-text)]">Test Set {{ $set->set_number }}</span>
+                                    </div>
+                                    <i class="fas fa-chevron-right text-[12px] text-[var(--color-text)] opacity-40"></i>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="p-[24px] py-[32px] text-center text-[14px] text-[var(--color-text)] opacity-60 bg-black/5">
+                            No test sets generated.
+                        </div>
+                    @endif
+                </x-card>
+            @endforeach
         </div>
         
         @if($tests->hasPages())
@@ -102,5 +113,4 @@
             </div>
         @endif
     @endif
-</x-card>
 @endsection

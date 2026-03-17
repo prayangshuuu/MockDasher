@@ -50,8 +50,8 @@
                 @endphp
 
                 @foreach($navItems as $item)
-                    <a href="{{ route($item['route']) }}" class="flex items-center px-[16px] py-[16px] rounded-[var(--radius-base)] text-[14px] font-medium transition-colors {{ request()->routeIs($item['pattern']) ? 'bg-[var(--color-primary)] text-[var(--color-white)]' : 'text-[var(--color-text)] hover:opacity-80' }}">
-                        <i class="fas {{ $item['icon'] }} w-[24px] mr-[16px] {{ request()->routeIs($item['pattern']) ? 'text-[var(--color-white)]' : 'text-[var(--color-text)] opacity-60' }}"></i>
+                    <a href="{{ route($item['route']) }}" class="flex items-center px-[16px] py-[8px] rounded-[var(--radius-base)] text-[14px] font-medium transition-colors {{ request()->routeIs($item['pattern']) ? 'bg-[var(--color-primary)] text-[var(--color-white)]' : 'text-[var(--color-text)] hover:bg-black/5' }}">
+                        <i class="fas {{ $item['icon'] }} w-[24px] mr-[8px] {{ request()->routeIs($item['pattern']) ? 'text-[var(--color-white)]' : 'text-[var(--color-text)] opacity-70' }}"></i>
                         {{ $item['label'] }}
                     </a>
                 @endforeach
@@ -64,12 +64,12 @@
                 <!-- Header -->
                 <div class="mb-[32px] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-[16px]">
                     <div>
-                        <h1 class="text-[36px] font-bold tracking-tight text-[var(--color-text)]">@yield('header', 'Dashboard')</h1>
+                        <h2 class="text-[28px] font-bold tracking-tight text-[var(--color-text)]">@yield('header', 'Dashboard')</h2>
                         @if(View::hasSection('subheader'))
-                            <p class="mt-[8px] text-[14px] text-[var(--color-text)] opacity-70">@yield('subheader')</p>
+                            <p class="mt-[4px] text-[16px] text-[var(--color-text)] opacity-70">@yield('subheader')</p>
                         @endif
                     </div>
-                    <div>
+                    <div class="flex items-center justify-end gap-[12px]">
                         @yield('header_actions')
                     </div>
                 </div>

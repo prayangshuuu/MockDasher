@@ -9,7 +9,7 @@ class TestController extends Controller
 {
     public function index()
     {
-        $tests = \App\Models\Test::withCount('testSets')
+        $tests = \App\Models\Test::with('testSets')
                     ->latest()
                     ->paginate(15);
         return view('admin.tests.index', compact('tests'));
