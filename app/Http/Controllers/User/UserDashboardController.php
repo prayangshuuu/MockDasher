@@ -13,7 +13,7 @@ class UserDashboardController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        $tests = \App\Models\Test::query()->where('status', '=', 'published')
+        $tests = \App\Models\Test::whereIn('status', ['published'])
             ->orderBy('created_at', 'desc')
             ->get();
 

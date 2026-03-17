@@ -21,27 +21,23 @@ class DefaultUsersSeeder extends Seeder
         // Create Admin
         /** @var \App\Models\User $admin */
         $admin = \App\Models\User::query()->firstOrCreate(
-            ['email' => 'prayangshu073@gmail.com']
-        );
-        if ($admin->wasRecentlyCreated) {
-            $admin->update([
+            ['email' => 'prayangshu073@gmail.com'],
+            [
                 'name' => 'Admin User',
                 'password' => \Illuminate\Support\Facades\Hash::make('MockDasher@TST'),
-            ]);
-        }
+            ]
+        );
         $admin->roles()->syncWithoutDetaching([$adminRole->id]);
 
         // Create User
         /** @var \App\Models\User $user */
         $user = \App\Models\User::query()->firstOrCreate(
-            ['email' => 'prayangshuuu@gmail.com']
-        );
-        if ($user->wasRecentlyCreated) {
-            $user->update([
+            ['email' => 'prayangshuuu@gmail.com'],
+            [
                 'name' => 'Regular User',
                 'password' => \Illuminate\Support\Facades\Hash::make('MockDasher@TST'),
-            ]);
-        }
+            ]
+        );
         $user->roles()->syncWithoutDetaching([$userRole->id]);
     }
 }
