@@ -1,4 +1,4 @@
-<div {{ $attributes->merge(['class' => 'bg-[var(--color-bg)] border border-[var(--color-divider)] rounded-[var(--radius-base)] flex flex-col p-[24px]']) }}>
+<div {{ $attributes->merge(['class' => 'bg-[var(--color-bg-primary)] border border-[var(--color-divider)] rounded-[var(--radius-lg)] shadow-sm flex flex-col p-[24px]']) }}>
     @if(isset($header))
         <div class="mb-[24px] border-b border-[var(--color-divider)] pb-[16px]">
             {{ $header }}

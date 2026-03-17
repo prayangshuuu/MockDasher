@@ -5,11 +5,11 @@
 ])
 
 @php
-    $baseClasses = 'inline-flex items-center justify-center px-[16px] py-[8px] text-[16px] font-medium rounded-[var(--radius-base)] transition-ui btn-active-state focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100';
+    $baseClasses = 'inline-flex items-center justify-center px-[20px] py-[10px] text-[16px] font-medium rounded-[var(--radius-base)] transition-ui btn-active-state focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100';
 
     $variants = [
-        'primary' => 'bg-[var(--color-primary)] text-[var(--color-white)] hover:opacity-90',
-        'secondary' => 'bg-transparent border border-[var(--color-divider)] text-[var(--color-text)] hover:opacity-90 hover:bg-black/5',
+        'primary' => 'bg-[var(--color-primary)] text-[var(--color-white)] hover:opacity-90 shadow-sm',
+        'secondary' => 'bg-[var(--color-bg-primary)] border border-[var(--color-divider)] text-[var(--color-text-primary)] hover:bg-black/5 cursor-pointer',
         'danger' => 'bg-[var(--color-error)] text-[var(--color-white)] hover:opacity-90',
         'success' => 'bg-[var(--color-success)] text-[var(--color-white)] hover:opacity-90',
     ];

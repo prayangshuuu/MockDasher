@@ -11,8 +11,8 @@
         <x-card>
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[14px] font-medium text-[var(--color-text)] opacity-70 mb-[4px] tracking-wide uppercase">Target Score</p>
-                    <p class="text-[28px] font-bold text-[var(--color-text)]">{{ auth()->user()->target_band_score ?? 'Not Set' }}</p>
+                    <p class="text-[14px] font-medium text-[var(--color-text-secondary)] tracking-wide uppercase mb-[4px]">Target Score</p>
+                    <p class="text-[28px] font-bold text-[var(--color-text-primary)]">{{ auth()->user()->target_band_score ?? 'Not Set' }}</p>
                 </div>
                 <div class="w-[48px] h-[48px] bg-[var(--color-primary)] opacity-10 text-[var(--color-primary)] rounded-[var(--radius-base)] flex items-center justify-center text-[20px] relative">
                     <i class="fas fa-bullseye absolute opacity-100"></i>
@@ -23,8 +23,8 @@
         <x-card>
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[14px] font-medium text-[var(--color-text)] opacity-70 mb-[4px] tracking-wide uppercase">Tests Taken</p>
-                    <p class="text-[28px] font-bold text-[var(--color-text)]">{{ $testsTakenCount ?? collect($recentAttempts ?? [])->count() ?? 0 }}</p>
+                    <p class="text-[14px] font-medium text-[var(--color-text-secondary)] tracking-wide uppercase mb-[4px]">Tests Taken</p>
+                    <p class="text-[28px] font-bold text-[var(--color-text-primary)]">{{ $testsTakenCount ?? collect($recentAttempts ?? [])->count() ?? 0 }}</p>
                 </div>
                 <div class="w-[48px] h-[48px] bg-[var(--color-success)] opacity-10 text-[var(--color-success)] rounded-[var(--radius-base)] flex items-center justify-center text-[20px] relative">
                     <i class="fas fa-check-circle absolute opacity-100"></i>
@@ -35,10 +35,10 @@
         <x-card>
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-[14px] font-medium text-[var(--color-text)] opacity-70 mb-[4px] tracking-wide uppercase">Exam Type</p>
-                    <p class="text-[28px] font-bold text-[var(--color-text)]">{{ auth()->user()->exam_type ?? 'Academic' }}</p>
+                    <p class="text-[14px] font-medium text-[var(--color-text-secondary)] tracking-wide uppercase mb-[4px]">Exam Type</p>
+                    <p class="text-[28px] font-bold text-[var(--color-text-primary)]">{{ auth()->user()->exam_type ?? 'Academic' }}</p>
                 </div>
-                <div class="w-[48px] h-[48px] border border-[var(--color-divider)] text-[var(--color-text)] rounded-[var(--radius-base)] flex items-center justify-center text-[20px]">
+                <div class="w-[48px] h-[48px] border border-[var(--color-divider)] text-[var(--color-text-secondary)] rounded-[var(--radius-base)] flex items-center justify-center text-[20px]">
                     <i class="fas fa-graduation-cap"></i>
                 </div>
             </div>
@@ -48,14 +48,14 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-[32px]">
         <!-- Main Content: Tests -->
         <div class="lg:col-span-2 space-y-[24px]">
-            <h3 class="text-[24px] font-bold text-[var(--color-text)] tracking-tight">Available Mock Tests</h3>
+            <h3 class="text-[24px] font-bold text-[var(--color-text-primary)] tracking-tight">Available Mock Tests</h3>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-[24px]">
                 @forelse($tests as $test)
                     <x-card class="hover:border-[var(--color-primary)] transition-colors h-full flex flex-col">
                         <div class="flex-grow">
-                            <h5 class="font-bold text-[18px] text-[var(--color-text)] mb-[8px] group-hover:text-[var(--color-primary)] transition">{{ $test->title ?? 'IELTS Practice Test' }}</h5>
-                            <p class="text-[14px] text-[var(--color-text)] opacity-60 mb-[24px] font-medium">Reading, Writing, Listening, Speaking</p>
+                            <h5 class="font-bold text-[18px] text-[var(--color-text-primary)] mb-[8px] group-hover:text-[var(--color-primary)] transition">{{ $test->title ?? 'IELTS Practice Test' }}</h5>
+                            <p class="text-[14px] text-[var(--color-text-secondary)] mb-[24px] font-medium">Reading, Writing, Listening, Speaking</p>
                         </div>
                         <form action="{{ route('user.tests.start', $test->id) }}" method="POST" class="mt-auto pt-[16px] border-t border-[var(--color-divider)]">
                             @csrf
@@ -65,9 +65,9 @@
                 @empty
                     <div class="col-span-full">
                         <x-card class="text-center py-[48px]">
-                            <div class="flex flex-col items-center justify-center text-[var(--color-text)] opacity-60">
+                            <div class="flex flex-col items-center justify-center text-[var(--color-text-secondary)]">
                                 <i class="fas fa-file-alt text-[48px] opacity-30 mb-[16px]"></i>
-                                <h4 class="text-[18px] font-bold text-[var(--color-text)] opacity-100">No Content Available</h4>
+                                <h4 class="text-[18px] font-bold text-[var(--color-text-primary)] mt-[8px]">No Content Available</h4>
                                 <p class="text-[14px] mt-[8px]">Check back later for new IELTS mock exams.</p>
                             </div>
                         </x-card>
@@ -81,14 +81,14 @@
             <!-- Recent Activity -->
             <x-card>
                 <x-slot name="header">
-                    <h3 class="text-[18px] font-bold text-[var(--color-text)]">Recent Activity</h3>
+                    <h3 class="text-[18px] font-bold text-[var(--color-text-primary)]">Recent Activity</h3>
                 </x-slot>
                 
                 <div>
                     @if(empty($recentAttempts) || $recentAttempts->isEmpty())
                         <div class="text-center py-[16px]">
-                            <i class="fas fa-history text-[var(--color-text)] opacity-30 text-[24px] mb-[12px]"></i>
-                            <p class="text-[14px] text-[var(--color-text)] opacity-60">You haven't taken any tests yet.</p>
+                            <i class="fas fa-history text-[var(--color-text-secondary)] opacity-30 text-[24px] mb-[12px]"></i>
+                            <p class="text-[14px] text-[var(--color-text-secondary)]">You haven't taken any tests yet.</p>
                         </div>
                     @else
                         <ul class="space-y-[24px]">
@@ -102,8 +102,8 @@
                                         @endif
                                     </div>
                                     <div class="ml-[16px]">
-                                        <p class="text-[14px] font-bold text-[var(--color-text)]">{{ $attempt->test->title ?? 'Practice Test' }}</p>
-                                        <p class="text-[12px] text-[var(--color-text)] opacity-60 mt-[4px]">{{ $attempt->created_at->diffForHumans() }} &bull; Band: {{ $attempt->overall_band ?? '-' }}</p>
+                                        <p class="text-[14px] font-bold text-[var(--color-text-primary)]">{{ $attempt->test->title ?? 'Practice Test' }}</p>
+                                        <p class="text-[12px] text-[var(--color-text-secondary)] mt-[4px]">{{ $attempt->created_at->diffForHumans() }} &bull; Band: {{ $attempt->overall_band ?? '-' }}</p>
                                     </div>
                                 </li>
                             @endforeach
@@ -119,11 +119,11 @@
             </x-card>
 
             <!-- Quick Tips -->
-            <div class="bg-[var(--color-bg)] rounded-[var(--radius-base)] border border-[var(--color-divider)] p-[24px]">
-                <h3 class="text-[14px] font-bold text-[var(--color-text)] mb-[12px] flex items-center uppercase tracking-wide">
+            <div class="bg-[var(--color-bg-primary)] rounded-[var(--radius-base)] border border-[var(--color-divider)] shadow-sm p-[24px]">
+                <h3 class="text-[14px] font-bold text-[var(--color-text-primary)] mb-[12px] flex items-center uppercase tracking-wide">
                     <i class="far fa-lightbulb text-[var(--color-primary)] mr-[8px] text-[18px]"></i> Prep Tip
                 </h3>
-                <p class="text-[14px] text-[var(--color-text)] opacity-80 leading-relaxed">
+                <p class="text-[14px] text-[var(--color-text-secondary)] leading-relaxed">
                     Consistent practice is key to a higher band score. Try to complete one full mock exam under timed conditions every week. Focus on your weakest module!
                 </p>
             </div>

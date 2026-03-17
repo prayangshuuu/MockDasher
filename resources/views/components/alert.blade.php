@@ -6,10 +6,10 @@
     $baseClasses = 'p-[16px] rounded-[var(--radius-base)] border text-[14px] leading-relaxed';
 
     $variants = [
-        'success' => 'bg-[var(--color-success)]/10 border-[var(--color-success)]/20 text-[var(--color-success)]',
-        'error' => 'bg-[var(--color-error)]/10 border-[var(--color-error)]/20 text-[var(--color-error)]',
-        'warning' => 'bg-yellow-100 border-yellow-200 text-yellow-800',
-        'info' => 'bg-[var(--color-primary)]/10 border-[var(--color-primary)]/20 text-[var(--color-primary)]',
+        'success' => 'bg-[var(--color-bg-primary)] border border-l-4 border-l-[var(--color-success)] border-[var(--color-divider)] text-[var(--color-text-primary)] shadow-sm',
+        'error' => 'bg-[var(--color-bg-primary)] border border-l-4 border-l-[var(--color-error)] border-[var(--color-divider)] text-[var(--color-text-primary)] shadow-sm',
+        'warning' => 'bg-[var(--color-bg-primary)] border border-l-4 border-l-yellow-500 border-[var(--color-divider)] text-[var(--color-text-primary)] shadow-sm',
+        'info' => 'bg-[var(--color-bg-primary)] border border-l-4 border-l-[var(--color-primary)] border-[var(--color-divider)] text-[var(--color-text-primary)] shadow-sm',
     ];
 
     $classes = $baseClasses . ' ' . ($variants[$variant] ?? $variants['info']);

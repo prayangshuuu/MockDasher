@@ -9,7 +9,7 @@
         'primary' => 'bg-[var(--color-primary)] text-[var(--color-white)]',
         'success' => 'bg-[var(--color-success)] text-[var(--color-white)]',
         'error' => 'bg-[var(--color-error)] text-[var(--color-white)]',
-        'neutral' => 'bg-[var(--color-bg)] text-[var(--color-text)] border border-[var(--color-divider)]',
+        'neutral' => 'bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)] border border-[var(--color-divider)]',
     ];
 
     $classes = $baseClasses . ' ' . ($variants[$variant] ?? $variants['neutral']);

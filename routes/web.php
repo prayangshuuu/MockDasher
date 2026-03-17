@@ -82,8 +82,7 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/questions/{question}', [\App\Http\Controllers\Admin\QuestionController::class, 'update'])->name('questions.update');
         Route::delete('/questions/{question}', [\App\Http\Controllers\Admin\QuestionController::class, 'destroy'])->name('questions.destroy');
 
-        Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['create', 'store', 'show']);
-        
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class)->except(['show']);
         Route::get('results', [\App\Http\Controllers\Admin\ResultController::class, 'index'])->name('results.index');
         Route::get('results/{result}', [\App\Http\Controllers\Admin\ResultController::class, 'show'])->name('results.show');
     });

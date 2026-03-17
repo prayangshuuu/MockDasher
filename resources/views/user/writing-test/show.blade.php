@@ -1,214 +1,209 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Speaking & Writing Test - MockDasher</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <!-- Alpine.js for lightweight interactions -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-</head>
-<body class="bg-[var(--color-bg)] font-sans antialiased text-[var(--color-text)]" x-data="writingTest({{ $remainingSeconds }}, '{{ route('user.writing.autosave', $attempt->id) }}', '{{ route('user.writing.submit', $attempt->id) }}')">
+@extends('layouts.exam')
+
+@section('title', 'Writing Test - ' . $attempt->test->book_number)
+@section('test_type', 'IELTS Writing')
+@section('test_title', 'IELTS ' . $attempt->test->book_number)
+
+@section('timer_area')
+<div x-data="writingTimer({{ $remainingSeconds }})" class="flex items-center gap-3 bg-white dark:bg-slate-800 border-2 px-4 py-2 rounded-2xl shadow-sm transition-all" :class="timeRemaining <= 300 ? 'border-rose-500 bg-rose-50 dark:bg-rose-950/20' : 'border-slate-100 dark:border-slate-700'">
+    <span class="material-symbols-outlined text-xl" :class="timeRemaining <= 300 ? 'text-rose-500 animate-pulse' : 'text-primary'">timer</span>
+    <div class="flex items-baseline gap-1.5">
+        <span class="text-2xl font-black font-mono tracking-tighter tabular-nums" :class="timeRemaining <= 300 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-white'" x-text="formattedTime"></span>
+        <span class="text-[10px] font-black uppercase tracking-widest opacity-40">Remaining</span>
+    </div>
+</div>
+@endsection
+
+@section('top_right_actions')
+<div x-data="{ saving: false }" 
+     @autosave-start.window="saving = true" 
+     @autosave-end.window="saving = false"
+     class="flex items-center gap-4">
+    <div x-show="saving" x-cloak class="flex items-center gap-2 text-slate-400">
+        <span class="material-symbols-outlined text-sm animate-spin">refresh</span>
+        <span class="text-[10px] font-black uppercase tracking-widest">Saving...</span>
+    </div>
+    <div x-show="!saving" x-cloak class="flex items-center gap-2 text-emerald-500">
+        <span class="material-symbols-outlined text-sm">check_circle</span>
+        <span class="text-[10px] font-black uppercase tracking-widest">Saved</span>
+    </div>
     
-    <!-- Top Bar -->
-    <div class="bg-white shadow-[0_2px_10px_-4px_rgba(0,0,0,0.1)] border-b border-[var(--color-divider)] sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div class="w-10 h-10 bg-[var(--color-primary)] rounded-md flex items-center justify-center font-bold text-white text-lg shadow-sm">M</div>
-                <div>
-                    <p class="text-[10px] text-gray-500 font-bold leading-tight uppercase tracking-wider">IELTS Writing</p>
-                    <span class="text-sm font-bold truncate block max-w-[200px]">{{ $test->title }}</span>
-                </div>
-            </div>
-            
-            <div class="flex items-center space-x-6">
-                <!-- Timer -->
-                <div class="flex items-center gap-2 bg-[var(--color-bg)] border border-[var(--color-divider)] rounded-[var(--radius-base)] px-4 py-2 shadow-sm" :class="timeRemaining <= 300 ? 'text-[var(--color-error)] font-bold animate-pulse' : 'text-[var(--color-text)]'">
-                    <i class="fas fa-clock" :class="timeRemaining <= 300 ? 'text-[var(--color-error)]' : 'text-[var(--color-primary)]'"></i>
-                    <div class="flex items-end gap-2">
-                        <span class="text-lg font-bold font-mono leading-none tracking-widest" x-text="formattedTime"></span>
-                        <p class="text-[10px] text-gray-500 font-medium leading-tight mb-0.5">Left</p>
-                    </div>
-                </div>
-                
-                <button type="button" @click="submitTest" class="bg-[var(--color-bg)] hover:bg-[#e8e4dc] text-[var(--color-text)] border border-[var(--color-divider)] px-6 py-2 rounded-[var(--radius-base)] font-bold transition-colors shadow-sm flex items-center gap-2">
-                    <i class="fas fa-paper-plane text-[var(--color-primary)]"></i> Submit Exam
-                </button>
-            </div>
-        </div>
+    <button @click="$dispatch('trigger-submit')" class="flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-black rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 shadow-lg shadow-slate-200 dark:shadow-none">
+        <span class="material-symbols-outlined text-sm">send</span>
+        End Exam
+    </button>
+</div>
+@endsection
+
+@section('content')
+<div x-data="writingApp('{{ route('user.writing.autosave', $attempt->id) }}', '{{ route('user.writing.submit', $attempt->id) }}')" 
+     class="flex-1 flex flex-col overflow-hidden"
+     @trigger-submit.window="submitTest()">
+    
+    <!-- Task Nav (If multiple tasks) -->
+    <div class="h-12 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-8 gap-6 z-10">
+        @foreach($tasks as $index => $task)
+            <button @click="currentTask = {{ $index }}" 
+                    class="h-full flex items-center gap-2 px-4 text-xs font-black uppercase tracking-widest transition-all border-b-2"
+                    :class="currentTask === {{ $index }} ? 'border-primary text-primary' : 'border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'">
+                <span class="material-symbols-outlined text-sm">edit_note</span>
+                Task {{ $task->task_number }}
+            </button>
+        @endforeach
     </div>
 
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        <form id="writing-form" action="{{ route('user.writing.submit', $attempt->id) }}" method="POST">
-            @csrf
-
-            <!-- Tasks Container -->
-            <div class="space-y-12">
-                @foreach($tasks as $task)
-                <div class="bg-white rounded-[var(--radius-base)] shadow-sm border border-[var(--color-divider)] p-8 mb-8" x-data="wordCounter('{{ $answers[$task->id]->answer_text ?? '' }}', {{ $task->minimum_word_count }})">
-                    
-                    <div class="border-b border-[var(--color-divider)] pb-4 mb-6">
-                        <h2 class="text-2xl font-bold text-[var(--color-text)]">Writing Task {{ $task->task_number }}</h2>
-                        <span class="text-sm text-gray-500 mt-1 block font-medium">Recommended minimum words: {{ $task->minimum_word_count }}</span>
+    <!-- Main Workspace -->
+    <div class="flex-1 flex overflow-hidden">
+        @foreach($tasks as $index => $task)
+        <div x-show="currentTask === {{ $index }}" x-cloak class="flex-1 flex overflow-hidden">
+            <!-- Left: Task Description -->
+            <div class="w-1/2 overflow-y-auto custom-scrollbar bg-slate-50 dark:bg-slate-900/50 p-10 border-r border-slate-200 dark:border-slate-800">
+                <div class="max-w-2xl mx-auto">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-lg text-[10px] font-black uppercase tracking-widest mb-6">
+                        <span class="material-symbols-outlined text-xs">info</span>
+                        Writing Task {{ $task->task_number }}
                     </div>
+                    
+                    <h2 class="text-3xl font-black text-slate-900 dark:text-white mb-6 tracking-tight leading-tight">
+                        {{ $task->task_title ?: 'Simulation Prompt' }}
+                    </h2>
 
                     @if($task->instruction_text)
-                    <div class="bg-[var(--color-bg)] text-[var(--color-text)] p-5 rounded-[var(--radius-base)] mb-6 text-sm font-medium border border-[var(--color-divider)] border-l-4 border-l-[var(--color-primary)]">
-                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Instructions</p>
-                        {{ $task->instruction_text }}
-                    </div>
+                        <div class="p-6 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-soft mb-8 text-slate-600 dark:text-slate-300 font-medium leading-relaxed italic">
+                            {{ $task->instruction_text }}
+                        </div>
                     @endif
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Left side: Question / Prompt -->
-                        <div class="prose max-w-none text-gray-700">
-                            @if($task->task_title)
-                                <h3 class="text-lg font-semibold">{{ $task->task_title }}</h3>
-                            @endif
+                    <div class="prose prose-slate dark:prose-invert max-w-none">
+                        @if($task->task_description)
+                            <p class="text-lg leading-relaxed text-slate-700 dark:text-slate-300 mb-8 whitespace-pre-wrap">
+                                {{ $task->task_description }}
+                            </p>
+                        @endif
 
-                            @if($task->task_description)
-                                <p class="whitespace-pre-wrap">{{ $task->task_description }}</p>
-                            @endif
-
-                            @if($task->images->count() > 0)
-                                <div class="my-6">
-                                    <img src="{{ Storage::url($task->images->first()->image_path) }}" class="rounded shadow object-contain max-h-96 w-full bg-gray-50" />
-                                </div>
-                            @endif
-
-                            @if($task->task_prompt)
-                                <div class="bg-gray-100 p-6 rounded border font-medium mt-4">
-                                    <p class="whitespace-pre-wrap">{{ $task->task_prompt }}</p>
-                                </div>
-                            @endif
-                        </div>
-
-                        <!-- Right side: Input text -->
-                        <div class="flex flex-col h-full">
-                            <div class="flex justify-between items-center mb-2">
-                                <label class="font-semibold text-gray-700">Your Answer</label>
-                                <div class="text-sm font-medium px-3 py-1 rounded" 
-                                     :class="customColorClass()">
-                                    Word Count: <span x-text="count"></span> / {{ $task->minimum_word_count }}
-                                </div>
+                        @if($task->images->count() > 0)
+                            <div class="rounded-3xl border-4 border-white dark:border-slate-800 shadow-xl overflow-hidden mb-8 bg-white dark:bg-slate-900">
+                                <img src="{{ Storage::url($task->images->first()->image_path) }}" class="w-full h-auto object-contain max-h-[500px]" alt="Task Content">
                             </div>
-                            
-                            <textarea 
-                                name="answers[{{ $task->id }}]"
-                                x-model="text"
-                                @input="updateCount"
-                                class="writing-answer-input w-full flex-grow min-h-[400px] p-5 border border-[var(--color-divider)] rounded-[var(--radius-base)] focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] bg-white resize-y text-[var(--color-text)] leading-relaxed outline-none transition-colors shadow-sm"
-                                placeholder="Start typing your answer here..."
-                            ></textarea>
-                        </div>
+                        @endif
+
+                        @if($task->task_prompt)
+                            <div class="p-8 bg-indigo-50 dark:bg-indigo-900/20 rounded-3xl border-2 border-primary/20 text-slate-800 dark:text-slate-200 font-bold leading-relaxed shadow-lg">
+                                <span class="block text-[10px] font-black uppercase tracking-widest text-primary mb-2">Detailed Prompt</span>
+                                {{ $task->task_prompt }}
+                            </div>
+                        @endif
                     </div>
                 </div>
-                @endforeach
             </div>
 
-            <!-- Hidden Submit Button for fallback -->
-            <button type="submit" id="hidden-submit" class="hidden"></button>
-        </form>
-    </div>
-
-    <!-- Auto-save notification anchor -->
-    <div x-show="showAutosaveNotice" 
-         x-transition.opacity.duration.500ms
-         class="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded shadow-lg text-sm flex items-center space-x-2 z-50"
-         style="display: none;">
-        <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-        <span>Saved as draft</span>
-    </div>
-
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('writingTest', (initialSeconds, autosaveUrl, submitUrl) => ({
-                timeRemaining: initialSeconds,
-                autosaveUrl: autosaveUrl,
-                submitUrl: submitUrl,
-                showAutosaveNotice: false,
-                autosaveInterval: null,
-                timerInterval: null,
-
-                init() {
-                    // Timer logic
-                    this.timerInterval = setInterval(() => {
-                        this.timeRemaining--;
-                        if (this.timeRemaining <= 0) {
-                            clearInterval(this.timerInterval);
-                            this.forceSubmitTest();
-                        }
-                    }, 1000);
-
-                    // Autosave logic (Every 10 seconds)
-                    this.autosaveInterval = setInterval(() => {
-                        this.autosave();
-                    }, 10000);
-                },
-
-                get formattedTime() {
-                    let m = Math.floor(this.timeRemaining / 60);
-                    let s = this.timeRemaining % 60;
-                    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                },
-
-                autosave() {
-                    const form = document.getElementById('writing-form');
-                    const formData = new FormData(form);
-                    
-                    // Simple fetch post to autosave endpoint
-                    fetch(this.autosaveUrl, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    }).then(response => {
-                        if(response.ok) {
-                            this.showAutosaveNotice = true;
-                            setTimeout(() => this.showAutosaveNotice = false, 2000);
-                        }
-                    }).catch(err => console.error('Autosave failed', err));
-                },
-
-                submitTest() {
-                    if(confirm("Are you sure you want to completely finish and submit your writing test? You cannot change your answers after this point.")) {
-                        clearInterval(this.autosaveInterval);
-                        document.getElementById('hidden-submit').click();
-                    }
-                },
-
-                forceSubmitTest() {
-                    alert("Time is up! Your test will now be submitted automatically.");
-                    clearInterval(this.autosaveInterval);
-                    document.getElementById('hidden-submit').click();
-                }
-            }));
-
-            Alpine.data('wordCounter', (initialText, minWords) => ({
-                text: initialText,
-                count: 0,
-                minWords: minWords,
+            <!-- Right: Answer Editor -->
+            <div class="w-1/2 flex flex-col bg-white dark:bg-slate-950">
+                <div class="flex-1 relative">
+                    <textarea 
+                        x-model="answers[{{ $task->id }}]"
+                        @input="updateWordCount({{ $task->id }}, {{ $task->minimum_word_count }})"
+                        class="absolute inset-0 w-full h-full p-12 text-lg font-medium bg-transparent border-none focus:ring-0 resize-none custom-scrollbar leading-relaxed placeholder:text-slate-300 dark:placeholder:text-slate-700"
+                        placeholder="Start typing your response here..."></textarea>
+                </div>
                 
-                init() {
-                    this.updateCount();
-                },
+                <!-- Editor Footer -->
+                <div class="h-16 border-t border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between shrink-0">
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all"
+                             :class="wordCounts[{{ $task->id }}] >= {{ $task->minimum_word_count }} ? 'bg-emerald-50 border-emerald-200 text-emerald-700' : 'bg-slate-50 border-slate-200 text-slate-500'">
+                            <span class="text-xs font-black tabular-nums" x-text="wordCounts[{{ $task->id }}] || 0"></span>
+                            <span class="text-[10px] font-bold uppercase tracking-widest opacity-60">Words</span>
+                        </div>
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                            Target: {{ $task->minimum_word_count }} min.
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <span class="size-2 rounded-full bg-primary animate-pulse"></span>
+                        <span class="text-[10px] font-black uppercase tracking-widest text-primary">Live Sync Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
 
-                updateCount() {
-                    const trimmed = this.text.trim();
-                    this.count = trimmed === '' ? 0 : trimmed.split(/\s+/).length;
-                },
+    <!-- Submission Form -->
+    <form id="submission-form" :action="submitUrl" method="POST" class="hidden">
+        @csrf
+        @foreach($tasks as $task)
+            <input type="hidden" :name="'answers['+{{ $task->id }}+']'" :value="answers[{{ $task->id }}]">
+        @endforeach
+    </form>
+</div>
+@endsection
 
-                customColorClass() {
-                    if (this.count === 0) return 'bg-gray-200 text-gray-700';
-                    if (this.count < this.minWords) return 'bg-yellow-100 text-yellow-800 border border-yellow-200';
-                    return 'bg-green-100 text-green-800 border border-green-200';
+@push('scripts')
+<script>
+    function writingTimer(initialSeconds) {
+        return {
+            timeRemaining: initialSeconds,
+            init() {
+                setInterval(() => {
+                    this.timeRemaining--;
+                    if (this.timeRemaining <= 0) $dispatch('trigger-submit');
+                }, 1000);
+            },
+            get formattedTime() {
+                const m = Math.floor(this.timeRemaining / 60);
+                const s = this.timeRemaining % 60;
+                return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }
+        }
+    }
+
+    function writingApp(autosaveUrl, submitUrl) {
+        return {
+            currentTask: 0,
+            answers: @json($answers->map(fn($a) => $a->answer_text)),
+            wordCounts: {},
+            autosaveUrl: autosaveUrl,
+            submitUrl: submitUrl,
+            init() {
+                this.answers = this.answers || {};
+                // Pre-calculate word counts
+                Object.keys(this.answers).forEach(id => {
+                    this.updateWordCount(id);
+                });
+
+                // Periodic autosave
+                setInterval(() => this.autosave(), 15000);
+            },
+            updateWordCount(id) {
+                const text = this.answers[id] || '';
+                const trimmed = text.trim();
+                this.wordCounts[id] = trimmed === '' ? 0 : trimmed.split(/\s+/).length;
+            },
+            async autosave() {
+                $dispatch('autosave-start');
+                try {
+                    const response = await fetch(this.autosaveUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({ answers: this.answers })
+                    });
+                    if (response.ok) $dispatch('autosave-end');
+                } catch (e) {
+                    console.error('Autosave failed:', e);
                 }
-            }));
-        });
-    </script>
-</body>
-</html>
+            },
+            submitTest() {
+                if (confirm("Final Submission: Are you sure you want to end your writing exam? Your answers will be locked.")) {
+                    document.getElementById('submission-form').submit();
+                }
+            }
+        }
+    }
+</script>
+@endpush

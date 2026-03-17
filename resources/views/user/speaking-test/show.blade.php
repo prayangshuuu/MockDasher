@@ -1,101 +1,219 @@
-@extends('layouts.app')
+@extends('layouts.exam')
+
+@section('title', 'Speaking Test - ' . $test->book_number)
+@section('test_type', 'IELTS Speaking')
+@section('test_title', 'IELTS ' . $test->book_number)
+
+@section('timer_area')
+<div x-data="speakingTimer({{ $remainingSeconds }})" class="flex items-center gap-3 bg-white dark:bg-slate-800 border-2 px-4 py-2 rounded-2xl shadow-sm transition-all" :class="timeRemaining <= 60 ? 'border-rose-500 bg-rose-50 dark:bg-rose-950/20' : 'border-slate-100 dark:border-slate-700'">
+    <span class="material-symbols-outlined text-xl" :class="timeRemaining <= 60 ? 'text-rose-500 animate-pulse' : 'text-primary'">timer</span>
+    <div class="flex items-baseline gap-1.5">
+        <span class="text-2xl font-black font-mono tracking-tighter tabular-nums" :class="timeRemaining <= 60 ? 'text-rose-600 dark:text-rose-400' : 'text-slate-900 dark:text-white'" x-text="formattedTime"></span>
+        <span class="text-[10px] font-black uppercase tracking-widest opacity-40">Remaining</span>
+    </div>
+</div>
+@endsection
+
+@section('top_right_actions')
+<div class="flex items-center gap-6">
+    <div x-data="{ recording: false }" 
+         @recording-start.window="recording = true" 
+         @recording-stop.window="recording = false"
+         class="flex items-center gap-3 px-4 py-2 rounded-xl border transition-all"
+         :class="recording ? 'bg-rose-50 border-rose-200 text-rose-600' : 'bg-slate-50 border-slate-200 text-slate-400'">
+        <span class="size-2 rounded-full bg-rose-500" :class="recording && 'animate-ping'"></span>
+        <span class="text-[10px] font-black uppercase tracking-widest" x-text="recording ? 'Capturing Audio' : 'Standby'"></span>
+    </div>
+    
+    <div class="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
+
+    <button @click="$dispatch('trigger-submit')" class="flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-black rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 shadow-lg shadow-slate-200 dark:shadow-none">
+        <span class="material-symbols-outlined text-sm">check_circle</span>
+        Complete Interview
+    </button>
+</div>
+@endsection
 
 @section('content')
-<div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+<div x-data="speakingApp('{{ route('user.speaking.submit', $attempt->id) }}')"
+     class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-slate-950"
+     @trigger-submit.window="submitInterview()">
     
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-900">Speaking Test: {{ $attempt->test->title }}</h1>
-            <p class="text-gray-500 mt-1">Please ensure your microphone is working properly.</p>
-        </div>
-        <div>
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200 shadow-sm">
-                <i class="fas fa-circle text-xs mr-2 animate-pulse"></i> In Progress
-            </span>
+    <!-- Stage Progress -->
+    <div class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-12 gap-12 z-10 shrink-0">
+        @foreach($test->parts as $index => $part)
+            <div class="flex items-center gap-4 transition-all" :class="currentPart >= {{ $index }} ? 'opacity-100' : 'opacity-30'">
+                <div class="size-8 rounded-xl flex items-center justify-center text-xs font-black transition-all"
+                     :class="currentPart === {{ $index }} ? 'exam-gradient text-white shadow-lg' : (currentPart > {{ $index }} ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400')">
+                    @if($index < 0) <!-- Placeholder for logic -->
+                    @else
+                        {{ $index + 1 }}
+                    @endif
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest" :class="currentPart === {{ $index }} ? 'text-primary' : 'text-slate-400'">{{ $part->part_title }}</span>
+            </div>
+            @if(!$loop->last)
+                <div class="w-8 h-px bg-slate-200 dark:bg-slate-800"></div>
+            @endif
+        @endforeach
+    </div>
+
+    <!-- Main Interview Area -->
+    <div class="flex-1 overflow-y-auto custom-scrollbar p-12">
+        <div class="max-w-4xl mx-auto flex flex-col items-center text-center">
+            @foreach($test->parts as $index => $part)
+                <div x-show="currentPart === {{ $index }}" x-cloak class="w-full space-y-12 animate-in fade-in zoom-in-95 duration-500">
+                    
+                    <!-- Part Header -->
+                    <div class="space-y-4">
+                        <div class="inline-flex items-center gap-3 px-4 py-1.5 bg-primary/10 text-primary rounded-full text-[10px] font-black uppercase tracking-widest">
+                            <span class="material-symbols-outlined text-sm">record_voice_over</span>
+                            IELTS Speaking Part {{ $index + 1 }}
+                        </div>
+                        <h2 class="text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+                            {{ $part->part_title }}
+                        </h2>
+                        @if($part->part_description)
+                            <p class="text-lg text-slate-500 font-medium italic">
+                                {{ $part->part_description }}
+                            </p>
+                        @endif
+                    </div>
+
+                    <!-- Prompts / Questions -->
+                    <div class="grid grid-cols-1 gap-6 w-full text-left">
+                        @foreach($part->prompts as $pi => $prompt)
+                            <div class="p-8 rounded-[32px] bg-slate-50 dark:bg-slate-900/50 border-2 border-slate-100 dark:border-slate-800 transition-all hover:border-primary/20 shadow-soft">
+                                <div class="flex gap-6">
+                                    <div class="size-12 rounded-2xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center shrink-0 border border-slate-100 dark:border-slate-700">
+                                        <span class="text-sm font-black text-primary">{{ $pi + 1 }}</span>
+                                    </div>
+                                    <div class="text-2xl font-bold text-slate-900 dark:text-white leading-[1.6]">
+                                        {{ $prompt->prompt_text }}
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <!-- Audio Visualization Placeholder -->
+                    <div x-show="isRecording" class="w-full h-32 flex items-center justify-center gap-1.5 px-12">
+                        <template x-for="i in 40">
+                            <div class="w-1.5 bg-rose-500 rounded-full animate-pulse" 
+                                 :style="`height: ${Math.random() * 80 + 20}%; animation-delay: ${i * 0.05}s`"></div>
+                        </template>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="pt-12 flex items-center justify-center gap-8">
+                        @if($index > 0)
+                            <button @click="currentPart--" class="px-8 py-4 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                                Previous Part
+                            </button>
+                        @endif
+
+                        <button @click="startOrStopRecording()" 
+                                class="size-24 rounded-full flex items-center justify-center transition-all active:scale-95 shadow-2xl relative"
+                                :class="isRecording ? 'bg-rose-500 text-white shadow-rose-500/30' : 'bg-slate-900 text-white shadow-slate-900/30'">
+                            <span class="material-symbols-outlined text-4xl font-black fill-1" x-text="isRecording ? 'stop' : 'mic'"></span>
+                            <div x-show="isRecording" class="absolute inset-0 rounded-full border-4 border-rose-500 animate-ping opacity-20"></div>
+                        </button>
+
+                        @if($index < count($test->parts) - 1)
+                            <button @click="currentPart++; stopRecording();" class="px-10 py-5 bg-primary text-white rounded-[28px] text-sm font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:scale-105 transition-all">
+                                Next Part
+                            </button>
+                        @else
+                            <button @click="submitInterview()" class="px-10 py-5 bg-emerald-600 text-white rounded-[28px] text-sm font-black uppercase tracking-[0.2em] shadow-xl shadow-emerald-500/20 hover:scale-105 transition-all">
+                                End Interview
+                            </button>
+                        @endif
+                    </div>
+                </div>
+            @endforeach
         </div>
     </div>
 
-    @if($speakingQuestions->isEmpty())
-        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 shadow-sm rounded">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-exclamation-triangle text-yellow-500"></i>
-                </div>
-                <div class="ml-3 text-sm text-yellow-700">
-                    <p>No speaking questions are currently assigned to this test module.</p>
-                </div>
-            </div>
-        </div>
-    @else
-        <div class="bg-white shadow border border-gray-200 rounded-lg overflow-hidden">
-            <!-- Tabs for Parts -->
-            <div class="bg-gray-50 border-b border-gray-200 px-6 py-4 flex space-x-6">
-                @foreach([1, 2, 3] as $partNum)
-                    @if(isset($parts[$partNum]))
-                        <h2 class="text-lg font-bold {{ $loop->first ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500' }} pb-2">
-                            Part {{ $partNum }}
-                        </h2>
-                    @endif
-                @endforeach
-            </div>
-
-            <div class="p-8">
-                <!-- Simple sequential rendering for demonstration. A real app would likely use JS to paginate. -->
-                @foreach($parts as $partNum => $questions)
-                    <div class="mb-10 last:mb-0">
-                        <h3 class="text-xl font-bold text-gray-800 mb-6 border-b pb-2">Speaking Part {{ $partNum }}</h3>
-                        
-                        <div class="space-y-8">
-                            @foreach($questions as $index => $question)
-                                <div class="bg-gray-50 rounded-lg p-6 border border-gray-100">
-                                    <div class="flex justify-between items-start mb-4">
-                                        <h4 class="font-semibold text-lg text-gray-900">Question {{ $index + 1 }}</h4>
-                                        @if($question->time_limit)
-                                            <span class="text-sm font-mono bg-blue-100 text-blue-800 px-2 py-1 rounded"><i class="fas fa-clock mr-1"></i> {{ $question->time_limit }}s target</span>
-                                        @endif
-                                    </div>
-                                    
-                                    <p class="text-gray-700 text-lg mb-6 leading-relaxed">{{ $question->question_text }}</p>
-
-                                    @if($question->audio_path)
-                                        <div class="mb-6 bg-white p-3 rounded border border-gray-200 inline-block">
-                                            <p class="text-xs font-bold text-gray-500 uppercase mb-2">Examiner Audio</p>
-                                            <audio controls class="h-10 outline-none">
-                                                <source src="{{ Storage::url($question->audio_path) }}" type="audio/mpeg">
-                                                Your browser does not support the audio element.
-                                            </audio>
-                                        </div>
-                                    @endif
-
-                                    <!-- Mock Recording Interface -->
-                                    <div class="border-t border-gray-200 pt-4 mt-2">
-                                        <p class="text-sm font-medium text-gray-500 mb-3">Your Response (Simulated)</p>
-                                        <div class="flex items-center space-x-4">
-                                            <button type="button" class="flex items-center justify-center w-12 h-12 bg-red-100 text-red-600 rounded-full hover:bg-red-200 transition focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm">
-                                                <i class="fas fa-microphone"></i>
-                                            </button>
-                                            <div class="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
-                                                <div class="h-full bg-red-500 w-0 transition-all duration-300"></div>
-                                            </div>
-                                            <span class="text-sm font-mono text-gray-500">00:00</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-            
-            <div class="bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end">
-                <form action="{{ route('user.speaking.submit', $attempt->id) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded shadow-sm transition">
-                        Finish Speaking Module
-                    </button>
-                </form>
-            </div>
-        </div>
-    @endif
+    <!-- Hidden Submission Form -->
+    <form id="speaking-form" :action="submitUrl" method="POST" enctype="multipart/form-data" class="hidden">
+        @csrf
+        <input type="file" name="recording" x-ref="audioInput">
+    </form>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function speakingTimer(initialSeconds) {
+        return {
+            timeRemaining: initialSeconds,
+            init() {
+                setInterval(() => {
+                    this.timeRemaining--;
+                    if (this.timeRemaining <= 0) $dispatch('trigger-submit');
+                }, 1000);
+            },
+            get formattedTime() {
+                const m = Math.floor(this.timeRemaining / 60);
+                const s = this.timeRemaining % 60;
+                return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+            }
+        }
+    }
+
+    function speakingApp(submitUrl) {
+        return {
+            currentPart: 0,
+            isRecording: false,
+            mediaRecorder: null,
+            audioChunks: [],
+            submitUrl: submitUrl,
+            
+            init() {
+                // Potential setup for recording
+            },
+            
+            async startOrStopRecording() {
+                if (this.isRecording) {
+                    this.stopRecording();
+                } else {
+                    await this.startRecording();
+                }
+            },
+            
+            async startRecording() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    this.mediaRecorder = new MediaRecorder(stream);
+                    this.audioChunks = [];
+                    
+                    this.mediaRecorder.ondataavailable = (e) => this.audioChunks.push(e.data);
+                    this.mediaRecorder.onstop = () => {
+                        $dispatch('recording-stop');
+                        // In a real app, we'd append to form or upload
+                    };
+                    
+                    this.mediaRecorder.start();
+                    this.isRecording = true;
+                    $dispatch('recording-start');
+                } catch (e) {
+                    alert('Audio permissions denied or microphone not found.');
+                }
+            },
+            
+            stopRecording() {
+                if (this.mediaRecorder && this.isRecording) {
+                    this.mediaRecorder.stop();
+                    this.isRecording = false;
+                }
+            },
+            
+            submitInterview() {
+                if (confirm("Finish Interview: Are you ready to submit your speaking responses for evaluation?")) {
+                    document.getElementById('speaking-form').submit();
+                }
+            }
+        }
+    }
+</script>
+@endpush

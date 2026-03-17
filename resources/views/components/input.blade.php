@@ -12,5 +12,5 @@
 @endphp
 
 <input {{ $disabled ? 'disabled' : '' }} {!! $attributes->merge([
-    'class' => "flex w-full p-[16px] bg-[var(--color-bg)] border rounded-[var(--radius-base)] text-[var(--color-text)] text-[16px] focus:outline-none focus:ring-1 disabled:opacity-50 disabled:cursor-not-allowed transition-ui {$borderClass}"
+    'class' => "flex w-full p-[16px] bg-[var(--color-bg-primary)] border rounded-[var(--radius-base)] text-[var(--color-text-primary)] text-[16px] focus:outline-none focus:ring-1 disabled:opacity-50 disabled:cursor-not-allowed transition-ui {$borderClass}"
 ]) !!}>

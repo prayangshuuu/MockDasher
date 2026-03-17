@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="py-12 bg-gray-50 min-h-screen">
+<div class="py-12 bg-[var(--color-bg-secondary)] min-h-screen">
     <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
 
         {{-- Header --}}
         <div class="mb-8 flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900">{{ $test->title }}</h1>
-                <p class="text-sm text-gray-500 mt-1">Select a module to begin your practice session</p>
+                <h1 class="text-2xl font-bold text-[var(--color-text-primary)]">{{ $test->title }}</h1>
+                <p class="text-sm text-[var(--color-text-secondary)] mt-1">Select a module to begin your practice session</p>
             </div>
             <a href="{{ route('dashboard') }}" class="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1">
                 <i class="fas fa-arrow-left text-xs"></i> Dashboard
@@ -19,14 +19,14 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
             {{-- LISTENING --}}
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 hover:border-teal-400 hover:shadow-md transition overflow-hidden group">
+            <div class="bg-[var(--color-bg-primary)] rounded-xl shadow-sm border border-[var(--color-divider)] hover:border-teal-400 hover:shadow-md transition overflow-hidden group">
                 <div class="h-1.5 bg-gradient-to-r from-teal-400 to-teal-600"></div>
                 <div class="p-6 flex flex-col items-center text-center">
                     <div class="w-12 h-12 bg-teal-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-teal-100 transition">
                         <i class="fas fa-headphones text-teal-600 text-xl"></i>
                     </div>
-                    <h2 class="text-lg font-bold text-gray-800 mb-1">Listening</h2>
-                    <p class="text-xs text-gray-500 mb-5">4 parts · 40 questions · ~30 min</p>
+                    <h2 class="text-lg font-bold text-[var(--color-text-primary)] mb-1">Listening</h2>
+                    <p class="text-xs text-[var(--color-text-secondary)] mb-5">4 parts · 40 questions · ~30 min</p>
                     <form action="{{ route('user.tests.start', $test->id) }}" method="POST" class="w-full">
                         @csrf
                         <input type="hidden" name="module" value="listening">
@@ -38,14 +38,14 @@
             </div>
 
             {{-- READING --}}
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 hover:border-orange-400 hover:shadow-md transition overflow-hidden group">
+            <div class="bg-[var(--color-bg-primary)] rounded-xl shadow-sm border border-[var(--color-divider)] hover:border-orange-400 hover:shadow-md transition overflow-hidden group">
                 <div class="h-1.5 bg-gradient-to-r from-orange-400 to-orange-600"></div>
                 <div class="p-6 flex flex-col items-center text-center">
                     <div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-orange-100 transition">
                         <i class="fas fa-book-open text-orange-500 text-xl"></i>
                     </div>
-                    <h2 class="text-lg font-bold text-gray-800 mb-1">Reading</h2>
-                    <p class="text-xs text-gray-500 mb-5">3 passages · 40 questions · 60 min</p>
+                    <h2 class="text-lg font-bold text-[var(--color-text-primary)] mb-1">Reading</h2>
+                    <p class="text-xs text-[var(--color-text-secondary)] mb-5">3 passages · 40 questions · 60 min</p>
                     <form action="{{ route('user.tests.start', $test->id) }}" method="POST" class="w-full">
                         @csrf
                         <input type="hidden" name="module" value="reading">
@@ -57,14 +57,14 @@
             </div>
 
             {{-- WRITING --}}
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 hover:border-blue-400 hover:shadow-md transition overflow-hidden group">
+            <div class="bg-[var(--color-bg-primary)] rounded-xl shadow-sm border border-[var(--color-divider)] hover:border-blue-400 hover:shadow-md transition overflow-hidden group">
                 <div class="h-1.5 bg-gradient-to-r from-blue-400 to-blue-600"></div>
                 <div class="p-6 flex flex-col items-center text-center">
                     <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-100 transition">
                         <i class="fas fa-pen-alt text-blue-600 text-xl"></i>
                     </div>
-                    <h2 class="text-lg font-bold text-gray-800 mb-1">Writing</h2>
-                    <p class="text-xs text-gray-500 mb-5">Task 1 + Task 2 · 60 min</p>
+                    <h2 class="text-lg font-bold text-[var(--color-text-primary)] mb-1">Writing</h2>
+                    <p class="text-xs text-[var(--color-text-secondary)] mb-5">Task 1 + Task 2 · 60 min</p>
                     <form action="{{ route('user.tests.start', $test->id) }}" method="POST" class="w-full">
                         @csrf
                         <input type="hidden" name="module" value="writing">
@@ -76,14 +76,14 @@
             </div>
 
             {{-- SPEAKING --}}
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 hover:border-green-400 hover:shadow-md transition overflow-hidden group">
+            <div class="bg-[var(--color-bg-primary)] rounded-xl shadow-sm border border-[var(--color-divider)] hover:border-green-400 hover:shadow-md transition overflow-hidden group">
                 <div class="h-1.5 bg-gradient-to-r from-green-400 to-green-600"></div>
                 <div class="p-6 flex flex-col items-center text-center">
                     <div class="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mb-4 group-hover:bg-green-100 transition">
                         <i class="fas fa-microphone-alt text-green-600 text-xl"></i>
                     </div>
-                    <h2 class="text-lg font-bold text-gray-800 mb-1">Speaking</h2>
-                    <p class="text-xs text-gray-500 mb-5">Part 1, 2 & 3 · ~15 min</p>
+                    <h2 class="text-lg font-bold text-[var(--color-text-primary)] mb-1">Speaking</h2>
+                    <p class="text-xs text-[var(--color-text-secondary)] mb-5">Part 1, 2 & 3 · ~15 min</p>
                     <form action="{{ route('user.tests.start', $test->id) }}" method="POST" class="w-full">
                         @csrf
                         <input type="hidden" name="module" value="speaking">
