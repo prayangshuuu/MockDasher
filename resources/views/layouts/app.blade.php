@@ -107,5 +107,7 @@
             });
         }, 4000);
     </script>
+    <!-- Toast Notifications -->
+    <x-toast-container />
 </body>
 </html>

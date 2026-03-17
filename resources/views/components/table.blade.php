@@ -6,7 +6,7 @@
             </thead>
         @endif
         
-        <tbody class="divide-y divide-[var(--color-divider)] bg-[var(--color-bg)]">
+        <tbody class="divide-y divide-[var(--color-divider)] bg-[var(--color-bg)] [&>tr]:transition-colors [&>tr]:duration-150 [&>tr]:ease-out hover:[&>tr]:bg-black/5 cursor-pointer">
             {{ $slot }}
         </tbody>
     </table>

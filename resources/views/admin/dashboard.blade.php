@@ -76,12 +76,14 @@
                 </x-tr>
             @empty
                 <x-tr>
-                    <x-td colspan="3" class="text-center py-[32px] text-[var(--color-text)] opacity-60">
-                        <div class="flex flex-col items-center justify-center">
-                            <i class="fas fa-folder-open text-[36px] opacity-30 mb-[16px]"></i>
-                            <p class="mb-[16px] text-[16px]">No tests available yet.</p>
-                            <x-button variant="primary" type="button" onclick="window.location.href='{{ route('admin.tests.create') }}'">Create your first test</x-button>
-                        </div>
+                    <x-td colspan="3" class="p-[24px]">
+                        <x-empty-state 
+                            icon="fas fa-folder-open" 
+                            title="No tests available yet" 
+                            message="Create your first test to see it here." 
+                            actionText="Create Test" 
+                            actionRoute="{{ route('admin.tests.create') }}" 
+                            class="border-0 bg-transparent py-[32px]" />
                     </x-td>
                 </x-tr>
             @endforelse

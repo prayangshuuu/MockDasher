@@ -35,15 +35,13 @@
 
     <!-- Table -->
     @if($tests->isEmpty())
-        <div class="p-[64px] text-center text-[var(--color-text)] opacity-70">
-            <i class="fas fa-file-alt text-[48px] opacity-30 mb-[16px]"></i>
-            <p class="text-[18px] font-bold text-[var(--color-text)] opacity-100">No tests available.</p>
-            <p class="text-[16px] mt-[8px]">Get started by creating your first test.</p>
-            <div class="mt-[24px]">
-                <x-button variant="primary" onclick="window.location.href='{{ route('admin.tests.create') }}'">
-                    <i class="fas fa-plus mr-[8px]"></i> Create Test
-                </x-button>
-            </div>
+        <div class="px-[24px]">
+            <x-empty-state 
+                icon="fas fa-file-alt" 
+                title="No tests available" 
+                message="Get started by creating your first test." 
+                actionText="Create Test" 
+                actionRoute="{{ route('admin.tests.create') }}" />
         </div>
     @else
         <div class="w-full">
