@@ -24,7 +24,7 @@
         .ans-btn.active-q   { background: var(--color-primary); color: white; border-color: var(--color-primary); outline: 2px solid var(--color-primary); outline-offset: 2px; }
         
         /* Flag indicator on button */
-        .ans-btn .flag-icon { position: absolute; top: -4px; right: -4px; color: var(--color-error); font-size: 10px; display: none; background: white; border-radius: 50%; width: 12px; height: 12px; line-height: 12px; text-align: center; box-shadow: 0 0 2px rgba(0,0,0,0.3); }
+        .ans-btn .flag-icon { transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: absolute; top: -4px; right: -4px; color: var(--color-error); font-size: 10px; display: none; background: white; border-radius: 50%; width: 12px; height: 12px; line-height: 12px; text-align: center; box-shadow: 0 0 2px rgba(0,0,0,0.3); }
         .ans-btn.flagged .flag-icon { display: block; }
 
         /* Active question highlight */
@@ -565,6 +565,11 @@ function toggleFlag() {
     if (chip) {
         if (flaggedState[currentQuestionId]) {
             chip.classList.add('flagged');
+            const icon = chip.querySelector('.flag-icon');
+            if(icon) {
+                icon.style.transform = 'scale(1.5)';
+                setTimeout(() => icon.style.transform = 'scale(1)', 150);
+            }
         } else {
             chip.classList.remove('flagged');
         }
