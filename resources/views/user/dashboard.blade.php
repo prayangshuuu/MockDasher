@@ -129,14 +129,14 @@
                     <div class="flex justify-between text-xs font-bold mb-2">
                         <span class="text-slate-600">{{ $module['name'] }}</span>
                         @if($module['score'] !== null)
-                            <span class="text-{{ $module['color'] }}">{{ number_format($module['score'], 1) }}</span>
+                            <span class="{{ $module['type'] === 'primary' ? 'text-primary' : 'text-slate-300' }}">{{ number_format($module['score'], 1) }}</span>
                         @else
                             <span class="text-slate-400">Pending</span>
                         @endif
                     </div>
                     <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                         @if($module['score'] !== null)
-                            <div class="bg-{{ $module['color'] }} h-full rounded-full" style="width: {{ $module['percentage'] }}%"></div>
+                            <div class="{{ $module['type'] === 'primary' ? 'bg-primary' : 'bg-slate-300' }} h-full rounded-full" style="width: {{ $module['percentage'] }}%"></div>
                         @else
                             <div class="bg-slate-200 h-full rounded-full w-0"></div>
                         @endif

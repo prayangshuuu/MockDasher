@@ -1,138 +1,98 @@
-<div align="center">
-  <h1>MockDasher</h1>
-  <p><strong>A beautifully designed, feature-rich IELTS Exam Simulation Platform</strong></p>
-</div>
+# MockDasher
 
-<hr/>
+MockDasher is a modern, premium SaaS platform tailored for IELTS preparation. It provides students with full-length mock tests spanning all four modules (Listening, Reading, Writing, and Speaking), detailed test history tracking, and analytics to visualize band score progression.
 
-## 🎯 About the Project
-
-**MockDasher** is a comprehensive exam simulation platform that allows students to experience a real IELTS computer-based testing environment. By providing high-quality practice tests across all four modules (Reading, Listening, Writing, and Speaking), MockDasher helps learners prepare efficiently and confidently for their actual exams.
-
-Built with a modern tech stack, MockDasher incorporates a premium user interface using the **Dwimik Design System** to offer an intuitive, dynamic, and responsive experience for both students and administrators.
+## Features Let Architecture Do the Work 🚀
+- **Comprehensive Mock Tests:** Simulates real IELTS exams with timed, module-based progression.
+- **Dynamic Dashboards:** Provides personalized test recommendations, score analysis, and progress charts.
+- **Robust Architecture:** Employs Service layers to decouple high-complexity logic from controllers, prioritizing clean, scalable MVC execution.
+- **Secure by Default:** Utilizes strict Laravel FormRequests for structural validation and authorization logic.
 
 ---
 
-## ✨ Key Features
+## Architecture Overview
 
-- **Real Exam Interface**: A simulation of the official computer-based IELTS testing environment.
-- **Comprehensive Modules**: Support for Reading, Listening, Writing, and Speaking.
-- **Smart Test Features**:
-  - Live Word Counter for Writing tasks.
-  - Autosave functionality.
-  - "Flag for Review" question management.
-  - Interactive Answer Sheet navigation.
-- **Admin Dashboard**: Powerful content management system to create, edit, and organize tests and question modules.
-- **User Dashboard**: Personalized student portal to track progress, view recent activities, and analyze test results.
-- **Dynamic UI/UX**: Premium aesthetic featuring Dwimik colors, modern typography (Inter font), fluid layouts, and micro-animations.
+This project is built using the **Laravel 11** ecosystem, emphasizing maintainability, scalability, and adherence to SOLID principles:
+- **Presentation Layer (Blade & Tailwind CSS):** A clean separation of UI styling. No hardcoded colors or design tokens are pushed from the backend; the UI adapts dynamically via configuration and data mapping.
+- **Controllers Layer (HTTP):** Lean controllers that manage exclusively HTTP lifecycle events and leverage Dependency Injection for services.
+- **Service Layer (Business Logic):** Extracting business domains into dedicated classes (e.g., `TestHistoryService`, `DashboardStatsService`) ensuring the "Fat Models, Skinny Controllers" paradigm is respected while avoiding model bloat.
+- **Aggregated Queries:** Avoiding `$model->get()->avg()` N+1 equivalents by strictly using Database-level `->avg()` Eloquent aggregations.
 
----
+## Prerequisites
+Ensure your local development environment meets the following requirements:
+- **PHP** 8.2 or higher
+- **Composer** v2+
+- **Node.js** & **NPM** (for compiling frontend assets)
+- **MySQL** 8.0+ or another preferred equivalent relational database
 
-## 🛠 Tech Stack
+## Installation Steps
 
-MockDasher leverages industry-leading technologies:
-
-- **Framework**: Laravel 11.x
-- **Language**: PHP 8.3
-- **Database**: MySQL
-- **Frontend**: 
-  - Tailwind CSS v4 (Powered by Dwimik Design System)
-  - Blade Templating Engine
-  - Alpine.js for lightweight reactivity
-- **Assets/Bundling**: Vite
-
----
-
-## 🚀 Getting Started
-
-Follow these steps to set up the project locally on your machine.
-
-### Prerequisites
-
-- PHP >= 8.2
-- Composer
-- Node.js & npm
-- MySQL / SQLite / PostgreSQL
-
-### Installation
-
-1. **Clone the repository**
+1. **Clone the repository:**
    ```bash
-   git clone https://github.com/prayangshuuu/MockDasher.git
+   git clone <repository-url>
    cd MockDasher
    ```
 
-2. **Install PHP and Node dependencies**
+2. **Install PHP Dependencies:**
    ```bash
    composer install
-   npm install
    ```
 
-3. **Environment Setup**
-   Copy the example environment file and generate a new application key:
+3. **Install & Build Frontend Assets:**
+   ```bash
+   npm install
+   npm run build
+   ```
+
+4. **Environment Setup:**
+   Duplicate the `.env.example` file and configure your local environment variables.
    ```bash
    cp .env.example .env
+   ```
+   **Crucial `.env` values to set:**
+   - `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`
+
+5. **Generate Application Key:**
+   ```bash
    php artisan key:generate
    ```
-   > ⚠️ **Note:** Ensure you configure your database connection settings (`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) in the `.env` file before proceeding. By default Laravel 11 uses SQLite.
 
-4. **Run Migrations & Seed Database**
-   Set up your database tables and populate them with essential default data (including demo accounts):
+6. **Run Migrations & Seeders:**
+   Prepare your database schema and insert default test data.
    ```bash
    php artisan migrate --seed
    ```
 
-5. **Start the Development Servers**
-   Run the Laravel backend server:
+7. **Link Storage:**
+   Ensure public disk assets (like profile photos or test audio files) are accessible.
+   ```bash
+   php artisan storage:link
+   ```
+
+8. **Serve the Application:**
    ```bash
    php artisan serve
    ```
-   In a separate terminal window, compile frontend assets:
+   *Your application is now accessible at `http://localhost:8000`.*
+
+---
+
+## Deployment
+
+To deploy MockDasher to a production server (like Forge, Vapor, or a VPS):
+
+1. **Ensure environment optimization:**
+   In your `.env` file, change `APP_ENV=production` and `APP_DEBUG=false`.
+2. **Optimize Laravel:**
    ```bash
-   npm run dev
+   php artisan optimize
+   php artisan view:cache
+   php artisan event:cache
    ```
-
-   You can now access the application at `http://127.0.0.1:8000`.
-
----
-
-## 🔑 Demo Accounts
-
-The database seeder automatically provides two pre-configured accounts for testing purposes:
-
-### **Admin Account**
-| Role | Email | Password |
-|---|---|---|
-| Administrator | `prayangshu073@gmail.com` | `MockDasher@TST` |
-
-### **User Account**
-| Role | Email | Password |
-|---|---|---|
-| Student | `prayangshuuu@gmail.com` | `MockDasher@TST` |
-
----
-
-## 📂 Project Structure
-
-- `app/` - Core PHP application logic (Controllers, Models, Middleware).
-- `database/` - Migrations, seeders, and model factories.
-- `resources/` - Blade views, CSS styles, JavaScript, and Dwimik design tokens.
-- `routes/` - Web and API endpoint definitions.
-- `public/` - Publicly accessible files and compiled assets.
-
----
-
-## 🗺 Roadmap
-
-- [x] Integrate Dwimik Design System
-- [x] Build Real IELTS Computer-Based Interface
-- [x] Live Word Counter & Answer Highlighting
-- [ ] Automated AI answers scoring system (Writing/Speaking)
-- [ ] Dark Mode Support
-- [ ] Audio recording integration with Speech-to-Text for Speaking tasks
-
----
-
-## 📄 License
-
-This project is open-source.
+3. **Queue Workers:**
+   If you rely on asynchronous queues (e.g., for automated grading or mailing), ensure your supervisor process manages:
+   ```bash
+   php artisan queue:work
+   ```
+4. **Permissions:**
+   Ensure the `storage` and `bootstrap/cache` directories are writable by the web server user (e.g., `www-data`).

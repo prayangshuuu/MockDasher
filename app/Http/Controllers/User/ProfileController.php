@@ -15,16 +15,10 @@ class ProfileController extends Controller
         ]);
     }
 
-    public function update(Request $request)
+    public function update(\App\Http\Requests\UpdateProfileRequest $request)
     {
         $user = $request->user();
-
-        $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        $validated = $request->validated();
 
         if ($request->hasFile('photo')) {
             if ($user->profile_photo_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($user->profile_photo_path)) {
@@ -44,12 +38,8 @@ class ProfileController extends Controller
         return back()->with('success', 'Profile information updated successfully.');
     }
 
-    public function updatePassword(Request $request)
+    public function updatePassword(\App\Http\Requests\UpdatePasswordRequest $request)
     {
-        $request->validate([
-            'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
-        ]);
 
         $request->user()->update([
             'password' => \Illuminate\Support\Facades\Hash::make($request->password),
