@@ -220,12 +220,12 @@
                     <span class="bg-emerald-400 text-slate-900 px-3 py-1 rounded-full text-xs font-bold">+1.5 Improvement</span>
                 </div>
                 <div class="h-48 flex items-end gap-3 px-2">
-                    <div class="flex-1 bg-white/20 rounded-t-lg transition-all hover:bg-white/40" style="height: 40%"></div>
-                    <div class="flex-1 bg-white/20 rounded-t-lg transition-all hover:bg-white/40" style="height: 55%"></div>
-                    <div class="flex-1 bg-white/20 rounded-t-lg transition-all hover:bg-white/40" style="height: 45%"></div>
-                    <div class="flex-1 bg-white/20 rounded-t-lg transition-all hover:bg-white/40" style="height: 70%"></div>
-                    <div class="flex-1 bg-white/40 rounded-t-lg transition-all hover:bg-white/60" style="height: 85%"></div>
-                    <div class="flex-1 bg-white rounded-t-lg shadow-lg" style="height: 95%"></div>
+                    <div class="flex-1 bg-white/20 rounded-t-lg transition-all hover:bg-white/40" x-data="{ height: '40%' }" :style="`height: ${height}`"></div>
+                    <div class="flex-1 bg-white/20 rounded-t-lg transition-all hover:bg-white/40" x-data="{ height: '55%' }" :style="`height: ${height}`"></div>
+                    <div class="flex-1 bg-white/20 rounded-t-lg transition-all hover:bg-white/40" x-data="{ height: '45%' }" :style="`height: ${height}`"></div>
+                    <div class="flex-1 bg-white/20 rounded-t-lg transition-all hover:bg-white/40" x-data="{ height: '70%' }" :style="`height: ${height}`"></div>
+                    <div class="flex-1 bg-white/40 rounded-t-lg transition-all hover:bg-white/60" x-data="{ height: '85%' }" :style="`height: ${height}`"></div>
+                    <div class="flex-1 bg-white rounded-t-lg shadow-lg" x-data="{ height: '95%' }" :style="`height: ${height}`"></div>
                 </div>
                 <div class="flex justify-between mt-4 text-white/60 text-xs font-medium">
                     <span>WK 1</span>

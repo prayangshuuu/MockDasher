@@ -60,7 +60,7 @@
                 </div>
                 <!-- Progress Bar -->
                 <div @click="seekTo($event)" class="h-3 bg-slate-100 dark:bg-slate-800 rounded-full cursor-pointer relative group overflow-hidden border border-slate-200 dark:border-slate-700">
-                    <div class="h-full exam-gradient transition-all duration-300 relative" :style="`width: ${progress}%` shadow-inner">
+                    <div class="h-full exam-gradient transition-all duration-300 relative shadow-inner" :style="`width: ${progress}%`">
                         <div class="absolute right-0 top-1/2 -translate-y-1/2 size-4 bg-white rounded-full border-2 border-primary shadow-sm scale-0 group-hover:scale-100 transition-transform"></div>
                     </div>
                 </div>

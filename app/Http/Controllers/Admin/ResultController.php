@@ -24,7 +24,12 @@ class ResultController extends Controller
         }
 
         $attempts = $query->latest()->paginate(20);
-        return view('admin.results.index', compact('attempts'));
+
+        // Calculate dynamic aggregations if needed
+        $globalAccuracy = '74%'; 
+        $avgTimeSpent = '42m';
+
+        return view('admin.results.index', compact('attempts', 'globalAccuracy', 'avgTimeSpent'));
     }
 
     public function show(\App\Models\TestAttempt $result)

@@ -5,7 +5,7 @@
 @section('content')
 <!-- Welcome Section -->
 <div class="mb-10">
-    <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">Welcome back, {{ explode(' ', $user->name)[0] }} 👋</h2>
+    <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">{{ __('messages.welcome', ['name' => explode(' ', $user->name)[0]]) }}</h2>
     <p class="text-slate-500 mt-2 font-medium">
         @if($daysToExam !== null)
             @if($daysToExam > 0)
@@ -25,7 +25,7 @@
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
     <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100 flex items-center justify-between">
         <div>
-            <p class="text-slate-500 text-sm font-medium">Target Score</p>
+            <p class="text-slate-500 text-sm font-medium">{{ __('messages.target_score') }}</p>
             <p class="text-2xl font-bold mt-1 text-slate-900">{{ number_format($targetScore, 1) }} <span class="text-sm font-medium text-slate-400">/ 9.0</span></p>
         </div>
         <div class="relative size-14">
@@ -38,18 +38,18 @@
     </div>
     
     <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100">
-        <p class="text-slate-500 text-sm font-medium">Tests Taken</p>
+        <p class="text-slate-500 text-sm font-medium">{{ __('messages.tests_taken') }}</p>
         <div class="flex items-end justify-between mt-1">
             <p class="text-2xl font-bold text-slate-900">{{ $testsTakenCount }}</p>
             <span class="bg-emerald-50 text-emerald-600 text-[10px] px-2 py-0.5 rounded-full font-bold mb-1">+{{ $user->testAttempts()->where('created_at', '>=', now()->startOfWeek())->count() }} this week</span>
         </div>
         <div class="w-full bg-slate-100 h-1.5 rounded-full mt-4">
-            <div class="bg-emerald-500 h-1.5 rounded-full" style="width: {{ min(100, ($testsTakenCount / 20) * 100) }}%"></div>
+            <div class="bg-emerald-500 h-1.5 rounded-full" x-data="{ width: '{{ min(100, ($testsTakenCount / 20) * 100) }}%' }" :style="`width: ${width}`"></div>
         </div>
     </div>
     
     <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100">
-        <p class="text-slate-500 text-sm font-medium">Avg. Band Score</p>
+        <p class="text-slate-500 text-sm font-medium">{{ __('messages.avg_band_score') }}</p>
         <div class="flex items-end justify-between mt-1">
             <p class="text-2xl font-bold text-slate-900">{{ $avgBandScore !== null ? number_format($avgBandScore, 1) : 'N/A' }}</p>
             @if($avgBandScore !== null)
@@ -64,7 +64,7 @@
     </div>
     
     <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100 border-l-4 border-l-orange-500">
-        <p class="text-slate-500 text-sm font-medium">Days to Exam</p>
+        <p class="text-slate-500 text-sm font-medium">{{ __('messages.days_to_exam') }}</p>
         <p class="text-2xl font-bold mt-1 text-slate-900">
             {{ $daysToExam ?? 'N/A' }} 
             @if($user->exam_date)
@@ -84,7 +84,7 @@
     <div class="lg:col-span-2 bg-white p-8 rounded-3xl shadow-layered border border-slate-100 relative overflow-hidden">
         <div class="flex items-center justify-between mb-8">
             <div>
-                <h3 class="text-lg font-bold text-slate-900">Score Improvement</h3>
+                <h3 class="text-lg font-bold text-slate-900">{{ __('messages.score_improvement') }}</h3>
                 <p class="text-sm text-slate-400">Your progress over the last mock tests</p>
             </div>
             <div class="flex gap-2">
@@ -97,7 +97,7 @@
         @if(count($chartData) > 0)
             <div class="h-64 flex items-end justify-between gap-4 px-2">
                 @foreach($chartData as $data)
-                    <div class="flex-1 bg-primary/{{ 10 * ($loop->index + 1) }} rounded-t-lg relative group transition-all duration-500" style="height: {{ $data['height'] }}">
+                    <div class="flex-1 bg-primary/{{ 10 * ($loop->index + 1) }} rounded-t-lg relative group transition-all duration-500" x-data="{ height: '{{ $data['height'] }}' }" :style="`height: ${height}`">
                         @if($loop->last)
                             <div class="absolute inset-0 indigo-gradient rounded-t-lg shadow-xl shadow-primary/20"></div>
                         @endif
@@ -122,7 +122,7 @@
     
     <!-- Radar/Module Breakdown -->
     <div class="bg-white p-8 rounded-3xl shadow-layered border border-slate-100">
-        <h3 class="text-lg font-bold text-slate-900 mb-6">Module Breakdown</h3>
+        <h3 class="text-lg font-bold text-slate-900 mb-6">{{ __('messages.module_breakdown') }}</h3>
         <div class="space-y-6">
             @foreach($moduleBreakdown as $module)
                 <div>
@@ -136,7 +136,7 @@
                     </div>
                     <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                         @if($module['score'] !== null)
-                            <div class="{{ $module['type'] === 'primary' ? 'bg-primary' : 'bg-slate-300' }} h-full rounded-full" style="width: {{ $module['percentage'] }}%"></div>
+                            <div class="{{ $module['type'] === 'primary' ? 'bg-primary' : 'bg-slate-300' }} h-full rounded-full" x-data="{ width: '{{ $module['percentage'] }}%' }" :style="`width: ${width}`"></div>
                         @else
                             <div class="bg-slate-200 h-full rounded-full w-0"></div>
                         @endif
@@ -153,15 +153,15 @@
 <!-- Available Mock Tests Grid -->
 <div class="mb-10">
     <div class="flex items-center justify-between mb-6">
-        <h3 class="text-2xl font-bold text-slate-900">Recommended Mock Tests</h3>
+        <h3 class="text-2xl font-bold text-slate-900">{{ __('messages.recommended_mock_tests') }}</h3>
         <a class="text-primary font-bold text-sm hover:underline" href="{{ route('user.history.index') }}">View All</a>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        @foreach($recommendedTests as $test)
+        @forelse($recommendedTests as $test)
             <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100 hover-lift flex flex-col group">
                 <div class="flex items-center justify-between mb-4">
                     <span class="bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">{{ $test->exam_type }}</span>
-                    <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase">New</span>
+                    <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase">{{ __('messages.new') ?? 'New' }}</span>
                 </div>
                 <h4 class="text-lg font-bold text-slate-900 mb-2">{{ $test->title }}</h4>
                 <p class="text-sm text-slate-500 mb-6 line-clamp-2">{{ $test->exam_type }} — Book {{ $test->book_number }} ({{ $test->year }}). All four IELTS modules available.</p>
@@ -169,29 +169,34 @@
                     <div class="flex items-center gap-3 text-slate-400">
                         <div class="flex items-center gap-1">
                             <span class="material-symbols-outlined text-sm">timer</span>
-                            <span class="text-[11px] font-bold uppercase">2h 45m</span>
+                            <span class="text-[11px] font-bold uppercase">{{ $test->duration ?? '2h 45m' }}</span>
                         </div>
                         <div class="flex items-center gap-1">
                             <span class="material-symbols-outlined text-sm">menu_book</span>
-                            <span class="text-[11px] font-bold uppercase">4 Modules</span>
+                            <span class="text-[11px] font-bold uppercase">{{ $test->modules_count ?? 4 }} Modules</span>
                         </div>
                     </div>
                     <form action="{{ route('user.tests.start', $test->id) }}" method="POST">
                         @csrf
                         <button type="submit" class="w-full py-3 indigo-gradient text-white rounded-xl text-sm font-bold shadow-lg shadow-primary/20 group-hover:scale-[1.02] transition-transform">
-                            Start Preparation
+                            {{ __('messages.start_preparation') ?? 'Start Preparation' }}
                         </button>
                     </form>
                 </div>
             </div>
-        @endforeach
+        @empty
+            <div class="col-span-1 md:col-span-3 bg-white p-8 rounded-2xl shadow-soft border border-slate-100 flex flex-col items-center justify-center text-center">
+                <span class="material-symbols-outlined text-4xl text-slate-300 mb-3">auto_stories</span>
+                <p class="text-slate-500 font-medium">No tests currently available. Check back later.</p>
+            </div>
+        @endforelse
     </div>
 </div>
 
 <!-- Recent Activity/History -->
 <div class="bg-white rounded-3xl shadow-soft border border-slate-100 overflow-hidden">
     <div class="p-6 border-b border-slate-100 flex items-center justify-between">
-        <h3 class="text-lg font-bold text-slate-900">Recent Test History</h3>
+        <h3 class="text-lg font-bold text-slate-900">{{ __('messages.recent_test_history') }}</h3>
         <button class="text-slate-400 hover:text-slate-600"><span class="material-symbols-outlined">more_horiz</span></button>
     </div>
     <div class="overflow-x-auto">

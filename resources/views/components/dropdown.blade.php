@@ -37,7 +37,7 @@ switch ($width) {
             x-transition:leave-start="opacity-100 scale-100"
             x-transition:leave-end="opacity-0 scale-95"
             class="absolute z-50 mt-2 {{ $widthClasses }} rounded-[var(--radius-dwimik)] shadow-lg border border-[var(--color-dwimik-divider)] bg-white {{ $alignmentClasses }}"
-            style="display: none;"
+            x-cloak
             @click="open = false">
         <div class="rounded-[var(--radius-dwimik)] ring-1 ring-black ring-opacity-5 {{ $contentClasses }}">
             {{ $content }}

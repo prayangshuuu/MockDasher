@@ -81,7 +81,7 @@
             </div>
             <div class="space-y-4">
                 <div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-primary rounded-full transition-all duration-1000" style="width: {{ ($attempt->reading_band ?? 0) * 11 }}%"></div>
+                    <div class="h-full bg-primary rounded-full transition-all duration-1000" x-data="{ width: '{{ ($attempt->reading_band ?? 0) * 11 }}%' }" :style="`width: ${width}`"></div>
                 </div>
                 <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
                     <span>Correct: {{ $attempt->reading_score !== null ? $attempt->reading_score . '/40' : 'N/A' }}</span>
@@ -108,7 +108,7 @@
             </div>
             <div class="space-y-4">
                 <div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-emerald-500 rounded-full transition-all duration-1000" style="width: {{ ($attempt->listening_band ?? 0) * 11 }}%"></div>
+                    <div class="h-full bg-emerald-500 rounded-full transition-all duration-1000" x-data="{ width: '{{ ($attempt->listening_band ?? 0) * 11 }}%' }" :style="`width: ${width}`"></div>
                 </div>
                 <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
                     <span>Correct: {{ $attempt->listening_score !== null ? $attempt->listening_score . '/40' : 'N/A' }}</span>

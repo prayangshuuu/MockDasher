@@ -23,7 +23,7 @@
     x-on:submit.window="if ($el.closest('form')) loading = true"
     :disabled="loading">
     
-    <span x-show="loading" class="mr-2" style="display: none;">
+    <span x-show="loading" class="mr-2 hidden">
         <i class="fas fa-spinner fa-spin"></i>
     </span>
     

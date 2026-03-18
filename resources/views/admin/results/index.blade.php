@@ -108,13 +108,13 @@
         />
         <x-admin.stat-card 
             label="Global Accuracy" 
-            value="74%" 
+            :value="$globalAccuracy ?? 'N/A'" 
             icon="history" 
             iconColor="purple" 
         />
         <x-admin.stat-card 
             label="Avg Time Spent" 
-            value="42m" 
+            :value="$avgTimeSpent ?? 'N/A'" 
             icon="timer" 
             iconColor="orange" 
         />

@@ -43,8 +43,8 @@ $maxWidth = [
     x-on:keydown.tab.prevent="$event.shiftKey || nextFocusable().focus()"
     x-on:keydown.shift.tab.prevent="prevFocusable().focus()"
     x-show="show"
+    x-cloak
     class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50 flex items-center justify-center"
-    style="display: {{ $show ? 'flex' : 'none' }};"
 >
     <!-- Overlay -->
     <div
