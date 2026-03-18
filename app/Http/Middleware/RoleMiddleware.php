@@ -15,12 +15,12 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return redirect('login');
         }
 
-        if (!$request->user()->roles->contains('name', $role)) {
-            abort(403, 'Unauthorized Access - ' . $role . ' Role Required.');
+        if (! $request->user()->roles->contains('name', $role)) {
+            abort(403, 'Unauthorized Access - '.$role.' Role Required.');
         }
 
         return $next($request);

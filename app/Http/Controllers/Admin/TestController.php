@@ -3,15 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Test;
 use Illuminate\Http\Request;
 
 class TestController extends Controller
 {
     public function index()
     {
-        $tests = \App\Models\Test::with('testSets')
-                    ->latest()
-                    ->paginate(15);
+        $tests = Test::with('testSets')
+            ->latest()
+            ->paginate(15);
+
         return view('admin.tests.index', compact('tests'));
     }
 
@@ -29,8 +31,8 @@ class TestController extends Controller
             'status' => 'required|in:draft,published',
         ]);
 
-        /** @var \App\Models\Test $test */
-        $test = \App\Models\Test::query()->create($validated);
+        /** @var Test $test */
+        $test = Test::query()->create($validated);
 
         // Auto-generate 4 Test Sets
         for ($i = 1; $i <= 4; $i++) {
@@ -40,18 +42,19 @@ class TestController extends Controller
         return redirect()->route('admin.tests.show', $test->id)->with('success', 'Test created successfully with 4 test sets.');
     }
 
-    public function show(\App\Models\Test $test)
+    public function show(Test $test)
     {
         $test->load(['testSets.writingTasks', 'testSets.speakingQuestions', 'testSets.listeningSections', 'testSets.readingPassages']);
+
         return view('admin.tests.show', compact('test'));
     }
 
-    public function edit(\App\Models\Test $test)
+    public function edit(Test $test)
     {
         return view('admin.tests.edit', compact('test'));
     }
 
-    public function update(Request $request, \App\Models\Test $test)
+    public function update(Request $request, Test $test)
     {
         $validated = $request->validate([
             'book_number' => 'required|integer',
@@ -65,7 +68,7 @@ class TestController extends Controller
         return redirect()->route('admin.tests.show', $test->id)->with('success', 'Test updated successfully.');
     }
 
-    public function destroy(\App\Models\Test $test)
+    public function destroy(Test $test)
     {
         $test->delete();
 

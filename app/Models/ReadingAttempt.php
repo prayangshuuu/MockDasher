@@ -11,7 +11,7 @@ class ReadingAttempt extends Model
     protected function casts(): array
     {
         return [
-            'started_at'   => 'datetime',
+            'started_at' => 'datetime',
             'completed_at' => 'datetime',
         ];
     }
@@ -34,6 +34,7 @@ class ReadingAttempt extends Model
     public function getBandScoreAttribute(): float
     {
         $rawScore = $this->calculateRawScore();
+
         return $this->rawToBand($rawScore, 'reading');
     }
 
@@ -45,22 +46,46 @@ class ReadingAttempt extends Model
                 $correctCount++;
             }
         }
+
         return $correctCount;
     }
 
     protected function rawToBand(int $rawScore, string $type): float
     {
-        if ($rawScore >= 39) return 9.0;
-        if ($rawScore >= 37) return 8.5;
-        if ($rawScore >= 35) return 8.0;
-        if ($rawScore >= 33) return 7.5;
-        if ($rawScore >= 30) return 7.0;
-        if ($rawScore >= 27) return 6.5;
-        if ($rawScore >= 23) return 6.0;
-        if ($rawScore >= 19) return 5.5;
-        if ($rawScore >= 15) return 5.0;
-        if ($rawScore >= 13) return 4.5;
-        if ($rawScore >= 10) return 4.0;
+        if ($rawScore >= 39) {
+            return 9.0;
+        }
+        if ($rawScore >= 37) {
+            return 8.5;
+        }
+        if ($rawScore >= 35) {
+            return 8.0;
+        }
+        if ($rawScore >= 33) {
+            return 7.5;
+        }
+        if ($rawScore >= 30) {
+            return 7.0;
+        }
+        if ($rawScore >= 27) {
+            return 6.5;
+        }
+        if ($rawScore >= 23) {
+            return 6.0;
+        }
+        if ($rawScore >= 19) {
+            return 5.5;
+        }
+        if ($rawScore >= 15) {
+            return 5.0;
+        }
+        if ($rawScore >= 13) {
+            return 4.5;
+        }
+        if ($rawScore >= 10) {
+            return 4.0;
+        }
+
         return 3.5;
     }
 }

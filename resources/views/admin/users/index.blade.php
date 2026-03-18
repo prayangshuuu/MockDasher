@@ -69,14 +69,14 @@
                                 {{ $user->created_at->format('M d, Y') }}
                             </td>
                             <td class="px-10 py-6 text-right">
-                                <div class="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <x-admin.button :href="route('admin.users.edit', $user->id)" variant="ghost" icon="edit" size="icon" class="!bg-white dark:!bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm" />
+                                <div class="flex justify-end gap-3 transition-opacity">
+                                    <x-admin.button :href="route('admin.users.edit', $user->id)" variant="ghost" icon="edit" size="icon" class="!bg-white dark:!bg-slate-800 !text-slate-600 hover:!text-primary dark:!text-slate-300 border border-slate-100 dark:border-slate-700 shadow-sm transition-colors" />
                                     
                                     @if(auth()->id() !== $user->id)
                                         <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Expel this student from the system?');">
                                             @csrf
                                             @method('DELETE')
-                                            <x-admin.button variant="danger" icon="person_remove" size="icon" class="!bg-white dark:!bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm" />
+                                            <x-admin.button variant="danger" icon="person_remove" size="icon" class="!bg-white dark:!bg-slate-800 !text-red-500 hover:bg-red-50 hover:!text-red-600 dark:hover:!bg-red-500/10 border border-slate-100 dark:border-slate-700 shadow-sm transition-colors" />
                                         </form>
                                     @endif
                                 </div>

@@ -18,9 +18,9 @@ return new class extends Migration
         Schema::table('tests', function (Blueprint $table) {
             $table->unsignedBigInteger('ielts_collection_id')->nullable()->change();
             $table->foreign('ielts_collection_id')
-                  ->references('id')
-                  ->on('ielts_collections')
-                  ->nullOnDelete();
+                ->references('id')
+                ->on('ielts_collections')
+                ->nullOnDelete();
         });
     }
 
@@ -36,9 +36,9 @@ return new class extends Migration
         Schema::table('tests', function (Blueprint $table) {
             $table->unsignedBigInteger('ielts_collection_id')->nullable(false)->change();
             $table->foreign('ielts_collection_id')
-                  ->references('id')
-                  ->on('ielts_collections')
-                  ->cascadeOnDelete();
+                ->references('id')
+                ->on('ielts_collections')
+                ->cascadeOnDelete();
         });
     }
 };

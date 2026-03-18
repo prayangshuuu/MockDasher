@@ -18,7 +18,7 @@ class UpdateProfileRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
@@ -27,7 +27,7 @@ class UpdateProfileRequest extends FormRequest
         return [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $userId,
+            'email' => 'required|string|email|max:255|unique:users,email,'.$userId,
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }

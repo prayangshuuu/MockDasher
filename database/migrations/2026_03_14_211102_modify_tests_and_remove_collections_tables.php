@@ -33,9 +33,9 @@ return new class extends Migration
 
         // 4. Update module tables
         $tables = [
-            'writing_tasks', 'speaking_questions', 'listening_sections', 
-            'reading_passages', 'test_attempts', 'listening_attempts', 
-            'reading_attempts', 'sections'
+            'writing_tasks', 'speaking_questions', 'listening_sections',
+            'reading_passages', 'test_attempts', 'listening_attempts',
+            'reading_attempts', 'sections',
         ];
 
         foreach ($tables as $tableName) {

@@ -3,18 +3,20 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\TestAttempt;
+use App\Models\WritingAnswer;
 use Illuminate\Http\Request;
 
 class WritingTestController extends Controller
 {
-    public function show(\App\Models\TestAttempt $attempt)
+    public function show(TestAttempt $attempt)
     {
         if ((int) $attempt->user_id !== (int) auth()->id()) {
             abort(403, 'Unauthorized access.');
         }
 
         // Initialize timer if first time
-        if (!$attempt->started_at) {
+        if (! $attempt->started_at) {
             $attempt->update(['started_at' => now(), 'status' => 'writing']);
         }
 
@@ -38,16 +40,16 @@ class WritingTestController extends Controller
         return view('user.writing-test.show', compact('attempt', 'tasks', 'answers', 'remainingSeconds'));
     }
 
-    public function autosave(Request $request, \App\Models\TestAttempt $attempt)
+    public function autosave(Request $request, TestAttempt $attempt)
     {
         if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->status === 'completed') {
             return response()->json(['error' => 'Unauthorized or completed'], 403);
         }
 
         foreach ($request->answers as $taskId => $text) {
-            $wordCount = str_word_count(strip_tags((string)$text));
+            $wordCount = str_word_count(strip_tags((string) $text));
 
-            \App\Models\WritingAnswer::updateOrCreate(
+            WritingAnswer::updateOrCreate(
                 [
                     'user_id' => auth()->id(),
                     'test_attempt_id' => $attempt->id,
@@ -63,7 +65,7 @@ class WritingTestController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function submit(Request $request, \App\Models\TestAttempt $attempt)
+    public function submit(Request $request, TestAttempt $attempt)
     {
         if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->status === 'completed') {
             abort(403);
@@ -71,9 +73,9 @@ class WritingTestController extends Controller
 
         // Final save
         foreach ($request->answers as $taskId => $text) {
-            $wordCount = str_word_count(strip_tags((string)$text));
+            $wordCount = str_word_count(strip_tags((string) $text));
 
-            \App\Models\WritingAnswer::updateOrCreate(
+            WritingAnswer::updateOrCreate(
                 [
                     'user_id' => auth()->id(),
                     'test_attempt_id' => $attempt->id,
@@ -89,18 +91,19 @@ class WritingTestController extends Controller
 
         $attempt->update([
             'status' => 'completed',
-            'completed_at' => now()
+            'completed_at' => now(),
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Writing test submitted successfully.');
     }
 
-    protected function forceSubmit(\App\Models\TestAttempt $attempt)
+    protected function forceSubmit(TestAttempt $attempt)
     {
         $attempt->update([
             'status' => 'completed',
-            'completed_at' => now()
+            'completed_at' => now(),
         ]);
+
         return redirect()->route('dashboard')->with('success', 'Time expired. Test submitted successfully.');
     }
 }

@@ -3,15 +3,12 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\ListeningAttempt;
-use App\Models\ReadingAttempt;
-use App\Models\Test;
-use App\Models\TestAttempt;
+use App\Services\DashboardStatsService;
 use Illuminate\Http\Request;
 
 class UserDashboardController extends Controller
 {
-    public function index(Request $request, \App\Services\DashboardStatsService $dashboardService)
+    public function index(Request $request, DashboardStatsService $dashboardService)
     {
         if (auth()->user()->isAdmin()) {
             return redirect()->route('admin.dashboard');

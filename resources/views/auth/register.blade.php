@@ -40,7 +40,7 @@
             <div class="flex flex-col items-center text-center">
                 <a href="{{ url('/') }}" class="flex items-center gap-2 mb-8 group cursor-pointer hover:opacity-90 transition-opacity">
                     <div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white">
-                        <span class="material-symbols-outlined text-2xl">neurology</span>
+                        <span class="material-symbols-outlined text-2xl">bolt</span>
                     </div>
                     <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">MockDasher</h2>
                 </a>

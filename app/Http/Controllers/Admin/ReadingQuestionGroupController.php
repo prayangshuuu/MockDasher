@@ -12,6 +12,7 @@ class ReadingQuestionGroupController extends Controller
     public function create($passageId)
     {
         $passage = ReadingPassage::with('test')->findOrFail($passageId);
+
         return view('admin.reading-question-groups.create', compact('passage'));
     }
 
@@ -21,8 +22,8 @@ class ReadingQuestionGroupController extends Controller
 
         $validated = $request->validate([
             'group_instruction' => 'nullable|string',
-            'question_type'     => 'required|string',
-            'sort_order'        => 'nullable|integer',
+            'question_type' => 'required|string',
+            'sort_order' => 'nullable|integer',
         ]);
 
         $passage->questionGroups()->create($validated);
@@ -35,6 +36,7 @@ class ReadingQuestionGroupController extends Controller
     public function edit(ReadingQuestionGroup $group)
     {
         $group->load('passage.test', 'questions.options');
+
         return view('admin.reading-question-groups.edit', compact('group'));
     }
 
@@ -42,8 +44,8 @@ class ReadingQuestionGroupController extends Controller
     {
         $validated = $request->validate([
             'group_instruction' => 'nullable|string',
-            'question_type'     => 'required|string',
-            'sort_order'        => 'nullable|integer',
+            'question_type' => 'required|string',
+            'sort_order' => 'nullable|integer',
         ]);
 
         $group->update($validated);

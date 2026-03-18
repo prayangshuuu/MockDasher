@@ -19,13 +19,14 @@ class DashboardStatsService
         $testsTakenCount = $user->testAttempts()->count();
         $daysToExam = $user->exam_date ? Carbon::now()->startOfDay()->diffInDays($user->exam_date->startOfDay(), false) : null;
 
-        $avgBandScore = $user->testAttempts()
+        $completedAttempts = $user->testAttempts()
             ->where('status', 'completed')
-            ->avg('overall_band');
+            ->get();
 
-        if ($avgBandScore !== null) {
-            $avgBandScore = round($avgBandScore * 2) / 2;
-        }
+        $validAttempts = $completedAttempts->filter(fn ($a) => $a->overall_band !== null);
+        $avgBandScore = $validAttempts->count() > 0 ? $validAttempts->avg('overall_band') : 0.0;
+
+        $avgBandScore = round($avgBandScore * 2) / 2;
 
         return [
             'targetScore' => $targetScore,
@@ -40,14 +41,15 @@ class DashboardStatsService
      */
     public function getModuleBreakdown($user)
     {
-        // Fix DB inefficiency: calculate avg at the DB level, not collection.
-        $readingAvg = ReadingAttempt::query()->where('user_id', $user->id)
+        $readingAttempts = ReadingAttempt::where('user_id', $user->id)
             ->where('status', 'completed')
-            ->avg('band_score');
+            ->get();
+        $readingAvg = $readingAttempts->count() > 0 ? $readingAttempts->avg('band_score') : null;
 
-        $listeningAvg = ListeningAttempt::query()->where('user_id', $user->id)
+        $listeningAttempts = ListeningAttempt::where('user_id', $user->id)
             ->where('status', 'completed')
-            ->avg('band_score');
+            ->get();
+        $listeningAvg = $listeningAttempts->count() > 0 ? $listeningAttempts->avg('band_score') : null;
 
         $moduleBreakdown = [];
 
@@ -142,8 +144,9 @@ class DashboardStatsService
             $band = $attempt->overall_band ?? 0;
             $heightPercent = $band > 0 ? round(($band / 9) * 100) : 0;
             $isLast = $index === $chartAttempts->count() - 1;
+
             return [
-                'label' => $isLast ? 'Latest' : 'Test ' . ($index + 1),
+                'label' => $isLast ? 'Latest' : 'Test '.($index + 1),
                 'score' => $band,
                 'height' => $heightPercent, // Returning number instead of string with "%" to remove hardcoding
             ];

@@ -56,14 +56,14 @@
                 <a href="{{ url('/dashboard') }}" class="px-5 py-2 text-sm font-semibold text-slate-700 hover:text-primary transition-colors">Dashboard</a>
                 <form method="POST" action="{{ route('logout') }}" class="inline">
                     @csrf
-                    <button type="submit" class="btn-gradient px-6 py-2.5 rounded-full text-white text-sm font-bold shadow-lg shadow-primary/20 hover:opacity-90 transition-all">
+                    <button type="submit" class="inline-flex justify-center items-center bg-primary hover:bg-indigo-500 text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-md shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5 transition-all duration-300">
                         Log Out
                     </button>
                 </form>
             @else
                 <a href="{{ route('login') }}" class="px-5 py-2 text-sm font-semibold text-slate-700 hover:text-primary transition-colors">Sign In</a>
                 @if (Route::has('register'))
-                    <a href="{{ route('register') }}" class="btn-gradient inline-block px-6 py-2.5 rounded-full text-white text-sm font-bold shadow-lg shadow-primary/20 hover:opacity-90 transition-all">
+                    <a href="{{ route('register') }}" class="inline-flex justify-center items-center bg-primary hover:bg-indigo-500 text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-md shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5 transition-all duration-300">
                         Start Free
                     </a>
                 @endif
@@ -90,10 +90,10 @@
                 A clean, distraction-free environment mirroring the computer-delivered IELTS format. Get real-time feedback and detailed band score analysis.
             </p>
             <div class="flex flex-wrap gap-4 pt-4">
-                <a href="{{ route('register') }}" class="btn-gradient inline-block px-8 py-4 rounded-xl text-white font-bold text-lg shadow-xl shadow-primary/30 hover:scale-[1.02] transition-transform">
+                <a href="{{ route('register') }}" class="inline-flex justify-center items-center bg-primary hover:bg-indigo-500 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-1 transition-all duration-300">
                     Start Practicing
                 </a>
-                <a href="#features" class="inline-block bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-8 py-4 rounded-xl text-slate-700 dark:text-slate-200 font-bold text-lg hover:bg-slate-50 transition-colors">
+                <a href="#features" class="inline-flex justify-center items-center bg-white hover:bg-slate-50 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white border border-slate-200 dark:border-slate-700 px-8 py-4 rounded-xl font-bold text-lg hover:-translate-y-1 transition-all duration-300">
                     Explore Features
                 </a>
             </div>
@@ -246,7 +246,7 @@
         <h2 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">Ready to boost your score?</h2>
         <p class="text-xl text-slate-600 dark:text-slate-400">Join thousands of students who have already achieved their dream scores using MockDasher.</p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="{{ route('register') }}" class="btn-gradient inline-block px-10 py-5 rounded-2xl text-white font-bold text-xl shadow-2xl shadow-primary/40 hover:scale-[1.02] transition-all">
+            <a href="{{ route('register') }}" class="inline-flex justify-center items-center bg-primary hover:bg-indigo-500 text-white px-10 py-5 rounded-2xl font-bold text-xl shadow-xl shadow-indigo-500/40 hover:shadow-indigo-500/60 hover:-translate-y-1 transition-all duration-300">
                 Create Your Free Account
             </a>
         </div>

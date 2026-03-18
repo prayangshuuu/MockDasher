@@ -2,7 +2,7 @@
 <aside class="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col z-50">
     <div class="p-6 flex items-center gap-3">
         <div class="size-9 bg-primary rounded-lg flex items-center justify-center text-white">
-            <span class="material-symbols-outlined text-2xl">auto_awesome</span>
+            <span class="material-symbols-outlined text-2xl">bolt</span>
         </div>
         <div>
             <h1 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white leading-none">MockDasher</h1>

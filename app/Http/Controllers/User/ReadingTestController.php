@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\ReadingAttempt;
 use App\Models\ReadingAnswer;
+use App\Models\ReadingAttempt;
 use Illuminate\Http\Request;
 
 class ReadingTestController extends Controller
@@ -20,13 +20,13 @@ class ReadingTestController extends Controller
         }
 
         // Start timer on first visit
-        if (!$attempt->started_at) {
+        if (! $attempt->started_at) {
             $attempt->update(['started_at' => now(), 'status' => 'in_progress']);
         }
 
         // Enforce 60-minute limit
-        $elapsedSeconds  = now()->diffInSeconds($attempt->started_at);
-        $totalSeconds    = 3600; // 60 minutes
+        $elapsedSeconds = now()->diffInSeconds($attempt->started_at);
+        $totalSeconds = 3600; // 60 minutes
         $remainingSeconds = max(0, $totalSeconds - $elapsedSeconds);
 
         if ($remainingSeconds <= 0) {
@@ -35,7 +35,7 @@ class ReadingTestController extends Controller
 
         $test = $attempt->test;
         $passages = $test->readingPassages()
-            ->with(['questionGroups' => fn($q) => $q->with(['questions.options'])])
+            ->with(['questionGroups' => fn ($q) => $q->with(['questions.options'])])
             ->orderBy('passage_number')
             ->get();
 
@@ -46,7 +46,7 @@ class ReadingTestController extends Controller
         // Saved answers keyed by question_id
         $answers = $attempt->answers;
         $savedAnswers = $answers->pluck('answer_text', 'question_id')->toArray();
-        $flaggedAnswers = $answers->filter(fn($a) => $a->is_flagged)->pluck('is_flagged', 'question_id')->toArray();
+        $flaggedAnswers = $answers->filter(fn ($a) => $a->is_flagged)->pluck('is_flagged', 'question_id')->toArray();
 
         return view('user.reading-test.show', compact(
             'attempt', 'test', 'passages', 'savedAnswers', 'flaggedAnswers', 'remainingSeconds'
@@ -64,27 +64,27 @@ class ReadingTestController extends Controller
         foreach ($request->input('answers', []) as $questionId => $answerText) {
             ReadingAnswer::updateOrCreate(
                 [
-                    'user_id'        => auth()->id(),
+                    'user_id' => auth()->id(),
                     'test_attempt_id' => $attempt->id,
-                    'question_id'    => $questionId,
+                    'question_id' => $questionId,
                 ],
                 [
                     'answer_text' => $answerText,
-                    'is_flagged'  => !empty($flagged[$questionId])
+                    'is_flagged' => ! empty($flagged[$questionId]),
                 ]
             );
         }
 
         foreach ($flagged as $questionId => $isFlagged) {
-            if (!array_key_exists($questionId, $request->input('answers', []))) {
+            if (! array_key_exists($questionId, $request->input('answers', []))) {
                 ReadingAnswer::updateOrCreate(
                     [
-                        'user_id'        => auth()->id(),
+                        'user_id' => auth()->id(),
                         'test_attempt_id' => $attempt->id,
-                        'question_id'    => $questionId,
+                        'question_id' => $questionId,
                     ],
                     [
-                        'is_flagged'  => (bool) $isFlagged
+                        'is_flagged' => (bool) $isFlagged,
                     ]
                 );
             }
@@ -104,27 +104,27 @@ class ReadingTestController extends Controller
         foreach ($request->input('answers', []) as $questionId => $answerText) {
             ReadingAnswer::updateOrCreate(
                 [
-                    'user_id'         => auth()->id(),
+                    'user_id' => auth()->id(),
                     'test_attempt_id' => $attempt->id,
-                    'question_id'     => $questionId,
+                    'question_id' => $questionId,
                 ],
                 [
                     'answer_text' => $answerText,
-                    'is_flagged'  => !empty($flagged[$questionId])
+                    'is_flagged' => ! empty($flagged[$questionId]),
                 ]
             );
         }
 
         foreach ($flagged as $questionId => $isFlagged) {
-            if (!array_key_exists($questionId, $request->input('answers', []))) {
+            if (! array_key_exists($questionId, $request->input('answers', []))) {
                 ReadingAnswer::updateOrCreate(
                     [
-                        'user_id'        => auth()->id(),
+                        'user_id' => auth()->id(),
                         'test_attempt_id' => $attempt->id,
-                        'question_id'    => $questionId,
+                        'question_id' => $questionId,
                     ],
                     [
-                        'is_flagged'  => (bool) $isFlagged
+                        'is_flagged' => (bool) $isFlagged,
                     ]
                 );
             }
@@ -138,6 +138,7 @@ class ReadingTestController extends Controller
     protected function forceSubmit(ReadingAttempt $attempt)
     {
         $attempt->update(['status' => 'completed', 'completed_at' => now()]);
+
         return redirect()->route('dashboard')->with('success', 'Time expired. Reading test submitted automatically.');
     }
 }

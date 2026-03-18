@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class WritingTask extends Model
 {
     protected $fillable = [
-        'test_set_id', 'task_number', 'task_title', 'task_description', 
-        'task_prompt', 'instruction_text', 'minimum_word_count'
+        'test_set_id', 'task_number', 'task_title', 'task_description',
+        'task_prompt', 'instruction_text', 'minimum_word_count',
     ];
 
     public function testSet()

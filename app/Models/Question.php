@@ -8,7 +8,7 @@ class Question extends Model
 {
     protected $fillable = [
         'questionable_id', 'questionable_type', 'question_type',
-        'question_text', 'correct_answer', 'explanation'
+        'question_text', 'correct_answer', 'explanation',
     ];
 
     public function questionable()

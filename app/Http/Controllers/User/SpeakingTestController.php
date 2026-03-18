@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\TestAttempt;
 use Illuminate\Http\Request;
 
 class SpeakingTestController extends Controller
 {
-    public function show(\App\Models\TestAttempt $attempt)
+    public function show(TestAttempt $attempt)
     {
         if ((int) $attempt->user_id !== (int) auth()->id()) {
             abort(403, 'Unauthorized access.');
@@ -18,7 +19,7 @@ class SpeakingTestController extends Controller
         // Assuming 'speaking' status.
         if ($attempt->status !== 'speaking' && $attempt->status !== 'completed') {
             $attempt->update(['status' => 'speaking']);
-            if (!$attempt->started_at) {
+            if (! $attempt->started_at) {
                 $attempt->update(['started_at' => now()]);
             }
         }
@@ -28,13 +29,13 @@ class SpeakingTestController extends Controller
         }
 
         $speakingQuestions = $attempt->test->speakingQuestions()->orderBy('part')->get();
-        
+
         $parts = $speakingQuestions->groupBy('part');
 
         return view('user.speaking-test.show', compact('attempt', 'parts', 'speakingQuestions'));
     }
 
-    public function submit(Request $request, \App\Models\TestAttempt $attempt)
+    public function submit(Request $request, TestAttempt $attempt)
     {
         if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->status === 'completed') {
             abort(403);
@@ -42,7 +43,7 @@ class SpeakingTestController extends Controller
 
         $attempt->update([
             'status' => 'completed',
-            'completed_at' => now()
+            'completed_at' => now(),
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Speaking test submitted successfully.');

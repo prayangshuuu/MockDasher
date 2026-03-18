@@ -46,40 +46,26 @@
         <aside class="w-72 glass-sidebar hidden lg:flex flex-col sticky top-0 h-screen z-50">
             <div class="p-8 flex items-center gap-3">
                 <div class="size-10 indigo-gradient rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary/30">
-                    <span class="material-symbols-outlined text-2xl">school</span>
+                    <span class="material-symbols-outlined text-2xl">bolt</span>
                 </div>
                 <h1 class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600">MockDasher</h1>
             </div>
             
-            <nav class="flex-1 px-4 space-y-2 mt-4">
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->routeIs('dashboard') ? 'bg-primary/10 text-primary font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900' }} transition-all group" href="{{ route('dashboard') }}">
-                    <span class="material-symbols-outlined">dashboard</span>
-                    Dashboard
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->routeIs('user.history.*') ? 'bg-primary/10 text-primary font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900' }} transition-all" href="{{ route('user.history.index') }}">
-                    <span class="material-symbols-outlined">assignment</span>
-                    My Tests
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all" href="{{ route('user.history.index') }}">
-                    <span class="material-symbols-outlined">database</span>
-                    Question Bank
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all" href="{{ route('user.history.index') }}">
-                    <span class="material-symbols-outlined">monitoring</span>
-                    Results
-                </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl {{ request()->routeIs('profile.show') ? 'bg-primary/10 text-primary font-semibold' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900' }} transition-all" href="{{ route('profile.show') }}">
-                    <span class="material-symbols-outlined">settings</span>
-                    Settings
-                </a>
+            <nav class="flex-1 px-4 py-4 space-y-1 mt-2">
+                <x-nav-link-admin href="{{ route('dashboard') }}" icon="dashboard" :active="request()->routeIs('dashboard')">Dashboard</x-nav-link-admin>
+                <x-nav-link-admin href="{{ route('user.history.index') }}" icon="history" :active="request()->routeIs('user.history.*')">My Test History</x-nav-link-admin>
                 
-                <form action="{{ route('logout') }}" method="POST" class="mt-4">
-                    @csrf
-                    <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 transition-all">
-                        <span class="material-symbols-outlined">logout</span>
-                        Logout
-                    </button>
-                </form>
+                <div class="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800">
+                    <p class="px-3 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Account</p>
+                    <x-nav-link-admin href="{{ route('profile.show') }}" icon="settings" :active="request()->routeIs('profile.show')">Settings</x-nav-link-admin>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-red-500 rounded-lg transition-colors group">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span class="text-sm font-medium">Logout</span>
+                        </button>
+                    </form>
+                </div>
             </nav>
 
             <div class="p-4 mx-4 mb-8 indigo-gradient rounded-2xl text-white shadow-xl shadow-primary/20">

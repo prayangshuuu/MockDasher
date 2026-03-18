@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ListeningSection;
+use App\Models\Question;
+use App\Models\ReadingPassage;
+use App\Models\ReadingQuestionGroup;
 use Illuminate\Http\Request;
 
 class QuestionController extends Controller
@@ -10,22 +14,27 @@ class QuestionController extends Controller
     private function getParentModel($type, $id)
     {
         if ($type === 'listening') {
-            return \App\Models\ListeningSection::findOrFail($id);
+            return ListeningSection::findOrFail($id);
         } elseif ($type === 'reading') {
-            return \App\Models\ReadingPassage::findOrFail($id);
+            return ReadingPassage::findOrFail($id);
         } elseif ($type === 'reading_group') {
-            return \App\Models\ReadingQuestionGroup::findOrFail($id);
+            return ReadingQuestionGroup::findOrFail($id);
         }
         abort(404);
     }
 
     private function getRedirectRoute($type, $id)
     {
-        if ($type === 'listening') return ['admin.listening-sections.edit', $id];
-        if ($type === 'reading')   return ['admin.reading-passages.edit',   $id];
+        if ($type === 'listening') {
+            return ['admin.listening-sections.edit', $id];
+        }
+        if ($type === 'reading') {
+            return ['admin.reading-passages.edit',   $id];
+        }
         if ($type === 'reading_group') {
             return ['admin.reading-question-groups.edit', $id];
         }
+
         return ['admin.reading-passages.edit', $id];
     }
 
@@ -37,6 +46,7 @@ class QuestionController extends Controller
     public function create($type, $id)
     {
         $parent = $this->getParentModel($type, $id);
+
         return view('admin.questions.create', compact('parent', 'type'));
     }
 
@@ -63,33 +73,35 @@ class QuestionController extends Controller
 
         if (isset($validated['options']) && is_array($validated['options'])) {
             foreach ($validated['options'] as $index => $optionText) {
-                if (!empty($optionText)) {
+                if (! empty($optionText)) {
                     $question->options()->create([
                         'option_text' => $optionText,
-                        'is_correct' => ($index === (int)$request->input('correct_option')),
+                        'is_correct' => ($index === (int) $request->input('correct_option')),
                     ]);
                 }
             }
         }
 
         [$route, $param] = $this->getRedirectRoute($type, $id);
+
         return redirect()->route($route, $param)->with('success', 'Question added successfully.');
     }
 
-    public function edit(\App\Models\Question $question)
+    public function edit(Question $question)
     {
         $morphType = $question->questionable_type;
-        if ($morphType === \App\Models\ListeningSection::class) {
+        if ($morphType === ListeningSection::class) {
             $type = 'listening';
-        } elseif ($morphType === \App\Models\ReadingQuestionGroup::class) {
+        } elseif ($morphType === ReadingQuestionGroup::class) {
             $type = 'reading_group';
         } else {
             $type = 'reading';
         }
+
         return view('admin.questions.create', compact('question', 'type'));
     }
 
-    public function update(Request $request, \App\Models\Question $question)
+    public function update(Request $request, Question $question)
     {
         $validated = $request->validate([
             'question_type' => 'required|in:'.$this->allTypes(),
@@ -112,34 +124,35 @@ class QuestionController extends Controller
         $question->options()->delete();
         if (isset($validated['options']) && is_array($validated['options'])) {
             foreach ($validated['options'] as $index => $optionText) {
-                if (!empty($optionText)) {
+                if (! empty($optionText)) {
                     $question->options()->create([
                         'option_text' => $optionText,
-                        'is_correct' => ($index === (int)$request->input('correct_option')),
+                        'is_correct' => ($index === (int) $request->input('correct_option')),
                     ]);
                 }
             }
         }
 
         $morphType = $question->questionable_type;
-        if ($morphType === \App\Models\ListeningSection::class) {
+        if ($morphType === ListeningSection::class) {
             $type = 'listening';
-        } elseif ($morphType === \App\Models\ReadingQuestionGroup::class) {
+        } elseif ($morphType === ReadingQuestionGroup::class) {
             $type = 'reading_group';
         } else {
             $type = 'reading';
         }
         [$route, $param] = $this->getRedirectRoute($type, $question->questionable_id);
+
         return redirect()->route($route, $param)->with('success', 'Question updated successfully.');
     }
 
-    public function destroy(\App\Models\Question $question)
+    public function destroy(Question $question)
     {
         $morphType = $question->questionable_type;
-        $parentId  = $question->questionable_id;
-        if ($morphType === \App\Models\ListeningSection::class) {
+        $parentId = $question->questionable_id;
+        if ($morphType === ListeningSection::class) {
             $type = 'listening';
-        } elseif ($morphType === \App\Models\ReadingQuestionGroup::class) {
+        } elseif ($morphType === ReadingQuestionGroup::class) {
             $type = 'reading_group';
         } else {
             $type = 'reading';
@@ -149,6 +162,7 @@ class QuestionController extends Controller
         $question->delete();
 
         [$route, $param] = $this->getRedirectRoute($type, $parentId);
+
         return redirect()->route($route, $param)->with('success', 'Question deleted successfully.');
     }
 }

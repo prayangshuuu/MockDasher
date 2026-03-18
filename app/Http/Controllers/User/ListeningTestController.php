@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\ListeningAttempt;
 use App\Models\ListeningAnswer;
+use App\Models\ListeningAttempt;
 use App\Models\Test;
 use Illuminate\Http\Request;
 
@@ -24,7 +24,7 @@ class ListeningTestController extends Controller
         }
 
         // Start timer if first visit
-        if (!$attempt->started_at) {
+        if (! $attempt->started_at) {
             $attempt->update(['started_at' => now(), 'status' => 'in_progress']);
         }
 
@@ -38,7 +38,7 @@ class ListeningTestController extends Controller
         // Get saved answers keyed by question_id
         $answers = $attempt->answers;
         $savedAnswers = $answers->pluck('answer_text', 'question_id')->toArray();
-        $flaggedAnswers = $answers->filter(fn($a) => $a->is_flagged)->pluck('is_flagged', 'question_id')->toArray();
+        $flaggedAnswers = $answers->filter(fn ($a) => $a->is_flagged)->pluck('is_flagged', 'question_id')->toArray();
 
         // If in transfer mode, calculate transfer remaining time
         $transferRemainingSeconds = null;
@@ -70,27 +70,27 @@ class ListeningTestController extends Controller
         foreach ($answers as $questionId => $answerText) {
             ListeningAnswer::updateOrCreate(
                 [
-                    'user_id'          => auth()->id(),
-                    'test_attempt_id'  => $attempt->id,
-                    'question_id'      => $questionId,
+                    'user_id' => auth()->id(),
+                    'test_attempt_id' => $attempt->id,
+                    'question_id' => $questionId,
                 ],
                 [
                     'answer_text' => $answerText,
-                    'is_flagged'  => !empty($flagged[$questionId])
+                    'is_flagged' => ! empty($flagged[$questionId]),
                 ]
             );
         }
 
         foreach ($flagged as $questionId => $isFlagged) {
-            if (!array_key_exists($questionId, $answers)) {
+            if (! array_key_exists($questionId, $answers)) {
                 ListeningAnswer::updateOrCreate(
                     [
-                        'user_id'          => auth()->id(),
-                        'test_attempt_id'  => $attempt->id,
-                        'question_id'      => $questionId,
+                        'user_id' => auth()->id(),
+                        'test_attempt_id' => $attempt->id,
+                        'question_id' => $questionId,
                     ],
                     [
-                        'is_flagged'  => (bool) $isFlagged
+                        'is_flagged' => (bool) $isFlagged,
                     ]
                 );
             }
@@ -117,12 +117,14 @@ class ListeningTestController extends Controller
             if ($nextSection > 4) {
                 // All 4 parts done — begin answer transfer phase
                 $attempt->update([
-                    'status'                => 'transfer',
-                    'transfer_started_at'   => now(),
+                    'status' => 'transfer',
+                    'transfer_started_at' => now(),
                 ]);
+
                 return response()->json(['status' => 'transfer', 'transfer_seconds' => 600]);
             } else {
                 $attempt->update(['current_section' => $nextSection]);
+
                 return response()->json(['status' => 'next', 'next_section' => $nextSection]);
             }
         }
@@ -145,34 +147,34 @@ class ListeningTestController extends Controller
         foreach ($answers as $questionId => $answerText) {
             ListeningAnswer::updateOrCreate(
                 [
-                    'user_id'         => auth()->id(),
+                    'user_id' => auth()->id(),
                     'test_attempt_id' => $attempt->id,
-                    'question_id'     => $questionId,
+                    'question_id' => $questionId,
                 ],
                 [
                     'answer_text' => $answerText,
-                    'is_flagged'  => !empty($flagged[$questionId])
+                    'is_flagged' => ! empty($flagged[$questionId]),
                 ]
             );
         }
-        
+
         foreach ($flagged as $questionId => $isFlagged) {
-            if (!array_key_exists($questionId, $answers)) {
+            if (! array_key_exists($questionId, $answers)) {
                 ListeningAnswer::updateOrCreate(
                     [
-                        'user_id'          => auth()->id(),
-                        'test_attempt_id'  => $attempt->id,
-                        'question_id'      => $questionId,
+                        'user_id' => auth()->id(),
+                        'test_attempt_id' => $attempt->id,
+                        'question_id' => $questionId,
                     ],
                     [
-                        'is_flagged'  => (bool) $isFlagged
+                        'is_flagged' => (bool) $isFlagged,
                     ]
                 );
             }
         }
 
         $attempt->update([
-            'status'       => 'completed',
+            'status' => 'completed',
             'completed_at' => now(),
         ]);
 
@@ -185,6 +187,7 @@ class ListeningTestController extends Controller
     protected function forceSubmit(ListeningAttempt $attempt)
     {
         $attempt->update(['status' => 'completed', 'completed_at' => now()]);
+
         return redirect()->route('dashboard')->with('success', 'Time expired. Listening test submitted automatically.');
     }
 }

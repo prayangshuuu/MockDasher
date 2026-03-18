@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class WritingAnswer extends Model
 {
     protected $fillable = [
-        'user_id', 'test_attempt_id', 'writing_task_id', 
-        'answer_text', 'word_count', 'submitted_at'
+        'user_id', 'test_attempt_id', 'writing_task_id',
+        'answer_text', 'word_count', 'submitted_at',
     ];
 
     protected function casts(): array

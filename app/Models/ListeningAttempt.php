@@ -8,15 +8,15 @@ class ListeningAttempt extends Model
 {
     protected $fillable = [
         'user_id', 'test_set_id', 'current_section', 'status',
-        'started_at', 'transfer_started_at', 'completed_at'
+        'started_at', 'transfer_started_at', 'completed_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'started_at'           => 'datetime',
-            'transfer_started_at'  => 'datetime',
-            'completed_at'         => 'datetime',
+            'started_at' => 'datetime',
+            'transfer_started_at' => 'datetime',
+            'completed_at' => 'datetime',
         ];
     }
 
@@ -38,6 +38,7 @@ class ListeningAttempt extends Model
     public function getBandScoreAttribute(): float
     {
         $rawScore = $this->calculateRawScore();
+
         return $this->rawToBand($rawScore, 'listening');
     }
 
@@ -49,22 +50,46 @@ class ListeningAttempt extends Model
                 $correctCount++;
             }
         }
+
         return $correctCount;
     }
 
     protected function rawToBand(int $rawScore, string $type): float
     {
-        if ($rawScore >= 39) return 9.0;
-        if ($rawScore >= 37) return 8.5;
-        if ($rawScore >= 35) return 8.0;
-        if ($rawScore >= 33) return 7.5;
-        if ($rawScore >= 30) return 7.0;
-        if ($rawScore >= 27) return 6.5;
-        if ($rawScore >= 23) return 6.0;
-        if ($rawScore >= 20) return 5.5;
-        if ($rawScore >= 16) return 5.0;
-        if ($rawScore >= 13) return 4.5;
-        if ($rawScore >= 10) return 4.0;
+        if ($rawScore >= 39) {
+            return 9.0;
+        }
+        if ($rawScore >= 37) {
+            return 8.5;
+        }
+        if ($rawScore >= 35) {
+            return 8.0;
+        }
+        if ($rawScore >= 33) {
+            return 7.5;
+        }
+        if ($rawScore >= 30) {
+            return 7.0;
+        }
+        if ($rawScore >= 27) {
+            return 6.5;
+        }
+        if ($rawScore >= 23) {
+            return 6.0;
+        }
+        if ($rawScore >= 20) {
+            return 5.5;
+        }
+        if ($rawScore >= 16) {
+            return 5.0;
+        }
+        if ($rawScore >= 13) {
+            return 4.5;
+        }
+        if ($rawScore >= 10) {
+            return 4.0;
+        }
+
         return 3.5;
     }
 }

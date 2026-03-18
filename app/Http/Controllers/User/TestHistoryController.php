@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\ListeningAttempt;
-use App\Models\ReadingAttempt;
+use App\Models\TestAttempt;
+use App\Services\TestHistoryService;
 use Illuminate\Http\Request;
 
 class TestHistoryController extends Controller
 {
-    public function index(Request $request, \App\Services\TestHistoryService $historyService)
+    public function index(Request $request, TestHistoryService $historyService)
     {
         $user = $request->user();
-        
+
         $attempts = $historyService->getPaginatedAttempts($user);
         $stats = $historyService->getStats($user);
 
@@ -22,7 +22,7 @@ class TestHistoryController extends Controller
         ]);
     }
 
-    public function show(Request $request, \App\Models\TestAttempt $attempt)
+    public function show(Request $request, TestAttempt $attempt)
     {
         // Ensure the user owns this attempt
         if ($attempt->user_id !== $request->user()->id) {
