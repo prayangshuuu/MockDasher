@@ -69,7 +69,9 @@ class TestAttempt extends Model
             $scores[] = $la->band_score;
         }
 
-        if (empty($scores)) {
+        // A true IELTS test requires 4 modules (Listening, Reading, Writing, Speaking).
+        // Since Writing and Speaking are not fully automated/completed, the overall score IS N/A.
+        if (count($scores) < 4) {
             return null;
         }
 

@@ -23,10 +23,12 @@ class DashboardStatsService
             ->where('status', 'completed')
             ->get();
 
-        $validAttempts = $completedAttempts->filter(fn ($a) => $a->overall_band !== null);
-        $avgBandScore = $validAttempts->count() > 0 ? $validAttempts->avg('overall_band') : 0.0;
+        $validAttempts = $completedAttempts->filter(fn($a) => $a->overall_band !== null);
+        $avgBandScore = $validAttempts->count() > 0 ? $validAttempts->avg('overall_band') : null;
 
-        $avgBandScore = round($avgBandScore * 2) / 2;
+        if ($avgBandScore !== null) {
+            $avgBandScore = round($avgBandScore * 2) / 2;
+        }
 
         return [
             'targetScore' => $targetScore,

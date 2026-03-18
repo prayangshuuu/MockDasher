@@ -54,8 +54,10 @@ class TestHistoryService
 
         // Calculate Average
         $validAttempts = $completedAttempts->filter(fn ($a) => $a->overall_band !== null);
-        $averageBandScore = $validAttempts->count() > 0 ? $validAttempts->avg('overall_band') : 0;
-        $averageBandScore = round($averageBandScore * 2) / 2;
+        $averageBandScore = $validAttempts->count() > 0 ? $validAttempts->avg('overall_band') : null;
+        if ($averageBandScore !== null) {
+            $averageBandScore = round($averageBandScore * 2) / 2;
+        }
 
         // Module stats for strongest module (reusing fetched data)
         $readingAvg = $readingAttempts->avg('band_score') ?: 0;

@@ -21,7 +21,7 @@
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-soft border-l-4 border-indigo-500">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Average Band Score</p>
             <div class="flex items-baseline gap-2 mt-2">
-                <span class="text-4xl font-extrabold text-slate-900 dark:text-white">{{ number_format($stats['averageBandScore'], 1) }}</span>
+                <span class="text-4xl font-extrabold text-slate-900 dark:text-white">{{ $stats['averageBandScore'] !== null ? number_format($stats['averageBandScore'], 1) : 'N/A' }}</span>
                 <span class="text-indigo-600 font-bold text-sm flex items-center gap-0.5">
                     @if($stats['trend'])
                         <span class="material-symbols-outlined text-xs">trending_up</span>
@@ -103,7 +103,7 @@
                         <td class="px-6 py-5">
                             @if($attempt->status === 'completed')
                                 <div class="w-10 h-10 rounded-full border-2 border-indigo-600 flex items-center justify-center text-indigo-600 font-extrabold text-sm bg-indigo-50 dark:bg-indigo-900/20">
-                                    {{ number_format($attempt->overall_band, 1) }}
+                                    {{ $attempt->overall_band !== null ? number_format($attempt->overall_band, 1) : 'N/A' }}
                                 </div>
                             @else
                                 <div class="w-10 h-10 rounded-full border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 font-extrabold text-sm">
