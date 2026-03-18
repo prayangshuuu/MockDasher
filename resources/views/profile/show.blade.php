@@ -10,9 +10,6 @@
         <p class="text-slate-500 dark:text-slate-400 mb-8">Manage your account preferences, security, and profile information.</p>
         <div class="flex border-b border-slate-200 dark:border-slate-800 gap-8">
             <button class="pb-4 text-sm font-semibold border-b-2 border-primary text-primary transition-all">Profile</button>
-            <button class="pb-4 text-sm font-medium text-slate-400 cursor-not-allowed transition-all border-b-2 border-transparent">Team</button>
-            <button class="pb-4 text-sm font-medium text-slate-400 cursor-not-allowed transition-all border-b-2 border-transparent">Billing</button>
-            <button class="pb-4 text-sm font-medium text-slate-400 cursor-not-allowed transition-all border-b-2 border-transparent">Notifications</button>
         </div>
     </div>
 
