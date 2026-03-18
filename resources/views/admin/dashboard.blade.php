@@ -26,28 +26,24 @@
             label="Total Tests" 
             :value="number_format($stats['total_tests'] ?? 0)" 
             icon="description" 
-            trend="+12%" 
             iconColor="primary" 
         />
         <x-admin.stat-card 
             label="Test Sets" 
             :value="number_format($stats['total_test_sets'] ?? 0)" 
             icon="layers" 
-            trend="+5%" 
             iconColor="blue" 
         />
         <x-admin.stat-card 
             label="Active Students" 
             :value="number_format($stats['users'] ?? 0)" 
             icon="group" 
-            trend="+18%" 
             iconColor="purple" 
         />
         <x-admin.stat-card 
             label="Global Attempts" 
             :value="number_format($stats['attempts'] ?? 0)" 
             icon="analytics" 
-            trend="+22%" 
             iconColor="orange" 
         />
     </div>
@@ -62,8 +58,8 @@
                     <p class="text-sm text-slate-400 font-medium">Weekly active session distribution</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">94.2%</p>
-                    <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Efficiency Rate</p>
+                    <p class="text-2xl font-black text-slate-900 dark:text-white tracking-tighter">{{ number_format($stats['completion_rate'] ?? 0, 1) }}%</p>
+                    <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Completion Rate</p>
                 </div>
             </div>
             

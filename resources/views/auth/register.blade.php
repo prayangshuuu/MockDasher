@@ -102,7 +102,7 @@
                     <div class="flex items-center space-x-2 py-2">
                         <input class="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer" id="terms" name="terms" type="checkbox" required />
                         <label class="text-sm text-slate-600 dark:text-slate-400 leading-none cursor-pointer" for="terms">
-                            I agree to the <a class="text-primary hover:underline font-medium" href="#">Terms of Service</a> and <a class="text-primary hover:underline font-medium" href="#">Privacy Policy</a>
+                            I agree to the <span class="text-primary font-medium cursor-default" title="Coming soon">Terms of Service</span> and <span class="text-primary font-medium cursor-default" title="Coming soon">Privacy Policy</span>
                         </label>
                     </div>
                     
@@ -142,12 +142,12 @@
         <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500 uppercase tracking-widest">
             <div class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-sm">copyright</span>
-                2024 MockDasher Inc.
+                {{ date('Y') }} MockDasher Inc.
             </div>
             <div class="flex gap-6">
-                <a class="hover:text-primary transition-colors" href="#">Privacy</a>
-                <a class="hover:text-primary transition-colors" href="#">Terms</a>
-                <a class="hover:text-primary transition-colors" href="#">Help</a>
+                <span class="cursor-default" title="Coming soon">Privacy</span>
+                <span class="cursor-default" title="Coming soon">Terms</span>
+                <span class="cursor-default" title="Coming soon">Help</span>
             </div>
         </div>
     </footer>

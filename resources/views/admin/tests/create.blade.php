@@ -115,7 +115,7 @@
     <!-- Footer Docs -->
     <div class="mt-12 text-center pb-12">
         <p class="text-slate-400 font-bold text-xs uppercase tracking-widest">
-            Need guidance? <a href="#" class="text-primary hover:underline ml-1">Read the Exam Builder Manual</a>
+            {{ config('app.name', 'MockDasher') }} Exam Builder — v{{ config('app.version', '2.0') }}
         </p>
     </div>
 </div>

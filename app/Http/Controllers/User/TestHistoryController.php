@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\ListeningAttempt;
+use App\Models\ReadingAttempt;
 use Illuminate\Http\Request;
 
 class TestHistoryController extends Controller
@@ -11,47 +13,67 @@ class TestHistoryController extends Controller
     {
         $user = $request->user();
         $attempts = $user->testAttempts()
-            ->with(['test', 'testSet'])
+            ->with(['testSet.test'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
-            
-        // Calculate Stats
+
+        // Calculate Stats from real data
         $completedAttempts = $user->testAttempts()
             ->where('status', 'completed')
             ->get();
-            
+
         $testsCompleted = $completedAttempts->count();
-        
-        $averageBandScore = $completedAttempts->avg(function($attempt) {
+
+        $averageBandScore = $completedAttempts->avg(function ($attempt) {
             return $attempt->overall_band;
         }) ?: 0;
         $averageBandScore = round($averageBandScore * 2) / 2; // Round to nearest 0.5
-        
-        // Modules stats for strongest module
-        $readingAvg = \App\Models\ReadingAttempt::where('user_id', $user->id)
-            ->where('status', 'completed')
-            ->get()
-            ->avg('band_score') ?: 0;
-            
-        $listeningAvg = \App\Models\ListeningAttempt::where('user_id', $user->id)
-            ->where('status', 'completed')
-            ->get()
-            ->avg('band_score') ?: 0;
-            
-        // Since writing/speaking are manually scored or mocked in attempts, we use placeholders
-        $writingAvg = 6.5; 
-        $speakingAvg = 7.0;
 
-        $moduleStats = [
-            'Reading' => $readingAvg,
-            'Listening' => $listeningAvg,
-            'Writing' => $writingAvg,
-            'Speaking' => $speakingAvg,
-        ];
-        
-        arsort($moduleStats);
-        $strongestModuleName = array_key_first($moduleStats);
-        $strongestModuleScore = $moduleStats[$strongestModuleName];
+        // Module stats for strongest module — real data only
+        $readingAvg = ReadingAttempt::where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->get()
+            ->avg('band_score') ?: 0;
+
+        $listeningAvg = ListeningAttempt::where('user_id', $user->id)
+            ->where('status', 'completed')
+            ->get()
+            ->avg('band_score') ?: 0;
+
+        // Only include modules that have real scores
+        $moduleStats = [];
+        if ($readingAvg > 0) {
+            $moduleStats['Reading'] = $readingAvg;
+        }
+        if ($listeningAvg > 0) {
+            $moduleStats['Listening'] = $listeningAvg;
+        }
+
+        if (!empty($moduleStats)) {
+            arsort($moduleStats);
+            $strongestModuleName = array_key_first($moduleStats);
+            $strongestModuleScore = $moduleStats[$strongestModuleName];
+        } else {
+            $strongestModuleName = null;
+            $strongestModuleScore = null;
+        }
+
+        // Calculate real trend from last two completed attempts
+        $lastTwo = $user->testAttempts()
+            ->where('status', 'completed')
+            ->orderBy('completed_at', 'desc')
+            ->take(2)
+            ->get();
+
+        $trend = null;
+        if ($lastTwo->count() === 2) {
+            $latest = $lastTwo->first()->overall_band;
+            $previous = $lastTwo->last()->overall_band;
+            if ($latest !== null && $previous !== null) {
+                $diff = $latest - $previous;
+                $trend = ($diff >= 0 ? '+' : '') . number_format($diff, 1);
+            }
+        }
 
         return view('user.history.index', [
             'attempts' => $attempts,
@@ -60,10 +82,10 @@ class TestHistoryController extends Controller
                 'testsCompleted' => $testsCompleted,
                 'strongestModule' => [
                     'name' => $strongestModuleName,
-                    'score' => $strongestModuleScore
+                    'score' => $strongestModuleScore,
                 ],
-                'trend' => '+0.2' // Mock trend for now
-            ]
+                'trend' => $trend,
+            ],
         ]);
     }
 
@@ -74,8 +96,8 @@ class TestHistoryController extends Controller
             abort(403);
         }
 
-        $attempt->load(['test.collection', 'answers']);
-        
+        $attempt->load(['testSet.test', 'writingAnswers', 'readingAttempt', 'listeningAttempt']);
+
         return view('user.history.show', compact('attempt'));
     }
 }

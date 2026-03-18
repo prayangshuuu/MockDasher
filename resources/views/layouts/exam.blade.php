@@ -15,26 +15,6 @@
     
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
-    <style>
-        [x-cloak] { display: none !important; }
-        
-        /* Modern Scrollbars */
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
-
-        .exam-gradient {
-            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-        }
-
-        /* Test Interface Specifics */
-        .active-question {
-            border-left: 4px solid #4F46E5 !important;
-            background-color: rgba(79, 70, 229, 0.02);
-        }
-    </style>
     @stack('styles')
 </head>
 <body class="h-full bg-slate-50 dark:bg-slate-950 font-sans antialiased text-slate-900 dark:text-slate-100 overflow-hidden flex flex-col">

@@ -124,33 +124,11 @@
                     </div>
                     <div>
                         <h5 class="text-base font-black text-slate-900 dark:text-white tracking-tight">Need help with exam modules?</h5>
-                        <p class="text-xs font-medium text-slate-400 mt-0.5">Visit our documentation to learn more about test configuration.</p>
+                        <p class="text-xs font-medium text-slate-400 mt-0.5">Visit the test detail page to manage modules and questions.</p>
                     </div>
                 </div>
-                <a href="#" class="inline-flex items-center gap-2 text-primary font-black text-xs uppercase tracking-widest hover:gap-3 transition-all shrink-0">
-                    Read Docs
-                    <span class="material-symbols-outlined text-lg">arrow_forward</span>
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-@endsection
-
-
-            <!-- Additional Info Section -->
-            <div class="mt-8 glass-card p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-soft flex flex-col sm:flex-row items-center justify-between gap-6">
-                <div class="flex items-center gap-5">
-                    <div class="size-14 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
-                        <span class="material-symbols-outlined text-3xl">help_center</span>
-                    </div>
-                    <div>
-                        <h5 class="text-base font-black text-slate-900 dark:text-white tracking-tight">Need help with exam modules?</h5>
-                        <p class="text-xs font-medium text-slate-400 mt-0.5">Visit our documentation to learn more about test configuration.</p>
-                    </div>
-                </div>
-                <a href="#" class="inline-flex items-center gap-2 text-primary font-black text-xs uppercase tracking-widest hover:gap-3 transition-all shrink-0">
-                    Read Docs
+                <a href="{{ route('admin.tests.show', $test->id) }}" class="inline-flex items-center gap-2 text-primary font-black text-xs uppercase tracking-widest hover:gap-3 transition-all shrink-0">
+                    Manage Modules
                     <span class="material-symbols-outlined text-lg">arrow_forward</span>
                 </a>
             </div>

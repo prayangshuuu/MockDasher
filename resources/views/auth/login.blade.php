@@ -33,11 +33,7 @@
             },
         }
     </script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
+
 </head>
 <body class="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center p-6">
 <div class="w-full max-w-[480px]">
@@ -141,8 +137,8 @@
 
     <!-- Legal Links -->
     <div class="flex justify-center gap-6 mt-12 opacity-50">
-        <a class="text-xs text-slate-500 hover:text-primary transition-colors" href="#">Privacy Policy</a>
-        <a class="text-xs text-slate-500 hover:text-primary transition-colors" href="#">Terms of Service</a>
+        <span class="text-xs text-slate-500 cursor-default" title="Coming soon">Privacy Policy</span>
+        <span class="text-xs text-slate-500 cursor-default" title="Coming soon">Terms of Service</span>
     </div>
 </div>
 

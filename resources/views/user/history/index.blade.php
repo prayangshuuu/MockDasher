@@ -23,8 +23,12 @@
             <div class="flex items-baseline gap-2 mt-2">
                 <span class="text-4xl font-extrabold text-slate-900 dark:text-white">{{ number_format($stats['averageBandScore'], 1) }}</span>
                 <span class="text-indigo-600 font-bold text-sm flex items-center gap-0.5">
-                    <span class="material-symbols-outlined text-xs">trending_up</span>
-                    {{ $stats['trend'] }}
+                    @if($stats['trend'])
+                        <span class="material-symbols-outlined text-xs">trending_up</span>
+                        {{ $stats['trend'] }}
+                    @else
+                        <span class="text-slate-400">—</span>
+                    @endif
                 </span>
             </div>
         </div>
@@ -38,10 +42,14 @@
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-soft border-l-4 border-emerald-500">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Strongest Module</p>
             <div class="flex items-center gap-2 mt-2">
-                <span class="text-2xl font-extrabold text-slate-900 dark:text-white">{{ $stats['strongestModule']['name'] }}</span>
-                <span class="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 text-[10px] font-bold rounded uppercase">
-                    {{ number_format($stats['strongestModule']['score'], 1) }} High
-                </span>
+                @if($stats['strongestModule']['name'])
+                    <span class="text-2xl font-extrabold text-slate-900 dark:text-white">{{ $stats['strongestModule']['name'] }}</span>
+                    <span class="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 text-[10px] font-bold rounded uppercase">
+                        {{ number_format($stats['strongestModule']['score'], 1) }} High
+                    </span>
+                @else
+                    <span class="text-2xl font-extrabold text-slate-400">N/A</span>
+                @endif
             </div>
         </div>
     </div>
@@ -107,7 +115,7 @@
                             @if($attempt->status === 'completed')
                                 <a href="{{ route('user.history.show', $attempt->id) }}" class="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition-colors">Review Details</a>
                             @else
-                                <a href="#" class="px-4 py-2 bg-slate-900 dark:bg-white dark:text-slate-900 text-white text-xs font-bold rounded-lg hover:bg-slate-800 transition-colors">Resume</a>
+                                <a href="{{ route('user.history.show', $attempt->id) }}" class="px-4 py-2 bg-slate-900 dark:bg-white dark:text-slate-900 text-white text-xs font-bold rounded-lg hover:bg-slate-800 transition-colors">Resume</a>
                             @endif
                         </td>
                     </tr>

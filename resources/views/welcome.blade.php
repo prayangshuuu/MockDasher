@@ -34,26 +34,7 @@
                 },
             }
     </script>
-    <style>
-            .glass-nav {
-                background: rgba(255, 255, 255, 0.7);
-                backdrop-filter: blur(12px);
-                -webkit-backdrop-filter: blur(12px);
-                border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-            }
-            .hero-gradient {
-                background: linear-gradient(135deg, #4F46E5 0%, #8B5CF6 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-            }
-            .btn-gradient {
-                background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-            }
-            .feature-card:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-            }
-    </style>
+
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
     
@@ -68,8 +49,7 @@
         </div>
         <div class="hidden md:flex items-center gap-10">
             <a class="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="#features">Features</a>
-            <a class="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="#">Pricing</a>
-            <a class="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="#">About</a>
+            <a class="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="{{ route('login') }}">Sign In</a>
         </div>
         <div class="flex items-center gap-4">
             @auth
@@ -216,7 +196,7 @@
 <!-- Progress Highlight -->
 <section class="mx-6 mb-24">
     <div class="max-w-7xl mx-auto bg-gradient-to-br from-primary to-violet-700 rounded-[2.5rem] overflow-hidden relative p-8 md:p-16 lg:p-24">
-        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#fff 1px, transparent 1px); background-size: 24px 24px;"></div>
+        <div class="absolute inset-0 opacity-10 dot-pattern"></div>
         <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div class="text-white space-y-6">
                 <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight">Track Your Progress with Visual Analytics</h2>
@@ -291,35 +271,30 @@
         <div>
             <h4 class="font-bold mb-6 dark:text-white">Platform</h4>
             <ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
-                <li><a class="hover:text-primary transition-colors" href="#">Simulation</a></li>
-                <li><a class="hover:text-primary transition-colors" href="#">Study Plans</a></li>
-                <li><a class="hover:text-primary transition-colors" href="#">Resources</a></li>
+                <li><a class="hover:text-primary transition-colors" href="#features">Features</a></li>
+                <li><a class="hover:text-primary transition-colors" href="{{ route('register') }}">Get Started</a></li>
+                <li><a class="hover:text-primary transition-colors" href="{{ route('login') }}">Sign In</a></li>
             </ul>
         </div>
         <div>
             <h4 class="font-bold mb-6 dark:text-white">Company</h4>
             <ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
-                <li><a class="hover:text-primary transition-colors" href="#">About</a></li>
-                <li><a class="hover:text-primary transition-colors" href="#">Blog</a></li>
-                <li><a class="hover:text-primary transition-colors" href="#">Careers</a></li>
+                <li><span class="cursor-default" title="Coming soon">About</span></li>
+                <li><span class="cursor-default" title="Coming soon">Blog</span></li>
+                <li><span class="cursor-default" title="Coming soon">Careers</span></li>
             </ul>
         </div>
         <div>
             <h4 class="font-bold mb-6 dark:text-white">Support</h4>
             <ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
-                <li><a class="hover:text-primary transition-colors" href="#">Help Center</a></li>
-                <li><a class="hover:text-primary transition-colors" href="#">Contact</a></li>
-                <li><a class="hover:text-primary transition-colors" href="#">Privacy</a></li>
+                <li><span class="cursor-default" title="Coming soon">Help Center</span></li>
+                <li><span class="cursor-default" title="Coming soon">Contact</span></li>
+                <li><span class="cursor-default" title="Coming soon">Privacy</span></li>
             </ul>
         </div>
     </div>
     <div class="max-w-7xl mx-auto pt-8 border-t border-slate-100 dark:border-slate-900 flex flex-col md:row justify-between items-center gap-6">
-        <p class="text-xs text-slate-400">© 2024 MockDasher Inc. All rights reserved. IELTS is a registered trademark.</p>
-        <div class="flex gap-6">
-            <a class="text-slate-400 hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">share</span></a>
-            <a class="text-slate-400 hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">public</span></a>
-            <a class="text-slate-400 hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined">alternate_email</span></a>
-        </div>
+        <p class="text-xs text-slate-400">© {{ date('Y') }} MockDasher Inc. All rights reserved. IELTS is a registered trademark.</p>
     </div>
 </footer>
 

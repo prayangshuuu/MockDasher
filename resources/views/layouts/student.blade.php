@@ -38,24 +38,6 @@
             },
         }
     </script>
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .glass-sidebar {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border-right: 1px solid rgba(226, 232, 240, 0.8);
-        }
-        .indigo-gradient {
-            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-        }
-        .hover-lift {
-            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
-        }
-        .hover-lift:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-    </style>
     @stack('styles')
 </head>
 <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 antialiased">
@@ -78,7 +60,7 @@
                     <span class="material-symbols-outlined">assignment</span>
                     My Tests
                 </a>
-                <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all" href="#">
+                <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all" href="{{ route('user.history.index') }}">
                     <span class="material-symbols-outlined">database</span>
                     Question Bank
                 </a>

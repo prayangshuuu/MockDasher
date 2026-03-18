@@ -90,8 +90,8 @@
             <footer class="mt-[48px] py-[24px] border-t border-[var(--color-divider)] text-[14px] text-[var(--color-text-secondary)] flex justify-between items-center max-w-7xl mx-auto px-[16px] md:px-0">
                 <div>&copy; {{ date('Y') }} MockDasher.</div>
                 <div class="flex gap-[16px]">
-                    <a href="#" class="hover:opacity-80 transition-opacity">Terms</a>
-                    <a href="#" class="hover:opacity-80 transition-opacity">Privacy</a>
+                    <span class="cursor-default" title="Coming soon">Terms</span>
+                    <span class="cursor-default" title="Coming soon">Privacy</span>
                 </div>
             </footer>
         </main>

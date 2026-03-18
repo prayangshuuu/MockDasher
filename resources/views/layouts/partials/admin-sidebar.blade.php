@@ -18,7 +18,7 @@
         
         <div class="pt-4 mt-4 border-t border-slate-100 dark:border-slate-800">
             <p class="px-3 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Account</p>
-            <x-nav-link-admin href="#" icon="settings">Settings</x-nav-link-admin>
+            <x-nav-link-admin href="{{ route('profile.show') }}" icon="settings">Settings</x-nav-link-admin>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="w-full flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-red-500 rounded-lg transition-colors group">

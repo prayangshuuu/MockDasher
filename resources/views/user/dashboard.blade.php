@@ -51,12 +51,14 @@
     <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100">
         <p class="text-slate-500 text-sm font-medium">Avg. Band Score</p>
         <div class="flex items-end justify-between mt-1">
-            <p class="text-2xl font-bold text-slate-900">{{ number_format($avgBandScore, 1) }}</p>
-            <span class="bg-indigo-50 text-indigo-600 text-[10px] px-2 py-0.5 rounded-full font-bold mb-1">+0.2 Improvement</span>
+            <p class="text-2xl font-bold text-slate-900">{{ $avgBandScore !== null ? number_format($avgBandScore, 1) : 'N/A' }}</p>
+            @if($avgBandScore !== null)
+                <span class="bg-indigo-50 text-indigo-600 text-[10px] px-2 py-0.5 rounded-full font-bold mb-1">Band {{ number_format($avgBandScore, 1) }}</span>
+            @endif
         </div>
         <div class="flex gap-1 mt-4">
             @for($i = 0; $i < 5; $i++)
-                <div class="flex-1 h-3 {{ $i < floor($avgBandScore - 2) ? 'bg-indigo-500' : 'bg-indigo-100' }} rounded-sm"></div>
+                <div class="flex-1 h-3 {{ $avgBandScore !== null && $i < floor($avgBandScore - 2) ? 'bg-indigo-500' : 'bg-indigo-100' }} rounded-sm"></div>
             @endfor
         </div>
     </div>
@@ -91,22 +93,31 @@
             </div>
         </div>
         
-        <!-- Mock Chart Visualization -->
-        <div class="h-64 flex items-end justify-between gap-4 px-2">
-            @foreach($chartData as $data)
-                <div class="flex-1 bg-primary/{{ 10 * ($loop->index + 1) }} rounded-t-lg relative group transition-all duration-500" style="height: {{ $data['height'] }}">
-                    @if($loop->last)
-                        <div class="absolute inset-0 indigo-gradient rounded-t-lg shadow-xl shadow-primary/20"></div>
-                    @endif
-                    <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">{{ $data['score'] }}</div>
+        <!-- Score Chart Visualization -->
+        @if(count($chartData) > 0)
+            <div class="h-64 flex items-end justify-between gap-4 px-2">
+                @foreach($chartData as $data)
+                    <div class="flex-1 bg-primary/{{ 10 * ($loop->index + 1) }} rounded-t-lg relative group transition-all duration-500" style="height: {{ $data['height'] }}">
+                        @if($loop->last)
+                            <div class="absolute inset-0 indigo-gradient rounded-t-lg shadow-xl shadow-primary/20"></div>
+                        @endif
+                        <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">{{ $data['score'] }}</div>
+                    </div>
+                @endforeach
+            </div>
+            <div class="flex justify-between mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                @foreach($chartData as $data)
+                    <span>{{ $data['label'] }}</span>
+                @endforeach
+            </div>
+        @else
+            <div class="h-64 flex items-center justify-center">
+                <div class="text-center">
+                    <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">bar_chart</span>
+                    <p class="text-sm text-slate-400 font-medium">Complete a test to see your score progression</p>
                 </div>
-            @endforeach
-        </div>
-        <div class="flex justify-between mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
-            @foreach($chartData as $data)
-                <span>{{ $data['label'] }}</span>
-            @endforeach
-        </div>
+            </div>
+        @endif
     </div>
     
     <!-- Radar/Module Breakdown -->
@@ -117,17 +128,25 @@
                 <div>
                     <div class="flex justify-between text-xs font-bold mb-2">
                         <span class="text-slate-600">{{ $module['name'] }}</span>
-                        <span class="text-{{ $module['color'] }}">{{ number_format($module['score'], 1) }}</span>
+                        @if($module['score'] !== null)
+                            <span class="text-{{ $module['color'] }}">{{ number_format($module['score'], 1) }}</span>
+                        @else
+                            <span class="text-slate-400">Pending</span>
+                        @endif
                     </div>
                     <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                        <div class="bg-{{ $module['color'] == 'primary' ? 'primary' : ($module['color'] == 'orange-500' ? 'orange-500' : 'indigo-400') }} h-full rounded-full" style="width: {{ $module['percentage'] }}%"></div>
+                        @if($module['score'] !== null)
+                            <div class="bg-{{ $module['color'] }} h-full rounded-full" style="width: {{ $module['percentage'] }}%"></div>
+                        @else
+                            <div class="bg-slate-200 h-full rounded-full w-0"></div>
+                        @endif
                     </div>
                 </div>
             @endforeach
         </div>
-        <button class="w-full mt-8 py-3 rounded-xl border-2 border-slate-100 text-slate-600 text-sm font-bold hover:bg-slate-50 transition-colors">
+        <a href="{{ route('user.history.index') }}" class="block w-full mt-8 py-3 rounded-xl border-2 border-slate-100 text-slate-600 text-sm font-bold hover:bg-slate-50 transition-colors text-center">
             View Detailed Analysis
-        </button>
+        </a>
     </div>
 </div>
 
@@ -135,7 +154,7 @@
 <div class="mb-10">
     <div class="flex items-center justify-between mb-6">
         <h3 class="text-2xl font-bold text-slate-900">Recommended Mock Tests</h3>
-        <a class="text-primary font-bold text-sm hover:underline" href="#">View All</a>
+        <a class="text-primary font-bold text-sm hover:underline" href="{{ route('user.history.index') }}">View All</a>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         @foreach($recommendedTests as $test)
@@ -145,7 +164,7 @@
                     <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase">New</span>
                 </div>
                 <h4 class="text-lg font-bold text-slate-900 mb-2">{{ $test->title }}</h4>
-                <p class="text-sm text-slate-500 mb-6 line-clamp-2">Full simulation including Listening, Reading, Writing, and Speaking modules.</p>
+                <p class="text-sm text-slate-500 mb-6 line-clamp-2">{{ $test->exam_type }} — Book {{ $test->book_number }} ({{ $test->year }}). All four IELTS modules available.</p>
                 <div class="mt-auto space-y-4">
                     <div class="flex items-center gap-3 text-slate-400">
                         <div class="flex items-center gap-1">

@@ -33,13 +33,6 @@
             },
         }
     </script>
-    <style>
-        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
-        [x-cloak] { display: none !important; }
-        .premium-shadow { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025); }
-        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border: 1px solid rgba(241, 245, 249, 1); }
-        .dark .glass-card { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(30, 41, 59, 1); }
-    </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex antialiased">

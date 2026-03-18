@@ -68,15 +68,6 @@ class TestAttempt extends Model
         if ($la && $la->status === 'completed') {
             $scores[] = $la->band_score;
         }
-        
-        // For the sake of "Full Dynamic" demo, we add realistic placeholders for Writing/Speaking
-        // if the overall test is marked as completed.
-        if ($this->status === 'completed') {
-            if (count($scores) < 4) {
-                $scores[] = 6.5; // Placeholder Writing
-                $scores[] = 7.0; // Placeholder Speaking
-            }
-        }
 
         if (empty($scores)) return null;
 
@@ -84,5 +75,43 @@ class TestAttempt extends Model
         
         // IELTS rounding: round to nearest 0.5
         return round($average * 2) / 2;
+    }
+
+    public function getReadingBandAttribute(): ?float
+    {
+        $ra = $this->readingAttempt;
+        return ($ra && $ra->status === 'completed') ? $ra->band_score : null;
+    }
+
+    public function getListeningBandAttribute(): ?float
+    {
+        $la = $this->listeningAttempt;
+        return ($la && $la->status === 'completed') ? $la->band_score : null;
+    }
+
+    public function getReadingScoreAttribute(): ?int
+    {
+        $ra = $this->readingAttempt;
+        return ($ra && $ra->status === 'completed') ? $ra->score : null;
+    }
+
+    public function getListeningScoreAttribute(): ?int
+    {
+        $la = $this->listeningAttempt;
+        return ($la && $la->status === 'completed') ? $la->score : null;
+    }
+
+    public function getTimeSpentAttribute(): ?string
+    {
+        if ($this->started_at && $this->completed_at) {
+            $diff = $this->started_at->diff($this->completed_at);
+            $hours = $diff->h + ($diff->days * 24);
+            $minutes = $diff->i;
+            if ($hours > 0) {
+                return "{$hours}h {$minutes}m";
+            }
+            return "{$minutes}m";
+        }
+        return null;
     }
 }
