@@ -13,7 +13,7 @@ class AdminDashboardController extends Controller
     public function index()
     {
         $totalAttempts = TestAttempt::count();
-        $completedAttempts = TestAttempt::where('status', 'completed')->count();
+        $completedAttempts = TestAttempt::where(fn ($q) => $q->where('status', 'completed'))->count();
 
         $stats = [
             'total_tests' => Test::count(),

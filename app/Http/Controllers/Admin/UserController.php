@@ -47,7 +47,7 @@ class UserController extends Controller
         ]);
 
         /** @var Role|null $role */
-        $role = Role::query()->where('name', '=', ucfirst($validated['role']))->first();
+        $role = Role::query()->where(fn ($q) => $q->where('name', '=', ucfirst($validated['role'])))->first();
         if ($role) {
             $user->roles()->attach($role->id);
         }

@@ -20,10 +20,10 @@ class DashboardStatsService
         $daysToExam = $user->exam_date ? Carbon::now()->startOfDay()->diffInDays($user->exam_date->startOfDay(), false) : null;
 
         $completedAttempts = $user->testAttempts()
-            ->where('status', 'completed')
+            ->where(['status' => 'completed'])
             ->get();
 
-        $validAttempts = $completedAttempts->filter(fn($a) => $a->overall_band !== null);
+        $validAttempts = $completedAttempts->filter(fn ($a) => $a->overall_band !== null);
         $avgBandScore = $validAttempts->count() > 0 ? $validAttempts->avg('overall_band') : null;
 
         if ($avgBandScore !== null) {
@@ -43,13 +43,13 @@ class DashboardStatsService
      */
     public function getModuleBreakdown($user)
     {
-        $readingAttempts = ReadingAttempt::where('user_id', $user->id)
-            ->where('status', 'completed')
+        $readingAttempts = ReadingAttempt::where(fn ($q) => $q->where('user_id', $user->id)
+            ->where('status', 'completed'))
             ->get();
         $readingAvg = $readingAttempts->count() > 0 ? $readingAttempts->avg('band_score') : null;
 
-        $listeningAttempts = ListeningAttempt::where('user_id', $user->id)
-            ->where('status', 'completed')
+        $listeningAttempts = ListeningAttempt::where(fn ($q) => $q->where('user_id', $user->id)
+            ->where('status', 'completed'))
             ->get();
         $listeningAvg = $listeningAttempts->count() > 0 ? $listeningAttempts->avg('band_score') : null;
 
@@ -96,21 +96,21 @@ class DashboardStatsService
     public function getRecommendedTests($user)
     {
         $completedTestSetIds = $user->testAttempts()
-            ->where('status', 'completed')
+            ->where(fn ($q) => $q->where('status', 'completed'))
             ->pluck('test_set_id');
 
         $completedTestIds = TestSet::query()->whereIn('id', $completedTestSetIds)
             ->pluck('test_id')
             ->unique();
 
-        $recommendedTests = Test::where('status', 'published')
+        $recommendedTests = Test::where(fn ($q) => $q->where('status', 'published'))
             ->whereNotIn('id', $completedTestIds)
             ->latest()
             ->take(3)
             ->get();
 
         if ($recommendedTests->count() < 3) {
-            $recommendedTests = Test::query()->where('status', 'published')
+            $recommendedTests = Test::query()->where(fn ($q) => $q->where('status', 'published'))
                 ->latest()
                 ->take(3)
                 ->get();
@@ -137,7 +137,7 @@ class DashboardStatsService
     public function getChartData($user)
     {
         $chartAttempts = $user->testAttempts()
-            ->where('status', 'completed')
+            ->where(fn ($q) => $q->where('status', 'completed'))
             ->orderBy('completed_at', 'asc')
             ->take(6)
             ->get();

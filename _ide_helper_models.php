@@ -14,35 +14,11 @@
 namespace App\Models{
 /**
  * @property int $id
- * @property string $title
- * @property string $exam_type
- * @property int|null $year
- * @property string|null $description
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Test> $tests
- * @property-read int|null $tests_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|IeltsCollection newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|IeltsCollection newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|IeltsCollection query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|IeltsCollection whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|IeltsCollection whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|IeltsCollection whereExamType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|IeltsCollection whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|IeltsCollection whereTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|IeltsCollection whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|IeltsCollection whereYear($value)
- */
-	class IeltsCollection extends \Eloquent {}
-}
-
-namespace App\Models{
-/**
- * @property int $id
  * @property int $user_id
  * @property int $test_attempt_id
  * @property int $question_id
  * @property string|null $answer_text
+ * @property int $is_flagged
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\ListeningAttempt $attempt
@@ -54,6 +30,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningAnswer whereAnswerText($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningAnswer whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningAnswer whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningAnswer whereIsFlagged($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningAnswer whereQuestionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningAnswer whereTestAttemptId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningAnswer whereUpdatedAt($value)
@@ -66,7 +43,6 @@ namespace App\Models{
 /**
  * @property int $id
  * @property int $user_id
- * @property int $test_id
  * @property int $current_section
  * @property string $status
  * @property \Illuminate\Support\Carbon|null $started_at
@@ -74,9 +50,11 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $completed_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $test_set_id
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ListeningAnswer> $answers
  * @property-read int|null $answers_count
- * @property-read \App\Models\Test $test
+ * @property-read float $band_score
+ * @property-read \App\Models\TestSet|null $testSet
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningAttempt newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningAttempt newQuery()
@@ -87,7 +65,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningAttempt whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningAttempt whereStartedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningAttempt whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningAttempt whereTestId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningAttempt whereTestSetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningAttempt whereTransferStartedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningAttempt whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningAttempt whereUserId($value)
@@ -98,16 +76,16 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
- * @property int $test_id
  * @property int $section_number
  * @property string|null $instruction_text
  * @property string|null $audio_path
  * @property string|null $passage_text
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $test_set_id
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Question> $questions
  * @property-read int|null $questions_count
- * @property-read \App\Models\Test $test
+ * @property-read \App\Models\TestSet|null $testSet
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningSection newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningSection newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningSection query()
@@ -117,7 +95,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningSection whereInstructionText($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningSection wherePassageText($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningSection whereSectionNumber($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningSection whereTestId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningSection whereTestSetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ListeningSection whereUpdatedAt($value)
  */
 	class ListeningSection extends \Eloquent {}
@@ -182,6 +160,7 @@ namespace App\Models{
  * @property int $test_attempt_id
  * @property int $question_id
  * @property string|null $answer_text
+ * @property int $is_flagged
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\ReadingAttempt $attempt
@@ -193,6 +172,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingAnswer whereAnswerText($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingAnswer whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingAnswer whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingAnswer whereIsFlagged($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingAnswer whereQuestionId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingAnswer whereTestAttemptId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingAnswer whereUpdatedAt($value)
@@ -205,15 +185,16 @@ namespace App\Models{
 /**
  * @property int $id
  * @property int $user_id
- * @property int $test_id
  * @property string $status
  * @property \Illuminate\Support\Carbon|null $started_at
  * @property \Illuminate\Support\Carbon|null $completed_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $test_set_id
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReadingAnswer> $answers
  * @property-read int|null $answers_count
- * @property-read \App\Models\Test $test
+ * @property-read float $band_score
+ * @property-read \App\Models\TestSet|null $testSet
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingAttempt newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingAttempt newQuery()
@@ -223,7 +204,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingAttempt whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingAttempt whereStartedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingAttempt whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingAttempt whereTestId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingAttempt whereTestSetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingAttempt whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingAttempt whereUserId($value)
  */
@@ -233,17 +214,17 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
- * @property int $test_id
  * @property int $passage_number
  * @property string|null $title
  * @property string|null $content
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $test_set_id
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReadingQuestionGroup> $questionGroups
  * @property-read int|null $question_groups_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Question> $questions
  * @property-read int|null $questions_count
- * @property-read \App\Models\Test $test
+ * @property-read \App\Models\TestSet|null $testSet
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingPassage newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingPassage newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingPassage query()
@@ -251,7 +232,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingPassage whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingPassage whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingPassage wherePassageNumber($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingPassage whereTestId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingPassage whereTestSetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingPassage whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReadingPassage whereUpdatedAt($value)
  */
@@ -306,18 +287,18 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
- * @property int $test_id
  * @property string $name
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Test $test
+ * @property int|null $test_set_id
+ * @property-read \App\Models\TestSet|null $testSet
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereTestId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereTestSetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Section whereUpdatedAt($value)
  */
 	class Section extends \Eloquent {}
@@ -326,7 +307,6 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
- * @property int $test_id
  * @property int $part
  * @property string|null $question_text
  * @property string|null $audio_path
@@ -334,7 +314,8 @@ namespace App\Models{
  * @property string|null $preparation_instructions
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Test $test
+ * @property int|null $test_set_id
+ * @property-read \App\Models\TestSet|null $testSet
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SpeakingQuestion newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SpeakingQuestion newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SpeakingQuestion query()
@@ -344,7 +325,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SpeakingQuestion wherePart($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SpeakingQuestion wherePreparationInstructions($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SpeakingQuestion whereQuestionText($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|SpeakingQuestion whereTestId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SpeakingQuestion whereTestSetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SpeakingQuestion whereTimeLimit($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SpeakingQuestion whereUpdatedAt($value)
  */
@@ -354,33 +335,25 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
- * @property int|null $ielts_collection_id
- * @property string $title
- * @property int $number
  * @property string $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\IeltsCollection|null $collection
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ListeningSection> $listeningSections
- * @property-read int|null $listening_sections_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReadingPassage> $readingPassages
- * @property-read int|null $reading_passages_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Section> $sections
- * @property-read int|null $sections_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SpeakingQuestion> $speakingQuestions
- * @property-read int|null $speaking_questions_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\WritingTask> $writingTasks
- * @property-read int|null $writing_tasks_count
+ * @property int|null $book_number
+ * @property int|null $year
+ * @property string|null $exam_type
+ * @property-read mixed $title
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\TestSet> $test_sets
+ * @property-read int|null $test_sets_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Test newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Test newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Test query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Test whereBookNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Test whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Test whereExamType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Test whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Test whereIeltsCollectionId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Test whereNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Test whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Test whereTitle($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Test whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Test whereYear($value)
  */
 	class Test extends \Eloquent {}
 }
@@ -389,13 +362,22 @@ namespace App\Models{
 /**
  * @property int $id
  * @property int $user_id
- * @property int $test_id
  * @property string $status
  * @property \Illuminate\Support\Carbon|null $started_at
  * @property \Illuminate\Support\Carbon|null $completed_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\Test $test
+ * @property int|null $test_set_id
+ * @property-read float|null $listening_band
+ * @property-read int|null $listening_score
+ * @property-read float|null $overall_band
+ * @property-read float|null $reading_band
+ * @property-read int|null $reading_score
+ * @property-read string|null $time_spent
+ * @property-read \App\Models\ListeningAttempt|null $listeningAttempt
+ * @property-read \App\Models\ReadingAttempt|null $readingAttempt
+ * @property-read \App\Models\Test|null $test
+ * @property-read \App\Models\TestSet|null $testSet
  * @property-read \App\Models\User $user
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\WritingAnswer> $writingAnswers
  * @property-read int|null $writing_answers_count
@@ -407,7 +389,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TestAttempt whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TestAttempt whereStartedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TestAttempt whereStatus($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|TestAttempt whereTestId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TestAttempt whereTestSetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TestAttempt whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|TestAttempt whereUserId($value)
  */
@@ -417,7 +399,39 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
+ * @property int $test_id
+ * @property int $set_number
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ListeningSection> $listeningSections
+ * @property-read int|null $listening_sections_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReadingPassage> $readingPassages
+ * @property-read int|null $reading_passages_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Section> $sections
+ * @property-read int|null $sections_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SpeakingQuestion> $speakingQuestions
+ * @property-read int|null $speaking_questions_count
+ * @property-read \App\Models\Test $test
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\WritingTask> $writingTasks
+ * @property-read int|null $writing_tasks_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TestSet newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TestSet newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TestSet query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TestSet whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TestSet whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TestSet whereSetNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TestSet whereTestId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|TestSet whereUpdatedAt($value)
+ */
+	class TestSet extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
  * @property string $name
+ * @property string|null $first_name
+ * @property string|null $last_name
  * @property string $email
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property string $password
@@ -431,6 +445,7 @@ namespace App\Models{
  * @property string|null $country
  * @property numeric|null $target_band_score
  * @property string|null $exam_type
+ * @property \Illuminate\Support\Carbon|null $exam_date
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Role> $roles
@@ -447,8 +462,11 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmailVerifiedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereExamDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereExamType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereFirstName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereLastName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereProfilePhotoPath($value)
@@ -495,7 +513,6 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
- * @property int $test_id
  * @property int $task_number
  * @property string $task_title
  * @property string|null $task_description
@@ -504,11 +521,12 @@ namespace App\Models{
  * @property int $minimum_word_count
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property int|null $test_set_id
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\WritingAnswer> $answers
  * @property-read int|null $answers_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\WritingTaskImage> $images
  * @property-read int|null $images_count
- * @property-read \App\Models\Test $test
+ * @property-read \App\Models\TestSet|null $testSet
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WritingTask newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WritingTask newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WritingTask query()
@@ -520,7 +538,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WritingTask whereTaskNumber($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WritingTask whereTaskPrompt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WritingTask whereTaskTitle($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|WritingTask whereTestId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|WritingTask whereTestSetId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|WritingTask whereUpdatedAt($value)
  */
 	class WritingTask extends \Eloquent {}

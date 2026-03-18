@@ -25,7 +25,7 @@ class TestHistoryService
     {
         // 1. Fetch completed test attempts
         $completedAttempts = $user->testAttempts()
-            ->where('status', 'completed')
+            ->where(fn ($q) => $q->where('status', 'completed'))
             ->orderBy('completed_at', 'desc')
             ->get();
 
@@ -34,15 +34,15 @@ class TestHistoryService
         // 2. Fetch related reading & listening attempts to prevent N+1 manually
         $testSetIds = $completedAttempts->pluck('test_set_id')->unique();
 
-        $readingAttempts = ReadingAttempt::where('user_id', $user->id)
+        $readingAttempts = ReadingAttempt::where(fn ($q) => $q->where('user_id', $user->id)
             ->whereIn('test_set_id', $testSetIds)
-            ->where('status', 'completed')
+            ->where('status', 'completed'))
             ->get()
             ->keyBy('test_set_id');
 
-        $listeningAttempts = ListeningAttempt::where('user_id', $user->id)
+        $listeningAttempts = ListeningAttempt::where(fn ($q) => $q->where('user_id', $user->id)
             ->whereIn('test_set_id', $testSetIds)
-            ->where('status', 'completed')
+            ->where('status', 'completed'))
             ->get()
             ->keyBy('test_set_id');
 
