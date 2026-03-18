@@ -2,23 +2,37 @@
 
 @section('title', 'Edit Listening Section')
 @section('header', 'Edit Listening Section')
-@section('subheader', 'For test: ' . $listening_section->test->title)
+@section('subheader', 'For test: ' . $listening_section->testSet->test->title)
 
 @section('header_actions')
-    <a href="{{ route('admin.tests.show', $listening_section->test_id) }}" class="text-gray-600 hover:text-gray-900 font-medium transition flex items-center">
+    <a href="{{ route('admin.tests.show', $listening_section->testSet->test_id) }}" class="text-gray-600 hover:text-gray-900 font-medium transition flex items-center">
         <i class="fas fa-arrow-left mr-2"></i> Back to Test
     </a>
 @endsection
 
 @section('content')
-    <div class="max-w-4xl">
-        <form action="{{ route('admin.listening-sections.update', $listening_section->id) }}" method="POST" enctype="multipart/form-data" class="bg-white shadow-sm border border-gray-200 rounded-lg p-8">
+<div class="max-w-4xl mx-auto space-y-12">
+    <!-- Page Header -->
+    <x-admin.page-header 
+        title="Edit Listening Section" 
+        description="Modify the configuration for part in: {{ $listening_section->testSet->test->title }}"
+    >
+        <x-slot:actions>
+            <x-admin.button :href="route('admin.test_sets.show', $listening_section->test_set_id)" variant="ghost" size="sm">
+                <span class="material-symbols-outlined text-lg mr-2">arrow_back</span>
+                Back to Set
+            </x-admin.button>
+        </x-slot:actions>
+    </x-admin.page-header>
+
+    <div class="glass-card rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden">
+        <form action="{{ route('admin.listening-sections.update', $listening_section->id) }}" method="POST" enctype="multipart/form-data" class="p-8 sm:p-10 space-y-8">
             @csrf
             @method('PUT')
             
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-semibold mb-2">Section Number</label>
-                <select name="section_number" class="w-full md:w-1/2 border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm">
+            <div class="space-y-3">
+                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Section Number</label>
+                <select name="section_number" class="w-full md:w-1/2 px-5 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm cursor-pointer">
                     <option value="1" {{ $listening_section->section_number == 1 ? 'selected' : '' }}>Part 1 (Conversation, everyday social context)</option>
                     <option value="2" {{ $listening_section->section_number == 2 ? 'selected' : '' }}>Part 2 (Monologue, everyday social context)</option>
                     <option value="3" {{ $listening_section->section_number == 3 ? 'selected' : '' }}>Part 3 (Conversation, educational/training context)</option>
@@ -26,41 +40,40 @@
                 </select>
             </div>
 
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-semibold mb-2">Section Instructions</label>
-                <p class="text-xs text-gray-500 mb-2">Displayed to test-takers above the questions.</p>
-                <textarea name="instruction_text" rows="3" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm" placeholder="e.g. Questions 1–10. Complete the form below. Write ONE WORD AND/OR A NUMBER for each answer.">{{ $listening_section->instruction_text }}</textarea>
+            <div class="space-y-3">
+                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Section Instructions</label>
+                <p class="text-[10px] font-bold text-slate-400 italic mb-2">Displayed to test-takers above the questions</p>
+                <textarea name="instruction_text" rows="3" class="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm" placeholder="e.g. Questions 1–10. Complete the form below...">{{ $listening_section->instruction_text }}</textarea>
             </div>
 
-            <div class="mb-8 border border-dashed border-gray-300 rounded-lg p-6 bg-gray-50 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div>
-                    <label class="block text-gray-700 text-sm font-semibold mb-1">Update Audio Recording</label>
-                    <p class="text-xs text-gray-500 mb-3">Optional. Will replace existing audio.</p>
-                    <input type="file" name="audio_file" accept=".mp3,.wav" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100">
+            <div class="p-8 rounded-[2.5rem] bg-slate-50 dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center gap-8">
+                <div class="w-full text-center">
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Update Audio Recording</label>
+                    <input type="file" name="audio_file" accept=".mp3,.wav" class="text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-6 file:rounded-xl file:border-0 file:text-xs file:font-black file:uppercase file:tracking-widest file:bg-purple-600 file:text-white hover:file:opacity-90 transition-all">
                 </div>
                 
                 @if($listening_section->audio_path)
-                    <div class="bg-white p-3 rounded shadow-sm border border-gray-200 w-full md:w-auto">
-                        <span class="block text-xs font-medium text-gray-600 mb-2">Current Audio:</span>
-                        <audio controls class="h-8 w-full md:w-64">
+                    <div class="glass-card p-6 rounded-3xl border border-slate-200 dark:border-slate-700 w-full max-w-lg">
+                        <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 text-center">Current Activity Recording</span>
+                        <audio controls class="h-10 w-full brightness-90">
                             <source src="{{ Storage::url($listening_section->audio_path) }}" type="audio/mpeg">
                         </audio>
                     </div>
                 @endif
             </div>
 
-            <div class="mb-6 border border-gray-100 p-4 rounded bg-gray-50">
-                <label class="block text-gray-700 text-sm font-semibold mb-2">Transcript / Passage Text <span class="text-gray-400 font-normal">(Optional)</span></label>
-                <textarea name="passage_text" rows="8" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm">{{ $listening_section->passage_text }}</textarea>
+            <div class="space-y-3">
+                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Transcript / Passage Text <span class="text-slate-300 font-normal">(Optional)</span></label>
+                <textarea name="passage_text" rows="8" class="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm">{{ $listening_section->passage_text }}</textarea>
             </div>
 
-            <div class="flex justify-between items-center border-t border-gray-100 pt-6">
-                <button type="button" onclick="if(confirm('Are you sure? All associated questions will also be deleted.')) { document.getElementById('delete-section').submit(); }" class="text-red-600 hover:text-red-800 font-medium text-sm transition">
-                    <i class="fas fa-trash-alt mr-1"></i> Delete Section
+            <div class="pt-8 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                <button type="button" onclick="if(confirm('Are you sure? All associated questions will also be deleted.')) { document.getElementById('delete-section').submit(); }" class="text-red-500 hover:text-red-700 font-black text-xs uppercase tracking-widest transition-all">
+                    Delete Section
                 </button>
-                <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-md shadow-sm transition flex items-center">
-                    <i class="fas fa-save mr-2"></i> Update Section
-                </button>
+                <x-admin.button type="submit" size="lg" class="from-purple-600 to-indigo-600">
+                    Update Section
+                </x-admin.button>
             </div>
         </form>
 
@@ -70,44 +83,55 @@
         </form>
 
         {{-- ── Questions Manager ── --}}
-        <div class="mt-8 pt-6 border-t border-gray-200">
-            <div class="flex justify-between items-center mb-4">
+        <div class="p-8 sm:p-10 border-t border-slate-100 dark:border-slate-800 space-y-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800">Questions for Part {{ $listening_section->section_number }}</h3>
-                    <p class="text-sm text-gray-500">{{ $listening_section->questions->count() }} question(s) configured.</p>
+                    <h3 class="text-xl font-black text-slate-900 dark:text-white tracking-tight">Questions for Part {{ $listening_section->section_number }}</h3>
+                    <p class="text-sm font-bold text-slate-400 italic mt-1">{{ $listening_section->questions->count() }} question(s) configured.</p>
                 </div>
-                <a href="{{ route('admin.questions.create', ['type' => 'listening', 'id' => $listening_section->id]) }}" class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded shadow-sm transition text-sm">
-                    <i class="fas fa-plus mr-2"></i> Add Question
-                </a>
+                <x-admin.button :href="route('admin.questions.create', ['type' => 'listening', 'id' => $listening_section->id])" size="sm">
+                    <span class="material-symbols-outlined text-lg mr-2">add</span>
+                    Add Question
+                </x-admin.button>
             </div>
 
             @if($listening_section->questions->isEmpty())
-                <div class="bg-gray-50 border border-gray-200 rounded p-6 text-center text-gray-500">
-                    <i class="fas fa-question-circle text-gray-300 text-3xl mb-2"></i>
-                    <p class="text-sm">No questions added yet. Click "Add Question" to begin.</p>
+                <div class="p-12 rounded-[2rem] bg-slate-50 dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-800 text-center">
+                    <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-3xl text-slate-400">quiz</span>
+                    </div>
+                    <p class="text-sm font-black text-slate-400 uppercase tracking-widest">No questions added yet</p>
                 </div>
             @else
-                <ul class="space-y-3">
+                <div class="grid grid-cols-1 gap-4">
                     @foreach($listening_section->questions as $index => $q)
-                        <li class="bg-white border border-gray-200 rounded p-4 flex justify-between items-start hover:shadow-sm transition">
-                            <div class="flex-1 min-w-0">
-                                <h4 class="font-medium text-gray-800 truncate">Q{{ $index + 1 }}. {{ \Illuminate\Support\Str::limit($q->question_text, 80) }}</h4>
-                                <div class="flex items-center space-x-3 mt-2 text-xs text-gray-500">
-                                    <span class="bg-purple-50 text-purple-700 border border-purple-200 px-2 py-0.5 rounded">{{ ucwords(str_replace('_', ' ', $q->question_type)) }}</span>
-                                    @if(in_array($q->question_type, ['multiple_choice']))
-                                        <span>{{ $q->options->count() }} options</span>
-                                    @elseif($q->correct_answer)
-                                        <span>Answer: <strong class="text-gray-700">{{ $q->correct_answer }}</strong></span>
-                                    @endif
+                        <div class="group flex items-center justify-between p-6 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-primary hover:shadow-soft transition-all duration-300">
+                            <div class="flex items-center gap-6 overflow-hidden">
+                                <div class="w-12 h-12 shrink-0 rounded-2xl bg-slate-50 dark:bg-slate-900/50 flex items-center justify-center text-primary font-black text-lg">
+                                    {{ $index + 1 }}
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-slate-900 dark:text-white truncate pr-4 leading-tight">{{ $q->question_text }}</h4>
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <span class="px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-900/30 text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest border border-purple-100 dark:border-purple-800/50">
+                                            {{ str_replace('_', ' ', $q->question_type) }}
+                                        </span>
+                                        @if($q->correct_answer)
+                                            <span class="text-[10px] font-bold text-slate-400 italic">
+                                                Ans: <span class="text-slate-600 dark:text-slate-300">{{ $q->correct_answer }}</span>
+                                            </span>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
-                            <a href="{{ route('admin.questions.edit', $q->id) }}" class="ml-4 text-blue-600 hover:text-blue-800 text-sm font-medium flex-shrink-0">
-                                <i class="fas fa-edit"></i> Edit
-                            </a>
-                        </li>
+                            <x-admin.button :href="route('admin.questions.edit', $q->id)" variant="secondary" size="sm">
+                                <span class="material-symbols-outlined text-lg">edit</span>
+                            </x-admin.button>
+                        </div>
                     @endforeach
-                </ul>
+                </div>
             @endif
         </div>
     </div>
+</div>
 @endsection

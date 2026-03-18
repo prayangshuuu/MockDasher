@@ -13,10 +13,7 @@
 @section('content')
 <div class="max-w-4xl mx-auto">
     <!-- Page Header -->
-    <div class="mb-10 text-center sm:text-left">
-        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Create New Test</h2>
-        <p class="text-slate-500 dark:text-slate-400 mt-1 text-base">Enter the details to initiate a new IELTS book volume and test sets.</p>
-    </div>
+    <x-admin.page-header title="Create New Test" description="Enter the details to initiate a new IELTS book volume and test sets." />
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Sidebar Info -->
@@ -106,9 +103,9 @@
                            class="px-8 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
                             Cancel
                         </a>
-                        <button type="submit" class="px-10 py-3.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-black uppercase tracking-widest rounded-2xl shadow-xl hover:scale-[1.05] active:scale-100 transition-all">
+                        <x-admin.button type="submit" size="lg">
                             Save & Initialize
-                        </button>
+                        </x-admin.button>
                     </div>
                 </form>
             </div>

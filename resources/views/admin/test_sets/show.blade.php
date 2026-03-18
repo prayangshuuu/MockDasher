@@ -14,17 +14,18 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto">
-    <!-- Page Title Section -->
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-        <div class="space-y-1">
-            <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Test Set: <span class="text-primary">0{{ $test_set->set_number }}</span></h2>
-            <p class="text-slate-500 dark:text-slate-400 text-base">Configure the specific module content and tasks for this set.</p>
-        </div>
-        <div class="flex items-center gap-3">
-             <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold text-slate-500 uppercase tracking-widest">IELTS {{ $test_set->test->book_number }}</span>
-             <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-lg text-xs font-bold text-slate-500 uppercase tracking-widest">{{ $test_set->test->exam_type }}</span>
-        </div>
-    </div>
+    <!-- Page Header -->
+    <x-admin.page-header 
+        title="Test Set: 0{{ $test_set->set_number }}" 
+        description="Configure the specific module content and tasks for this set."
+    >
+        <x-slot:actions>
+            <div class="flex items-center gap-3">
+                <x-admin.badge variant="neutral" :label="'IELTS ' . $test_set->test->book_number" />
+                <x-admin.badge variant="neutral" :label="$test_set->test->exam_type" />
+            </div>
+        </x-slot:actions>
+    </x-admin.page-header>
 
     <!-- 4-Column Module Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -45,12 +46,12 @@
                     </div>
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-slate-500">Status</span>
-                        <span class="font-bold text-emerald-600 text-xs uppercase tracking-widest">Configured</span>
+                        <x-admin.badge variant="success" label="Configured" />
                     </div>
                 </div>
-                <a href="{{ route('admin.writing-tasks.create', $test_set->id) }}" class="w-full py-3 rounded-xl bg-gradient-to-r from-primary to-indigo-600 text-white text-xs font-black uppercase tracking-widest text-center shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-100 transition-all">
+                <x-admin.button :href="route('admin.writing-tasks.create', $test_set->id)" block>
                     Manage Tasks
-                </a>
+                </x-admin.button>
             </div>
         </div>
 
@@ -71,12 +72,12 @@
                     </div>
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-slate-500">Status</span>
-                        <span class="font-bold text-emerald-600 text-xs uppercase tracking-widest">Configured</span>
+                        <x-admin.badge variant="success" label="Configured" />
                     </div>
                 </div>
-                <a href="{{ route('admin.speaking-questions.create', $test_set->id) }}" class="w-full py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-xs font-black uppercase tracking-widest text-center shadow-lg shadow-blue-500/20 hover:scale-[1.02] active:scale-100 transition-all">
+                <x-admin.button :href="route('admin.speaking-questions.create', $test_set->id)" block class="from-blue-600 to-cyan-600">
                     Manage Parts
-                </a>
+                </x-admin.button>
             </div>
         </div>
 
@@ -97,12 +98,12 @@
                     </div>
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-slate-500">Audio Sync</span>
-                        <span class="font-bold text-emerald-600 text-xs uppercase tracking-widest">Active</span>
+                        <x-admin.badge variant="success" label="Active" />
                     </div>
                 </div>
-                <a href="{{ route('admin.listening-sections.create', $test_set->id) }}" class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-black uppercase tracking-widest text-center shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-100 transition-all">
+                <x-admin.button :href="route('admin.listening-sections.create', $test_set->id)" block class="from-purple-600 to-pink-600">
                     Manage Audio
-                </a>
+                </x-admin.button>
             </div>
         </div>
 
@@ -123,12 +124,12 @@
                     </div>
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-slate-500">Layout</span>
-                        <span class="font-bold text-emerald-600 text-xs uppercase tracking-widest">Optimized</span>
+                        <x-admin.badge variant="success" label="Optimized" />
                     </div>
                 </div>
-                <a href="{{ route('admin.reading-passages.create', $test_set->id) }}" class="w-full py-3 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-black uppercase tracking-widest text-center shadow-lg shadow-orange-500/20 hover:scale-[1.02] active:scale-100 transition-all">
+                <x-admin.button :href="route('admin.reading-passages.create', $test_set->id)" block class="from-orange-500 to-red-500">
                     Manage Reading
-                </a>
+                </x-admin.button>
             </div>
         </div>
     </div>
@@ -145,12 +146,12 @@
             </div>
         </div>
         <div class="flex gap-4">
-            <button class="px-6 py-2 text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-primary transition-colors">
+            <x-admin.button variant="ghost" size="md">
                 View Documentation
-            </button>
-            <button class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest premium-shadow hover:scale-[1.05] transition-all">
+            </x-admin.button>
+            <x-admin.button size="lg">
                 Invite Students
-            </button>
+            </x-admin.button>
         </div>
     </div>
 </div>

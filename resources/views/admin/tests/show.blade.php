@@ -13,22 +13,16 @@
 @section('content')
 <div class="max-w-7xl mx-auto">
     <!-- Page Title Section -->
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-        <div class="space-y-1">
-            <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Test Details: <span class="text-primary">IELTS {{ $test->book_number }}</span></h2>
-            <p class="text-slate-500 dark:text-slate-400 text-base">Manage modules and monitor performance for this book volume ({{ $test->year }}).</p>
-        </div>
-        <div class="flex gap-4">
-            <a href="{{ route('admin.tests.edit', $test->id) }}" class="inline-flex items-center gap-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-5 py-2.5 rounded-xl font-bold text-sm text-slate-700 dark:text-slate-200 premium-shadow hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
-                <span class="material-symbols-outlined text-lg">edit</span>
+    <x-admin.page-header :title="'Test Details: ' . $test->book_number" :description="'Manage modules and monitor performance for this book volume (' . $test->year . ').'">
+        <x-slot:actions>
+            <x-admin.button :href="route('admin.tests.edit', $test->id)" variant="outline" icon="edit">
                 Edit Test
-            </a>
-            <button class="inline-flex items-center gap-2 bg-primary text-white border border-transparent px-5 py-2.5 rounded-xl font-bold text-sm premium-shadow hover:brightness-110 active:scale-95 transition-all">
-                <span class="material-symbols-outlined text-lg">add</span>
+            </x-admin.button>
+            <x-admin.button icon="add" size="md">
                 Create New Set
-            </button>
-        </div>
-    </div>
+            </x-admin.button>
+        </x-slot:actions>
+    </x-admin.page-header>
 
     <!-- 4-Column Aggregate Module Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
@@ -145,7 +139,7 @@
                         </div>
                         <div class="text-right">
                             <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Status</span>
-                            <span class="px-2.5 py-1 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 rounded-lg text-xs font-bold uppercase tracking-wider">Active</span>
+                            <x-admin.badge type="success" label="Active" />
                         </div>
                     </div>
 
@@ -173,9 +167,9 @@
 
                 <div class="p-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                     <button class="text-xs font-black uppercase tracking-widest text-slate-400 hover:text-red-500 transition-colors">Delete Set</button>
-                    <a href="{{ route('admin.test_sets.show', $testSet->id) }}" class="inline-flex items-center gap-2 px-6 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl text-xs font-black uppercase tracking-widest shadow-xl hover:-translate-y-1 transition-all">
+                    <x-admin.button :href="route('admin.test_sets.show', $testSet->id)" variant="secondary" size="md">
                         Manage Set
-                    </a>
+                    </x-admin.button>
                 </div>
             </div>
         @endforeach
@@ -194,10 +188,11 @@
         </div>
         <div class="flex gap-4">
             <button class="px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-500 hover:text-primary transition-colors">Documentation</button>
-            <button class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-3.5 rounded-2xl text-xs font-black uppercase tracking-widest premium-shadow hover:scale-105 active:scale-95 transition-all">
+            <x-admin.button size="lg">
                 Publish Volume
-            </button>
+            </x-admin.button>
         </div>
     </div>
 </div>
 @endsection
+

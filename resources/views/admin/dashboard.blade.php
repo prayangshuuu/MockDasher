@@ -11,62 +11,45 @@
 @section('content')
 <div class="max-w-7xl mx-auto space-y-10">
     <!-- Page Header -->
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div>
-            <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">System Overview</h2>
-            <p class="text-slate-500 dark:text-slate-400 text-base">Key performance indicators and recent system activity.</p>
-        </div>
-        <div class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded-xl shadow-sm">
-            <span class="material-symbols-outlined text-emerald-500 animate-pulse">check_circle</span>
-            <span class="text-xs font-black uppercase tracking-widest text-slate-500">System Live</span>
-        </div>
-    </div>
+    <x-admin.page-header title="System Overview" description="Key performance indicators and recent system activity.">
+        <x-slot:actions>
+            <div class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded-xl shadow-sm">
+                <span class="material-symbols-outlined text-emerald-500 animate-pulse">check_circle</span>
+                <span class="text-xs font-black uppercase tracking-widest text-slate-500">System Live</span>
+            </div>
+        </x-slot:actions>
+    </x-admin.page-header>
 
     <!-- Overview Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="glass-card p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-soft group hover:border-primary/50 transition-all">
-            <div class="flex justify-between items-start mb-6">
-                <div class="size-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/40 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                    <span class="material-symbols-outlined text-2xl">description</span>
-                </div>
-                <span class="text-[10px] font-black text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded-lg uppercase tracking-widest">+12%</span>
-            </div>
-            <h3 class="text-slate-400 dark:text-slate-500 text-[11px] font-black uppercase tracking-widest mb-1">Total Tests</h3>
-            <p class="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">{{ number_format($stats['total_tests'] ?? 0) }}</p>
-        </div>
-        
-        <div class="glass-card p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-soft group hover:border-primary/50 transition-all">
-            <div class="flex justify-between items-start mb-6">
-                <div class="size-12 rounded-2xl bg-blue-50 dark:bg-blue-900/40 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform">
-                    <span class="material-symbols-outlined text-2xl">layers</span>
-                </div>
-                <span class="text-[10px] font-black text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded-lg uppercase tracking-widest">+5%</span>
-            </div>
-            <h3 class="text-slate-400 dark:text-slate-500 text-[11px] font-black uppercase tracking-widest mb-1">Test Sets</h3>
-            <p class="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">{{ number_format($stats['total_test_sets'] ?? 0) }}</p>
-        </div>
-        
-        <div class="glass-card p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-soft group hover:border-primary/50 transition-all">
-            <div class="flex justify-between items-start mb-6">
-                <div class="size-12 rounded-2xl bg-purple-50 dark:bg-purple-900/40 flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
-                    <span class="material-symbols-outlined text-2xl">group</span>
-                </div>
-                <span class="text-[10px] font-black text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded-lg uppercase tracking-widest">+18%</span>
-            </div>
-            <h3 class="text-slate-400 dark:text-slate-500 text-[11px] font-black uppercase tracking-widest mb-1">Active Students</h3>
-            <p class="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">{{ number_format($stats['users'] ?? 0) }}</p>
-        </div>
-        
-        <div class="glass-card p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-soft group hover:border-primary/50 transition-all">
-            <div class="flex justify-between items-start mb-6">
-                <div class="size-12 rounded-2xl bg-orange-50 dark:bg-orange-900/40 flex items-center justify-center text-orange-600 group-hover:scale-110 transition-transform">
-                    <span class="material-symbols-outlined text-2xl">analytics</span>
-                </div>
-                <span class="text-[10px] font-black text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded-lg uppercase tracking-widest">+22%</span>
-            </div>
-            <h3 class="text-slate-400 dark:text-slate-500 text-[11px] font-black uppercase tracking-widest mb-1">Global Attempts</h3>
-            <p class="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">{{ number_format($stats['attempts'] ?? 0) }}</p>
-        </div>
+        <x-admin.stat-card 
+            label="Total Tests" 
+            :value="number_format($stats['total_tests'] ?? 0)" 
+            icon="description" 
+            trend="+12%" 
+            iconColor="primary" 
+        />
+        <x-admin.stat-card 
+            label="Test Sets" 
+            :value="number_format($stats['total_test_sets'] ?? 0)" 
+            icon="layers" 
+            trend="+5%" 
+            iconColor="blue" 
+        />
+        <x-admin.stat-card 
+            label="Active Students" 
+            :value="number_format($stats['users'] ?? 0)" 
+            icon="group" 
+            trend="+18%" 
+            iconColor="purple" 
+        />
+        <x-admin.stat-card 
+            label="Global Attempts" 
+            :value="number_format($stats['attempts'] ?? 0)" 
+            icon="analytics" 
+            trend="+22%" 
+            iconColor="orange" 
+        />
     </div>
 
     <!-- Analytics & Actions -->
@@ -109,10 +92,9 @@
                 <div class="relative z-10">
                     <h3 class="text-xl font-extrabold mb-2 tracking-tight">Expand Library</h3>
                     <p class="text-sm opacity-80 mb-8 leading-relaxed font-medium">Publish new IELTS books and sets for your candidates using the high-conversion toolset.</p>
-                    <a href="{{ route('admin.tests.create') }}" class="inline-flex items-center gap-2 bg-white text-primary px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg hover:scale-105 active:scale-95 transition-all">
-                        <span class="material-symbols-outlined text-lg">add_circle</span>
+                    <x-admin.button :href="route('admin.tests.create')" icon="add_circle" variant="outline" class="!bg-white !text-primary border-none">
                         Create Test
-                    </a>
+                    </x-admin.button>
                 </div>
                 <span class="material-symbols-outlined absolute -bottom-6 -right-6 text-[12rem] opacity-5 group-hover:rotate-12 transition-transform duration-700">auto_awesome</span>
             </div>
@@ -129,7 +111,7 @@
                             <span class="text-xs font-bold text-slate-500">API Gateway</span>
                             <span class="text-xs font-black text-emerald-500 uppercase">Excellent</span>
                         </div>
-                        <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div class="size-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
                             <div class="bg-emerald-500 h-full w-[94%]"></div>
                         </div>
                     </div>
@@ -138,7 +120,7 @@
                             <span class="text-xs font-bold text-slate-500">Resource Load</span>
                             <span class="text-xs font-black text-primary uppercase">Optimal</span>
                         </div>
-                        <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div class="size-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
                             <div class="bg-primary h-full w-[12%]"></div>
                         </div>
                     </div>
@@ -177,14 +159,10 @@
                                 </div>
                             </td>
                             <td class="px-10 py-6 text-center">
-                                <span class="px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 text-[10px] font-black uppercase tracking-widest">
-                                    {{ $test->status }}
-                                </span>
+                                <x-admin.badge type="success" :label="$test->status" />
                             </td>
                             <td class="px-10 py-6 text-right">
-                                <a href="{{ route('admin.tests.show', $test->id) }}" class="size-10 inline-flex items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-300 hover:text-primary hover:bg-primary/10 transition-all">
-                                    <span class="material-symbols-outlined">chevron_right</span>
-                                </a>
+                                <x-admin.button :href="route('admin.tests.show', $test->id)" icon="chevron_right" variant="ghost" size="icon" />
                             </td>
                         </tr>
                     @empty
@@ -201,3 +179,4 @@
     </div>
 </div>
 @endsection
+

@@ -11,56 +11,69 @@
 @endsection
 
 @section('content')
-<div class="max-w-3xl">
-    <form action="{{ route('admin.reading-question-groups.store', $passage->id) }}" method="POST"
-          class="bg-white shadow-sm border border-gray-200 rounded-lg p-8">
-        @csrf
+<div class="max-w-4xl mx-auto space-y-10">
+    <!-- Page Header -->
+    <x-admin.page-header 
+        title="Add Question Group" 
+        description="Configure a new question group for: {{ $passage->title }}"
+    >
+        <x-slot:actions>
+            <x-admin.button :href="route('admin.reading-passages.edit', $passage->id)" variant="ghost" size="sm">
+                <span class="material-symbols-outlined text-lg mr-2">arrow_back</span>
+                Back to Passage
+            </x-admin.button>
+        </x-slot:actions>
+    </x-admin.page-header>
 
-        <div class="mb-6">
-            <label class="block text-gray-700 text-sm font-semibold mb-2">Question Type</label>
-            <select name="question_type" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 sm:text-sm">
-                <optgroup label="Completion">
-                    <option value="sentence_completion">Sentence Completion</option>
-                    <option value="summary_completion">Summary Completion</option>
-                    <option value="table_completion">Table Completion</option>
-                    <option value="flow_chart_completion">Flow-chart Completion</option>
-                </optgroup>
-                <optgroup label="Multiple Choice / T/F/NG">
-                    <option value="multiple_choice">Multiple Choice</option>
-                    <option value="true_false_not_given">True / False / Not Given</option>
-                    <option value="yes_no_not_given">Yes / No / Not Given</option>
-                </optgroup>
-                <optgroup label="Matching">
-                    <option value="matching_headings">Matching Headings</option>
-                    <option value="matching_information">Matching Information</option>
-                    <option value="matching_sentence_endings">Matching Sentence Endings</option>
-                </optgroup>
-                <optgroup label="Short Answer">
-                    <option value="short_answer">Short Answer Questions</option>
-                </optgroup>
-            </select>
-        </div>
+    <div class="glass-card rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden">
+        <form action="{{ route('admin.reading-question-groups.store', $passage->id) }}" method="POST" class="p-8 sm:p-10 space-y-8">
+            @csrf
 
-        <div class="mb-6">
-            <label class="block text-gray-700 text-sm font-semibold mb-2">Group Instruction</label>
-            <p class="text-xs text-gray-500 mb-2">Displayed above each question group, e.g. "Questions 1–7: Do the following statements agree with the information in the reading passage?"</p>
-            <textarea name="group_instruction" rows="3"
-                class="w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 sm:text-sm"
-                placeholder="Questions X–Y: …"></textarea>
-        </div>
+            <div class="space-y-3">
+                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Question Type</label>
+                <select name="question_type" class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm cursor-pointer">
+                    <optgroup label="Completion">
+                        <option value="sentence_completion">Sentence Completion</option>
+                        <option value="summary_completion">Summary Completion</option>
+                        <option value="table_completion">Table Completion</option>
+                        <option value="flow_chart_completion">Flow-chart Completion</option>
+                    </optgroup>
+                    <optgroup label="Multiple Choice / T/F/NG">
+                        <option value="multiple_choice">Multiple Choice</option>
+                        <option value="true_false_not_given">True / False / Not Given</option>
+                        <option value="yes_no_not_given">Yes / No / Not Given</option>
+                    </optgroup>
+                    <optgroup label="Matching">
+                        <option value="matching_headings">Matching Headings</option>
+                        <option value="matching_information">Matching Information</option>
+                        <option value="matching_sentence_endings">Matching Sentence Endings</option>
+                    </optgroup>
+                    <optgroup label="Short Answer">
+                        <option value="short_answer">Short Answer Questions</option>
+                    </optgroup>
+                </select>
+            </div>
 
-        <div class="mb-6">
-            <label class="block text-gray-700 text-sm font-semibold mb-2">Sort Order</label>
-            <input type="number" name="sort_order" value="0" min="0"
-                class="w-24 border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 sm:text-sm">
-            <p class="text-xs text-gray-500 mt-1">Lower numbers appear first.</p>
-        </div>
+            <div class="space-y-3">
+                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Group Instruction</label>
+                <p class="text-[10px] font-bold text-slate-400 italic mb-2">Displayed above each question group</p>
+                <textarea name="group_instruction" rows="3" class="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm" placeholder="Questions X–Y: …"></textarea>
+            </div>
 
-        <div class="flex justify-end border-t border-gray-100 pt-6">
-            <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-6 rounded-md shadow-sm transition flex items-center">
-                <i class="fas fa-save mr-2"></i> Create Group
-            </button>
-        </div>
-    </form>
+            <div class="space-y-3">
+                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Sort Order</label>
+                <input type="number" name="sort_order" value="0" min="0" class="w-32 px-5 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm">
+                <p class="text-[10px] font-bold text-slate-400 italic mt-2 ml-1">Lower numbers appear first.</p>
+            </div>
+
+            <div class="pt-8 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                <x-admin.button type="submit" size="lg" class="from-orange-500 to-orange-600">
+                    Create Group
+                </x-admin.button>
+            </div>
+        </form>
+    </div>
 </div>
+@endsection
+
 @endsection

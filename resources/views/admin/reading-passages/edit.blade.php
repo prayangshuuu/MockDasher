@@ -2,55 +2,62 @@
 
 @section('title', 'Edit Reading Passage')
 @section('header', 'Edit Reading Passage')
-@section('subheader', 'For test: ' . $reading_passage->test->title)
+@section('subheader', 'For test: ' . $reading_passage->testSet->test->title)
 
 @section('header_actions')
-    <a href="{{ route('admin.tests.show', $reading_passage->test_id) }}" class="text-gray-600 hover:text-gray-900 font-medium transition flex items-center">
+    <a href="{{ route('admin.tests.show', $reading_passage->testSet->test_id) }}" class="text-gray-600 hover:text-gray-900 font-medium transition flex items-center">
         <i class="fas fa-arrow-left mr-2"></i> Back to Test
     </a>
 @endsection
 
 @section('content')
-    <div class="max-w-5xl space-y-8">
+<div class="max-w-5xl mx-auto space-y-12">
+    <!-- Page Header -->
+    <x-admin.page-header 
+        title="Edit Reading Passage" 
+        description="Modify the configuration for module in: {{ $reading_passage->testSet->test->title }}"
+    >
+        <x-slot:actions>
+            <x-admin.button :href="route('admin.test_sets.show', $reading_passage->test_set_id)" variant="ghost" size="sm">
+                <span class="material-symbols-outlined text-lg mr-2">arrow_back</span>
+                Back to Set
+            </x-admin.button>
+        </x-slot:actions>
+    </x-admin.page-header>
 
-        {{-- ── Passage Form ── --}}
-        <form action="{{ route('admin.reading-passages.update', $reading_passage->id) }}" method="POST"
-              class="bg-white shadow-sm border border-gray-200 rounded-lg p-8">
+    <div class="glass-card rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden">
+        <form action="{{ route('admin.reading-passages.update', $reading_passage->id) }}" method="POST" class="p-8 sm:p-10 space-y-8">
             @csrf
             @method('PUT')
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <label class="block text-gray-700 text-sm font-semibold mb-2">Passage Number</label>
-                    <select name="passage_number" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 sm:text-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-3">
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Passage Number</label>
+                    <select name="passage_number" class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm cursor-pointer">
                         <option value="1" {{ $reading_passage->passage_number == 1 ? 'selected' : '' }}>Passage 1</option>
                         <option value="2" {{ $reading_passage->passage_number == 2 ? 'selected' : '' }}>Passage 2</option>
                         <option value="3" {{ $reading_passage->passage_number == 3 ? 'selected' : '' }}>Passage 3</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-gray-700 text-sm font-semibold mb-2">Passage Title / Heading</label>
-                    <input type="text" name="title" value="{{ $reading_passage->title }}"
-                        class="w-full border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500 sm:text-sm" required>
+                <div class="space-y-3">
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Passage Title / Heading</label>
+                    <input type="text" name="title" value="{{ $reading_passage->title }}" class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm" required>
                 </div>
             </div>
 
-            <div class="mb-8 border border-gray-100 p-4 rounded bg-gray-50">
-                <label class="block text-gray-700 text-sm font-semibold mb-2">Passage Content</label>
-                <p class="text-xs text-gray-500 mb-3">HTML tags supported: &lt;p&gt;, &lt;h3&gt;, &lt;strong&gt;, &lt;em&gt;, &lt;ul&gt;, &lt;li&gt;. Use &lt;p&gt; for paragraphs.</p>
-                <textarea name="content" rows="20"
-                    class="w-full font-mono text-sm border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
-                    required>{{ $reading_passage->content }}</textarea>
+            <div class="space-y-3">
+                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Passage Content</label>
+                <p class="text-[10px] font-bold text-slate-400 italic mb-2">Use HTML tags for formatting.</p>
+                <textarea name="content" rows="15" class="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm" required>{{ $reading_passage->content }}</textarea>
             </div>
 
-            <div class="flex justify-between items-center border-t border-gray-100 pt-6">
-                <button type="button" class="text-red-600 hover:text-red-800 font-medium text-sm"
-                    onclick="if(confirm('Delete this passage? All question groups and questions will be deleted.')) document.getElementById('delete-passage').submit();">
-                    <i class="fas fa-trash-alt mr-1"></i> Delete Passage
+            <div class="pt-8 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                <button type="button" onclick="if(confirm('Delete this passage? All question groups and questions will be deleted.')) document.getElementById('delete-passage').submit();" class="text-red-500 hover:text-red-700 font-black text-xs uppercase tracking-widest transition-all">
+                    Delete Passage
                 </button>
-                <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-6 rounded-md shadow-sm transition flex items-center">
-                    <i class="fas fa-save mr-2"></i> Update Passage
-                </button>
+                <x-admin.button type="submit" size="lg" class="from-orange-500 to-red-600">
+                    Update Passage
+                </x-admin.button>
             </div>
         </form>
 
@@ -59,53 +66,52 @@
         </form>
 
         {{-- ── Question Groups ── --}}
-        <div>
-            <div class="flex justify-between items-center mb-4">
+        <div class="p-8 sm:p-10 border-t border-slate-100 dark:border-slate-800 space-y-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800">Question Groups</h3>
-                    <p class="text-sm text-gray-500">
+                    <h3 class="text-xl font-black text-slate-900 dark:text-white tracking-tight">Question Groups</h3>
+                    <p class="text-sm font-bold text-slate-400 italic mt-1">
                         {{ $reading_passage->questionGroups->count() }} group(s) · 
                         {{ $reading_passage->questionGroups->sum(fn($g) => $g->questions->count()) }} total questions
                     </p>
                 </div>
-                <a href="{{ route('admin.reading-question-groups.create', $reading_passage->id) }}"
-                   class="inline-flex items-center bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded shadow-sm transition text-sm">
-                    <i class="fas fa-plus mr-2"></i> Add Question Group
-                </a>
+                <x-admin.button :href="route('admin.reading-question-groups.create', $reading_passage->id)" size="sm" class="from-orange-500 to-orange-600">
+                    <span class="material-symbols-outlined text-lg mr-2">add_circle</span>
+                    Add Group
+                </x-admin.button>
             </div>
 
             @if($reading_passage->questionGroups->isEmpty())
-                <div class="bg-gray-50 border border-gray-200 rounded p-6 text-center text-gray-500">
-                    <i class="fas fa-layer-group text-gray-300 text-3xl mb-2"></i>
-                    <p class="text-sm">No question groups yet. Click "Add Question Group" to get started.</p>
+                <div class="p-12 rounded-[2rem] bg-slate-50 dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-800 text-center">
+                    <div class="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-3xl text-slate-400">category</span>
+                    </div>
+                    <p class="text-sm font-black text-slate-400 uppercase tracking-widest">No groups added yet</p>
                 </div>
             @else
-                <div class="space-y-4">
+                <div class="grid grid-cols-1 gap-4">
                     @foreach($reading_passage->questionGroups as $group)
-                        <div class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition">
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <span class="bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-0.5 rounded">
-                                            {{ ucwords(str_replace('_', ' ', $group->question_type)) }}
-                                        </span>
-                                        <span class="text-xs text-gray-400">Sort: {{ $group->sort_order }}</span>
-                                    </div>
-                                    @if($group->group_instruction)
-                                        <p class="text-sm text-gray-700 mb-2 italic">"{{ \Illuminate\Support\Str::limit($group->group_instruction, 100) }}"</p>
-                                    @endif
-                                    <p class="text-xs text-gray-500">{{ $group->questions->count() }} question(s)</p>
+                        <div class="group flex items-center justify-between p-6 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-orange-500 hover:shadow-soft transition-all duration-300">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="px-3 py-1 rounded-full bg-orange-50 dark:bg-orange-900/30 text-[10px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-widest border border-orange-100 dark:border-orange-800/50">
+                                        {{ str_replace('_', ' ', $group->question_type) }}
+                                    </span>
+                                    <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Order: {{ $group->sort_order }}</span>
                                 </div>
-                                <a href="{{ route('admin.reading-question-groups.edit', $group->id) }}"
-                                   class="ml-4 flex-shrink-0 text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1">
-                                    <i class="fas fa-edit"></i> Manage
-                                </a>
+                                @if($group->group_instruction)
+                                    <p class="text-sm font-bold text-slate-600 dark:text-slate-400 italic truncate pr-8">"{{ $group->group_instruction }}"</p>
+                                @endif
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">{{ $group->questions->count() }} question(s)</p>
                             </div>
+                            <x-admin.button :href="route('admin.reading-question-groups.edit', $group->id)" variant="secondary" size="sm">
+                                <span class="material-symbols-outlined text-lg">settings</span>
+                            </x-admin.button>
                         </div>
                     @endforeach
                 </div>
             @endif
         </div>
-
     </div>
+</div>
 @endsection

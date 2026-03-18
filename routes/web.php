@@ -33,6 +33,7 @@ Route::middleware(['auth'])->group(function () {
     // Profile & History Routes
     Route::get('/profile', [\App\Http\Controllers\User\ProfileController::class, 'show'])->name('profile.show');
     Route::put('/profile/update', [\App\Http\Controllers\User\ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [\App\Http\Controllers\User\ProfileController::class, 'updatePassword'])->name('profile.password.update');
     Route::delete('/profile/delete', [\App\Http\Controllers\User\ProfileController::class, 'destroy'])->name('profile.destroy');
     
     Route::get('/history', [\App\Http\Controllers\User\TestHistoryController::class, 'index'])->name('user.history.index');

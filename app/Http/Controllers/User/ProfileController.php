@@ -20,11 +20,9 @@ class ProfileController extends Controller
         $user = $request->user();
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'country' => 'nullable|string|max:255',
-            'target_band_score' => 'nullable|numeric|min:0|max:9',
-            'exam_type' => 'nullable|in:Academic,General',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
@@ -36,15 +34,28 @@ class ProfileController extends Controller
             $user->profile_photo_path = $path;
         }
 
-        $user->name = $validated['name'];
+        $user->first_name = $validated['first_name'];
+        $user->last_name = $validated['last_name'];
+        $user->name = trim($validated['first_name'] . ' ' . $validated['last_name']);
         $user->email = $validated['email'];
-        $user->country = $validated['country'] ?? $user->country;
-        $user->target_band_score = $validated['target_band_score'] ?? $user->target_band_score;
-        $user->exam_type = $validated['exam_type'] ?? $user->exam_type;
 
         $user->save();
 
-        return back()->with('status', 'profile-information-updated');
+        return back()->with('success', 'Profile information updated successfully.');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+        ]);
+
+        $request->user()->update([
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+        ]);
+
+        return back()->with('success', 'Password updated successfully.');
     }
 
     public function destroy(Request $request)

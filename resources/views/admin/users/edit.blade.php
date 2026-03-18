@@ -13,10 +13,10 @@
 @section('content')
 <div class="max-w-4xl mx-auto">
     <!-- Page Header -->
-    <div class="mb-10 text-center sm:text-left">
-        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Edit Student Details</h2>
-        <p class="text-slate-500 dark:text-slate-400 mt-1 text-base">Update the account information and access permissions for {{ $user->name }}.</p>
-    </div>
+    <x-admin.page-header 
+        title="Edit Student Details" 
+        description="Update the account information and access permissions for {{ $user->name }}."
+    />
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Sidebar Info -->
@@ -124,13 +124,16 @@
                            class="px-8 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
                             Discard
                         </a>
-                        <button type="submit" class="px-10 py-3.5 bg-primary text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.05] active:scale-100 transition-all">
+                        <x-admin.button type="submit" size="lg">
                             Update Student
-                        </button>
+                        </x-admin.button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+</div>
+@endsection
+
 </div>
 @endsection

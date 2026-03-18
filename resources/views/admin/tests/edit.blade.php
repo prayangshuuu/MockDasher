@@ -13,23 +13,28 @@
 @section('content')
 <div class="max-w-4xl mx-auto">
     <!-- Page Header -->
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-        <div class="space-y-1">
-            <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white text-3xl font-bold">Edit Test Details</h2>
-            <p class="text-slate-500 dark:text-slate-400">Modify the configuration for the IELTS {{ $test->exam_type }} Mock Exam.</p>
-        </div>
-        <div class="flex items-center gap-3">
-            <button type="button" onclick="if(confirm('WARNING: Are you sure you want to delete this test book and all of its question sets?')) { document.getElementById('delete-test-form').submit(); }" 
-                    class="px-4 py-2 text-sm font-bold text-slate-500 hover:text-red-500 transition-colors flex items-center gap-2 group">
-                <span class="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">delete</span>
-                Delete Test
-            </button>
-            <form id="delete-test-form" action="{{ route('admin.tests.destroy', $test->id) }}" method="POST" class="hidden">
-                @csrf
-                @method('DELETE')
-            </form>
-        </div>
-    </div>
+    <x-admin.page-header 
+        title="Edit Test Details" 
+        description="Modify the configuration for the IELTS {{ $test->exam_type }} Mock Exam."
+    >
+        <x-slot:actions>
+            <div class="flex items-center gap-3">
+                <x-admin.button 
+                    variant="ghost" 
+                    size="sm"
+                    class="text-slate-500 hover:text-red-500"
+                    onclick="if(confirm('WARNING: Are you sure you want to delete this test book and all of its question sets?')) { document.getElementById('delete-test-form').submit(); }"
+                >
+                    <span class="material-symbols-outlined text-lg mr-2">delete</span>
+                    Delete Test
+                </x-admin.button>
+                <form id="delete-test-form" action="{{ route('admin.tests.destroy', $test->id) }}" method="POST" class="hidden">
+                    @csrf
+                    @method('DELETE')
+                </form>
+            </div>
+        </x-slot:actions>
+    </x-admin.page-header>
 
     <!-- Layout: Image + Form -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -104,12 +109,34 @@
                            class="px-8 py-3 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
                             Cancel Changes
                         </a>
-                        <button type="submit" class="px-10 py-3.5 bg-gradient-to-r from-primary to-indigo-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.05] active:scale-100 transition-all">
+                        <x-admin.button type="submit" size="lg">
                             Save Configurations
-                        </button>
+                        </x-admin.button>
                     </div>
                 </form>
             </div>
+
+            <!-- Additional Info Section -->
+            <div class="mt-8 glass-card p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-soft flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-5">
+                    <div class="size-14 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
+                        <span class="material-symbols-outlined text-3xl">help_center</span>
+                    </div>
+                    <div>
+                        <h5 class="text-base font-black text-slate-900 dark:text-white tracking-tight">Need help with exam modules?</h5>
+                        <p class="text-xs font-medium text-slate-400 mt-0.5">Visit our documentation to learn more about test configuration.</p>
+                    </div>
+                </div>
+                <a href="#" class="inline-flex items-center gap-2 text-primary font-black text-xs uppercase tracking-widest hover:gap-3 transition-all shrink-0">
+                    Read Docs
+                    <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
+
 
             <!-- Additional Info Section -->
             <div class="mt-8 glass-card p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-soft flex flex-col sm:flex-row items-center justify-between gap-6">

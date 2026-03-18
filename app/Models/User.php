@@ -26,6 +26,9 @@ class User extends Authenticatable
         'country',
         'target_band_score',
         'exam_type',
+        'exam_date',
+        'first_name',
+        'last_name',
     ];
 
     /**
@@ -48,6 +51,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'exam_date' => 'date',
         ];
     }
 
