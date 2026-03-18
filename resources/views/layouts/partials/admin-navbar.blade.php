@@ -17,14 +17,18 @@
 
         <div class="h-8 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
 
-        <div class="flex items-center gap-3 pl-2">
+        <a href="{{ route('profile.show') }}" class="flex items-center gap-3 pl-2 hover:opacity-80 transition-opacity">
             <div class="text-right hidden md:block">
                 <p class="text-xs font-bold text-slate-900 dark:text-white">{{ auth()->user()->name }}</p>
-                <p class="text-[10px] text-slate-500 uppercase tracking-widest font-black">Administrator</p>
+                <p class="text-[10px] text-slate-500 uppercase tracking-widest font-black">ID: {{ auth()->user()->id }}-{{ auth()->user()->isAdmin() ? 'ADMIN' : 'STUD' }}</p>
             </div>
-            <div class="size-9 bg-primary/10 rounded-full border-2 border-white dark:border-slate-700 shadow-sm flex items-center justify-center text-primary font-black">
-                {{ substr(auth()->user()->name, 0, 1) }}
+            <div class="size-9 bg-primary/10 rounded-full border-2 border-white dark:border-slate-700 shadow-sm flex items-center justify-center text-primary font-black overflow-hidden">
+                @if(auth()->user()->profile_photo_path)
+                    <img class="w-full h-full object-cover" src="{{ Storage::url(auth()->user()->profile_photo_path) }}" alt="{{ auth()->user()->name }}"/>
+                @else
+                    {{ substr(auth()->user()->name, 0, 1) }}
+                @endif
             </div>
-        </div>
+        </a>
     </div>
 </header>
