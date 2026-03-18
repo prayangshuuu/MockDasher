@@ -1,4 +1,4 @@
-@extends('layouts.student')
+@extends(auth()->check() && auth()->user()->isAdmin() ? 'layouts.admin' : 'layouts.student')
 
 @section('title', 'My Test History')
 
