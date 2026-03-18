@@ -74,32 +74,34 @@
         <!-- Main Content Area -->
         <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
             <!-- Top Header -->
-            <header class="h-20 bg-white/60 backdrop-blur-md border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-40">
-                <div class="flex-1 max-w-md">
-                    <div class="relative group">
-                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">search</span>
-                        <input class="w-full pl-10 pr-4 py-2 bg-slate-100/50 border-transparent focus:border-primary/30 focus:bg-white focus:ring-4 focus:ring-primary/5 rounded-xl text-sm transition-all" placeholder="Search tests, modules..." type="text"/>
-                    </div>
-                </div>
-                
+            <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-8 py-3 flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    <button class="size-10 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-500 relative transition-colors">
+                    @yield('breadcrumbs')
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="relative hidden sm:block">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+                        <input type="text" placeholder="Search tests, modules..." class="pl-10 pr-4 py-1.5 bg-slate-100 dark:bg-slate-800 border-none rounded-lg text-sm w-64 focus:ring-2 focus:ring-primary/20">
+                    </div>
+                    
+                    <button class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors relative">
                         <span class="material-symbols-outlined">notifications</span>
-                        <span class="absolute top-2.5 right-2.5 size-2 bg-red-500 border-2 border-white rounded-full"></span>
+                        <span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"></span>
                     </button>
-                    <div class="h-8 w-[1px] bg-slate-200 mx-2"></div>
+
+                    <div class="h-8 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
+
                     <div class="flex items-center gap-3 pl-2">
-                        <div class="text-right hidden sm:block">
-                            <p class="text-sm font-bold leading-none">{{ auth()->user()->name }}</p>
-                            <p class="text-[11px] text-slate-500 font-medium mt-1">ID: {{ auth()->user()->id }}-STUD</p>
+                        <div class="text-right hidden md:block">
+                            <p class="text-xs font-bold text-slate-900 dark:text-white">{{ auth()->user()->name }}</p>
+                            <p class="text-[10px] text-slate-500 uppercase tracking-widest font-black">ID: {{ auth()->user()->id }}-STUD</p>
                         </div>
-                        <div class="size-10 rounded-xl bg-slate-200 overflow-hidden ring-2 ring-slate-100">
+                        <div class="size-9 bg-primary/10 rounded-full border-2 border-white dark:border-slate-700 shadow-sm flex items-center justify-center text-primary font-black overflow-hidden">
                             @if(auth()->user()->profile_photo_path)
                                 <img class="w-full h-full object-cover" src="{{ Storage::url(auth()->user()->profile_photo_path) }}" alt="{{ auth()->user()->name }}"/>
                             @else
-                                <div class="w-full h-full flex items-center justify-center bg-primary text-white font-bold">
-                                    {{ substr(auth()->user()->name, 0, 1) }}
-                                </div>
+                                {{ substr(auth()->user()->name, 0, 1) }}
                             @endif
                         </div>
                     </div>
