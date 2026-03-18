@@ -68,13 +68,7 @@
                 </div>
             </nav>
 
-            <div class="p-4 mx-4 mb-8 indigo-gradient rounded-2xl text-white shadow-xl shadow-primary/20">
-                <p class="text-xs font-medium opacity-80 mb-1 uppercase tracking-wider">Premium Plan</p>
-                <p class="text-sm font-bold mb-3 leading-tight">Unlock AI Speaking Feedback</p>
-                <button class="w-full py-2 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-lg text-xs font-bold transition-all">
-                    Upgrade Now
-                </button>
-            </div>
+
         </aside>
 
         <!-- Main Content Area -->
