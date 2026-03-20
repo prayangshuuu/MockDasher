@@ -130,16 +130,29 @@
                     </div>
                 </div>
                 <div class="text-4xl font-black text-amber-600 tabular-nums">
-                    <span class="text-slate-300 text-2xl">Pending</span>
+                    @if($attempt->aiWritingEvaluation)
+                        {{ number_format($attempt->aiWritingEvaluation->band_score, 1) }}
+                    @else
+                        <span class="text-slate-300 text-2xl">Pending</span>
+                    @endif
                 </div>
             </div>
             <div class="space-y-4">
                 <div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-slate-200 rounded-full w-0"></div>
+                    @if($attempt->aiWritingEvaluation)
+                        <div class="h-full bg-amber-500 rounded-full transition-all duration-1000" x-data="{ width: '{{ ($attempt->aiWritingEvaluation->band_score ?? 0) * 11 }}%' }" :style="`width: ${width}`"></div>
+                    @else
+                        <div class="h-full bg-slate-200 dark:bg-slate-700 rounded-full w-0"></div>
+                    @endif
                 </div>
                 <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    <span>Automated scoring not yet available</span>
-                    <span>Manual review required</span>
+                    @if($attempt->aiWritingEvaluation)
+                        <span class="text-amber-600">AI Scored</span>
+                        <a href="#writing-feedback" class="underline hover:text-amber-600">View Feedback</a>
+                    @else
+                        <span>Processing with AI...</span>
+                        <span>Evaluation pending</span>
+                    @endif
                 </div>
             </div>
         </div>
@@ -157,21 +170,67 @@
                     </div>
                 </div>
                 <div class="text-4xl font-black text-rose-600 tabular-nums">
-                    <span class="text-slate-300 text-2xl">Pending</span>
+                    @if($attempt->aiSpeakingEvaluation)
+                        {{ number_format($attempt->aiSpeakingEvaluation->band_score, 1) }}
+                    @else
+                        <span class="text-slate-300 text-2xl">Pending</span>
+                    @endif
                 </div>
             </div>
             <div class="space-y-4">
                 <div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-slate-200 rounded-full w-0"></div>
+                    @if($attempt->aiSpeakingEvaluation)
+                        <div class="h-full bg-rose-500 rounded-full transition-all duration-1000" x-data="{ width: '{{ ($attempt->aiSpeakingEvaluation->band_score ?? 0) * 11 }}%' }" :style="`width: ${width}`"></div>
+                    @else
+                        <div class="h-full bg-slate-200 dark:bg-slate-700 rounded-full w-0"></div>
+                    @endif
                 </div>
                 <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    <span>Automated scoring not yet available</span>
-                    <span>Manual review required</span>
+                    @if($attempt->aiSpeakingEvaluation)
+                        <span class="text-rose-600">AI Scored</span>
+                        <a href="#speaking-feedback" class="underline hover:text-rose-600">View Feedback</a>
+                    @else
+                        <span>Processing with AI...</span>
+                        <span>Evaluation pending</span>
+                    @endif
                 </div>
             </div>
         </div>
 
     </div>
+
+    <!-- AI Feedback Details -->
+    @if($attempt->aiWritingEvaluation || $attempt->aiSpeakingEvaluation)
+    <div class="space-y-8">
+        <h2 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">AI Examiner Reports</h2>
+        
+        @if($attempt->aiWritingEvaluation)
+        <div id="writing-feedback" class="bg-white dark:bg-slate-900 rounded-[40px] p-10 md:p-14 border border-amber-200 dark:border-amber-900 shadow-xl shadow-amber-500/5 transition-all">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="size-12 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-lg shadow-amber-500/20">
+                    <span class="material-symbols-outlined">edit_square</span>
+                </div>
+                <h3 class="text-2xl font-black text-slate-900 dark:text-white">Writing Evaluation</h3>
+                <div class="ml-auto text-3xl font-black text-amber-500">Band {{ $attempt->aiWritingEvaluation->band_score }}</div>
+            </div>
+            <div class="prose prose-amber dark:prose-invert max-w-none font-medium leading-relaxed whitespace-pre-wrap text-slate-600 dark:text-slate-300 bg-amber-50/50 dark:bg-amber-950/20 p-8 rounded-3xl border border-amber-100 dark:border-amber-900/50">{{ $attempt->aiWritingEvaluation->evaluation_text }}</div>
+        </div>
+        @endif
+
+        @if($attempt->aiSpeakingEvaluation)
+        <div id="speaking-feedback" class="bg-white dark:bg-slate-900 rounded-[40px] p-10 md:p-14 border border-rose-200 dark:border-rose-900 shadow-xl shadow-rose-500/5 transition-all">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="size-12 rounded-xl bg-rose-500 text-white flex items-center justify-center shadow-lg shadow-rose-500/20">
+                    <span class="material-symbols-outlined">record_voice_over</span>
+                </div>
+                <h3 class="text-2xl font-black text-slate-900 dark:text-white">Speaking Evaluation</h3>
+                <div class="ml-auto text-3xl font-black text-rose-500">Band {{ $attempt->aiSpeakingEvaluation->band_score }}</div>
+            </div>
+            <div class="prose prose-rose dark:prose-invert max-w-none font-medium leading-relaxed whitespace-pre-wrap text-slate-600 dark:text-slate-300 bg-rose-50/50 dark:bg-rose-950/20 p-8 rounded-3xl border border-rose-100 dark:border-rose-900/50">{{ $attempt->aiSpeakingEvaluation->evaluation_text }}</div>
+        </div>
+        @endif
+    </div>
+    @endif
 
     <!-- Call to Action -->
     <div class="flex flex-col sm:flex-row items-center justify-between gap-6 p-10 bg-slate-900 dark:bg-white rounded-[40px]">

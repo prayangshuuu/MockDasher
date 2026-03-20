@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\EvaluateSpeakingSubmission;
 use App\Models\TestAttempt;
 use Illuminate\Http\Request;
 
@@ -45,6 +46,9 @@ class SpeakingTestController extends Controller
             'status' => 'completed',
             'completed_at' => now(),
         ]);
+
+        $transcript = $request->input('transcript', '');
+        EvaluateSpeakingSubmission::dispatch($attempt->id, $transcript);
 
         return redirect()->route('dashboard')->with('success', 'Speaking test submitted successfully.');
     }

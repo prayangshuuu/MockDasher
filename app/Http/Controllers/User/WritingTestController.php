@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\EvaluateWritingSubmission;
 use App\Models\TestAttempt;
 use App\Models\WritingAnswer;
 use Illuminate\Http\Request;
@@ -94,6 +95,8 @@ class WritingTestController extends Controller
             'completed_at' => now(),
         ]);
 
+        EvaluateWritingSubmission::dispatch($attempt->id);
+
         return redirect()->route('dashboard')->with('success', 'Writing test submitted successfully.');
     }
 
@@ -103,6 +106,8 @@ class WritingTestController extends Controller
             'status' => 'completed',
             'completed_at' => now(),
         ]);
+
+        EvaluateWritingSubmission::dispatch($attempt->id);
 
         return redirect()->route('dashboard')->with('success', 'Time expired. Test submitted successfully.');
     }

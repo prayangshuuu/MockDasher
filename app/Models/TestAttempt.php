@@ -55,6 +55,16 @@ class TestAttempt extends Model
             ->where(fn ($q) => $q->where('user_id', $this->user_id));
     }
 
+    public function aiWritingEvaluation()
+    {
+        return $this->hasOne(AiWritingEvaluation::class);
+    }
+
+    public function aiSpeakingEvaluation()
+    {
+        return $this->hasOne(AiSpeakingEvaluation::class);
+    }
+
     public function getOverallBandAttribute(): ?float
     {
         $scores = [];
@@ -69,8 +79,17 @@ class TestAttempt extends Model
             $scores[] = $la->band_score;
         }
 
+        $wa = $this->aiWritingEvaluation;
+        if ($wa) {
+            $scores[] = $wa->band_score;
+        }
+
+        $sa = $this->aiSpeakingEvaluation;
+        if ($sa) {
+            $scores[] = $sa->band_score;
+        }
+
         // A true IELTS test requires 4 modules (Listening, Reading, Writing, Speaking).
-        // Since Writing and Speaking are not fully automated/completed, the overall score IS N/A.
         if (count($scores) < 4) {
             return null;
         }

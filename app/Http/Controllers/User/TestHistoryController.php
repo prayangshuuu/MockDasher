@@ -29,7 +29,14 @@ class TestHistoryController extends Controller
             abort(403);
         }
 
-        $attempt->load(['testSet.test', 'writingAnswers', 'readingAttempt', 'listeningAttempt']);
+        $attempt->load([
+            'testSet.test',
+            'writingAnswers',
+            'readingAttempt',
+            'listeningAttempt',
+            'aiWritingEvaluation',
+            'aiSpeakingEvaluation'
+        ]);
 
         return view('user.history.show', compact('attempt'));
     }
