@@ -24,11 +24,22 @@
                         "display": ["Inter", "sans-serif"]
                     },
                     borderRadius: {
-                        "DEFAULT": "0.5rem",
+                        "xs": "0.375rem",
+                        "sm": "0.5rem",
+                        "base": "0.75rem",
+                        "DEFAULT": "0.75rem",
+                        "md": "0.75rem",
                         "lg": "1rem",
                         "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "3xl": "2.5rem",
                         "full": "9999px"
                     },
+                    boxShadow: {
+                        'soft': 'var(--shadow-soft)',
+                        'premium': 'var(--shadow-premium)',
+                        'lift': 'var(--shadow-lift)',
+                    }
                 },
             },
         }
@@ -48,7 +59,7 @@
                 <p class="mt-2 text-slate-600 dark:text-slate-400">Join thousands of test-takers worldwide</p>
             </div>
 
-            <div class="bg-white dark:bg-slate-900 p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+            <div class="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-premium border border-slate-200 dark:border-slate-800">
                 <form method="POST" action="{{ route('register') }}" class="space-y-5">
                     @csrf
                     
@@ -56,7 +67,7 @@
                         <label class="text-sm font-medium leading-none {{ $errors->has('name') ? 'text-red-500' : '' }}" for="name">Full Name</label>
                         <div class="relative">
                             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">person</span>
-                            <input class="flex h-12 w-full rounded-lg border {{ $errors->has('name') ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200 dark:border-slate-800 focus-visible:ring-primary' }} bg-transparent px-10 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2" id="name" name="name" value="{{ old('name') }}" required autofocus autocomplete="name" placeholder="John Doe" type="text"/>
+                            <input class="flex h-12 w-full rounded-base border {{ $errors->has('name') ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200 dark:border-slate-800 focus-visible:ring-primary' }} bg-transparent px-10 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2" id="name" name="name" value="{{ old('name') }}" required autofocus autocomplete="name" placeholder="John Doe" type="text"/>
                         </div>
                         @error('name')
                             <p class="text-xs text-red-500 mt-1 font-medium">{{ $message }}</p>
@@ -67,7 +78,7 @@
                         <label class="text-sm font-medium leading-none {{ $errors->has('email') ? 'text-red-500' : '' }}" for="email">Email Address</label>
                         <div class="relative">
                             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">mail</span>
-                            <input class="flex h-12 w-full rounded-lg border {{ $errors->has('email') ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200 dark:border-slate-800 focus-visible:ring-primary' }} bg-transparent px-10 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2" id="email" name="email" value="{{ old('email') }}" required autocomplete="email" placeholder="name@example.com" type="email"/>
+                            <input class="flex h-12 w-full rounded-base border {{ $errors->has('email') ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200 dark:border-slate-800 focus-visible:ring-primary' }} bg-transparent px-10 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2" id="email" name="email" value="{{ old('email') }}" required autocomplete="email" placeholder="name@example.com" type="email"/>
                         </div>
                         @error('email')
                             <p class="text-xs text-red-500 mt-1 font-medium">{{ $message }}</p>
@@ -80,7 +91,7 @@
                             <label class="text-sm font-medium leading-none {{ $errors->has('password') ? 'text-red-500' : '' }}" for="password">Password</label>
                             <div class="relative flex items-center">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl z-10 pointer-events-none">lock</span>
-                                <input class="flex h-12 w-full rounded-lg border {{ $errors->has('password') ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200 dark:border-slate-800 focus-visible:ring-primary' }} bg-transparent px-10 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2" id="password" name="password" required autocomplete="new-password" :type="showPassword ? 'text' : 'password'" placeholder="••••••••" />
+                                <input class="flex h-12 w-full rounded-base border {{ $errors->has('password') ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200 dark:border-slate-800 focus-visible:ring-primary' }} bg-transparent px-10 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2" id="password" name="password" required autocomplete="new-password" :type="showPassword ? 'text' : 'password'" placeholder="••••••••" />
                                 <button @click="showPassword = !showPassword" class="absolute right-3 text-slate-400 hover:text-slate-600 focus:outline-none" type="button" tabindex="-1">
                                     <span class="material-symbols-outlined text-[20px]" x-text="showPassword ? 'visibility_off' : 'visibility'">visibility</span>
                                 </button>
@@ -94,7 +105,7 @@
                             <label class="text-sm font-medium leading-none" for="password_confirmation">Confirm Password</label>
                             <div class="relative flex items-center">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl z-10 pointer-events-none">lock_reset</span>
-                                <input class="flex h-12 w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-transparent px-10 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" id="password_confirmation" name="password_confirmation" required autocomplete="new-password" :type="showPassword ? 'text' : 'password'" placeholder="••••••••" />
+                                <input class="flex h-12 w-full rounded-base border border-slate-200 dark:border-slate-800 bg-transparent px-10 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" id="password_confirmation" name="password_confirmation" required autocomplete="new-password" :type="showPassword ? 'text' : 'password'" placeholder="••••••••" />
                             </div>
                         </div>
                     </div>
@@ -106,7 +117,7 @@
                         </label>
                     </div>
                     
-                    <button class="w-full flex items-center justify-center h-12 px-4 py-2 bg-gradient-to-r from-primary to-[#6366f1] text-white text-sm font-semibold rounded-lg shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity active:scale-[0.98]" type="submit">
+                    <button class="w-full flex items-center justify-center h-12 px-4 py-2 bg-gradient-to-r from-primary to-[#6366f1] text-white text-sm font-semibold rounded-base shadow-lift hover:opacity-90 transition-opacity active:scale-[0.98]" type="submit">
                         Get Started
                     </button>
                 </form>
@@ -120,7 +131,7 @@
                     </div>
                 </div>
 
-                <button class="w-full flex items-center justify-center gap-3 h-12 px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-lg text-sm font-medium bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                <button class="w-full flex items-center justify-center gap-3 h-12 px-4 py-2 border border-slate-200 dark:border-slate-800 rounded-base text-sm font-medium bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                     <svg class="h-5 w-5" viewbox="0 0 24 24">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
                         <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>

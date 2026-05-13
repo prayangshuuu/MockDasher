@@ -29,7 +29,7 @@ class SpeakingTestController extends Controller
             return redirect()->route('dashboard')->with('error', 'Test already completed.');
         }
 
-        $speakingQuestions = $attempt->test->speakingQuestions()->orderBy('part')->get();
+        $speakingQuestions = $attempt->testSet->speakingQuestions()->orderBy('part')->get();
 
         $parts = $speakingQuestions->groupBy('part');
 

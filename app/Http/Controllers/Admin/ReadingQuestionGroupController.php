@@ -11,7 +11,7 @@ class ReadingQuestionGroupController extends Controller
 {
     public function create($passageId)
     {
-        $passage = ReadingPassage::with('test')->findOrFail($passageId);
+        $passage = ReadingPassage::with('testSet.test')->findOrFail($passageId);
 
         return view('admin.reading-question-groups.create', compact('passage'));
     }

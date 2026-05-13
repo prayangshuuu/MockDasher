@@ -34,6 +34,11 @@ class ListeningAttempt extends Model
     {
         return $this->hasMany(ListeningAnswer::class, 'test_attempt_id');
     }
+    
+    public function getScoreAttribute(): int
+    {
+        return $this->calculateRawScore();
+    }
 
     public function getBandScoreAttribute(): float
     {

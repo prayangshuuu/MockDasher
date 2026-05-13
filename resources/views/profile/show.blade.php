@@ -16,7 +16,7 @@
     <!-- Sections -->
     <div class="space-y-8">
         <!-- Profile Section Card -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-premium overflow-hidden">
             <div class="p-6 border-b border-slate-100 dark:border-slate-800">
                 <h3 class="text-lg font-semibold">Profile Information</h3>
                 <p class="text-sm text-slate-500">This information will be displayed across the platform.</p>
@@ -43,9 +43,9 @@
                         </div>
                         <div>
                             <div class="flex gap-3 mb-2">
-                                <label for="photo-upload" class="px-4 py-2 text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">Change Photo</label>
+                                <label for="photo-upload" class="px-4 py-2 text-sm font-semibold border border-slate-200 dark:border-slate-700 rounded-base hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer">Change Photo</label>
                                 @if($user->profile_photo_path)
-                                    <button type="button" class="px-4 py-2 text-sm font-semibold text-red-500 border border-transparent hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">Remove</button>
+                                    <button type="button" class="px-4 py-2 text-sm font-semibold text-red-500 border border-transparent hover:bg-red-50 dark:hover:bg-red-900/20 rounded-base transition-colors">Remove</button>
                                 @endif
                             </div>
                             <p class="text-xs text-slate-400 leading-relaxed">JPG, GIF or PNG. Max size of 2MB.</p>
@@ -56,23 +56,23 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-slate-700 dark:text-slate-300">First Name</label>
-                            <input name="first_name" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none" type="text" value="{{ old('first_name', $user->first_name) }}"/>
+                            <input name="first_name" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-base text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none" type="text" value="{{ old('first_name', $user->first_name) }}"/>
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Last Name</label>
-                            <input name="last_name" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none" type="text" value="{{ old('last_name', $user->last_name) }}"/>
+                            <input name="last_name" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-base text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none" type="text" value="{{ old('last_name', $user->last_name) }}"/>
                         </div>
                         <div class="space-y-2 md:col-span-2">
                             <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Email Address</label>
                             <div class="relative">
                                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">mail</span>
-                                <input name="email" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none" type="email" value="{{ old('email', $user->email) }}"/>
+                                <input name="email" class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-base text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none" type="email" value="{{ old('email', $user->email) }}"/>
                             </div>
                         </div>
                     </div>
                     
                     <div class="mt-8 flex justify-end">
-                        <button type="submit" class="px-8 py-3 bg-gradient-to-r from-[#5048e5] to-[#7c3aed] text-white text-sm font-bold rounded-lg shadow-lg shadow-primary/20 hover:shadow-xl hover:translate-y-[-1px] transition-all">
+                        <button type="submit" class="px-8 py-3 bg-gradient-to-r from-[#5048e5] to-[#7c3aed] text-white text-sm font-bold rounded-base shadow-lg shadow-primary/20 hover:shadow-xl hover:translate-y-[-1px] transition-all">
                             Save Profile Changes
                         </button>
                     </div>
@@ -81,7 +81,7 @@
         </div>
 
         <!-- Password Section Card -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-premium overflow-hidden">
             <div class="p-6 border-b border-slate-100 dark:border-slate-800">
                 <h3 class="text-lg font-semibold">Security</h3>
                 <p class="text-sm text-slate-500">Update your password and security settings.</p>
@@ -94,20 +94,20 @@
                     <div class="grid grid-cols-1 gap-6 max-w-lg">
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Current Password</label>
-                            <input name="current_password" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none" placeholder="••••••••" type="password"/>
+                            <input name="current_password" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-base text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none" placeholder="••••••••" type="password"/>
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-slate-700 dark:text-slate-300">New Password</label>
-                            <input name="password" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none" type="password" required/>
+                            <input name="password" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-base text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none" type="password" required/>
                         </div>
                         <div class="space-y-2">
                             <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Confirm New Password</label>
-                            <input name="password_confirmation" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none" type="password" required/>
+                            <input name="password_confirmation" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-base text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none" type="password" required/>
                         </div>
                     </div>
                     
                     <div class="mt-8 flex justify-end">
-                        <button type="submit" class="px-8 py-3 bg-slate-900 text-white text-sm font-bold rounded-lg shadow-lg hover:shadow-xl hover:translate-y-[-1px] transition-all">
+                        <button type="submit" class="px-8 py-3 bg-slate-900 text-white text-sm font-bold rounded-base shadow-lg hover:shadow-xl hover:translate-y-[-1px] transition-all">
                             Update Password
                         </button>
                     </div>
@@ -122,7 +122,7 @@
                     <h4 class="text-red-700 dark:text-red-400 font-bold">Delete Account</h4>
                     <p class="text-sm text-red-600/80 dark:text-red-400/60 leading-relaxed">Once you delete your account, there is no going back. All your mock test history and analysis will be lost.</p>
                 </div>
-                <button type="button" onclick="openDeleteModal()" class="px-4 py-2 text-sm font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors">Delete Account</button>
+                <button type="button" onclick="openDeleteModal()" class="px-4 py-2 text-sm font-bold text-white bg-red-600 rounded-base hover:bg-red-700 transition-colors">Delete Account</button>
             </div>
         </div>
     </div>

@@ -29,7 +29,8 @@ class ListeningTestController extends Controller
         }
 
         $test = $attempt->test;
-        $sections = $test->listeningSections()->with(['questions.options'])->orderBy('section_number')->get();
+        $testSet = $attempt->testSet;
+        $sections = $testSet->listeningSections()->with(['questions.options'])->orderBy('section_number')->get();
 
         if ($sections->isEmpty()) {
             return redirect()->route('dashboard')->with('error', 'No listening sections configured for this test.');

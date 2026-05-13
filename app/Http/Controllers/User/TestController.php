@@ -18,12 +18,18 @@ class TestController extends Controller
             return view('user.tests.placeholder', compact('test'));
         }
 
+        // Get the first test set for this test (default)
+        $testSet = $test->testSets()->first();
+        if (! $testSet) {
+            return redirect()->route('dashboard')->with('error', 'No test sets found for this test.');
+        }
+
         // Handle specific module starts
         if ($request->module === 'writing') {
             /** @var TestAttempt $attempt */
             $attempt = TestAttempt::query()->firstOrCreate([
                 'user_id' => auth()->id(),
-                'test_id' => $test->id,
+                'test_set_id' => $testSet->id,
                 'status' => 'writing',
             ]);
 
@@ -34,7 +40,7 @@ class TestController extends Controller
             /** @var TestAttempt $attempt */
             $attempt = TestAttempt::query()->firstOrCreate([
                 'user_id' => auth()->id(),
-                'test_id' => $test->id,
+                'test_set_id' => $testSet->id,
                 'status' => 'speaking',
             ]);
 
@@ -45,7 +51,7 @@ class TestController extends Controller
             /** @var ListeningAttempt $attempt */
             $attempt = ListeningAttempt::query()->firstOrCreate([
                 'user_id' => auth()->id(),
-                'test_id' => $test->id,
+                'test_set_id' => $testSet->id,
             ]);
             if ($attempt->wasRecentlyCreated) {
                 $attempt->update([
@@ -60,7 +66,7 @@ class TestController extends Controller
         if ($request->module === 'reading') {
             /** @var ReadingAttempt $attempt */
             $attempt = ReadingAttempt::query()->firstOrCreate(
-                ['user_id' => auth()->id(), 'test_id' => $test->id]
+                ['user_id' => auth()->id(), 'test_set_id' => $testSet->id]
             );
             if ($attempt->wasRecentlyCreated) {
                 $attempt->update(['status' => 'in_progress']);

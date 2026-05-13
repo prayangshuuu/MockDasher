@@ -49,6 +49,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tests/attempts/{attempt}/reading', [ReadingTestController::class, 'show'])->name('user.reading.show');
     Route::post('/tests/attempts/{attempt}/reading/autosave', [ReadingTestController::class, 'autosave'])->name('user.reading.autosave');
     Route::post('/tests/attempts/{attempt}/reading/submit', [ReadingTestController::class, 'submit'])->name('user.reading.submit');
+    Route::get('/tests/attempts/{attempt}/reading/result', [ReadingTestController::class, 'result'])->name('user.reading.result');
 
     // Profile & History Routes
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');

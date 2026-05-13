@@ -25,11 +25,22 @@
                             "display": ["Inter", "sans-serif"]
                         },
                         borderRadius: {
-                            "DEFAULT": "0.5rem",
+                            "xs": "0.375rem",
+                            "sm": "0.5rem",
+                            "base": "0.75rem",
+                            "DEFAULT": "0.75rem",
+                            "md": "0.75rem",
                             "lg": "1rem",
                             "xl": "1.5rem",
+                            "2xl": "2rem",
+                            "3xl": "2.5rem",
                             "full": "9999px"
                         },
+                        boxShadow: {
+                            'soft': 'var(--shadow-soft)',
+                            'premium': 'var(--shadow-premium)',
+                            'lift': 'var(--shadow-lift)',
+                        }
                     },
                 },
             }
@@ -39,34 +50,63 @@
 <body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
     
 <!-- Navbar -->
-<nav class="fixed top-0 left-0 right-0 z-50 glass-nav">
-    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<nav x-data="{ mobileMenuOpen: false }" class="fixed top-0 left-0 right-0 z-50 glass-nav">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 h-20 flex items-center justify-between">
         <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white">
-                <span class="material-symbols-outlined">bolt</span>
+            <div class="w-10 h-10 bg-primary rounded-base flex items-center justify-center text-white shadow-lift">
+                <span class="material-symbols-outlined text-2xl">bolt</span>
             </div>
             <span class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">MockDasher</span>
         </div>
-        <div class="hidden md:flex items-center gap-10">
-            <a class="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="#features">Features</a>
-            <a class="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="{{ route('login') }}">Sign In</a>
-        </div>
-        <div class="flex items-center gap-4">
+        
+        <!-- Desktop Nav -->
+        <div class="hidden md:flex items-center gap-8">
+            <a class="text-sm font-bold text-slate-600 hover:text-primary transition-colors" href="#features">Features</a>
             @auth
-                <a href="{{ url('/dashboard') }}" class="px-5 py-2 text-sm font-semibold text-slate-700 hover:text-primary transition-colors">Dashboard</a>
+                <a href="{{ url('/dashboard') }}" class="text-sm font-bold text-slate-600 hover:text-primary transition-colors">Dashboard</a>
+            @else
+                <a class="text-sm font-bold text-slate-600 hover:text-primary transition-colors" href="{{ route('login') }}">Sign In</a>
+            @endauth
+            @auth
                 <form method="POST" action="{{ route('logout') }}" class="inline">
                     @csrf
-                    <button type="submit" class="inline-flex justify-center items-center bg-primary hover:bg-indigo-500 text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-md shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5 transition-all duration-300">
+                    <button type="submit" class="bg-primary hover:bg-indigo-500 text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-lift hover:shadow-indigo-500/50 transition-all duration-300">
                         Log Out
                     </button>
                 </form>
             @else
-                <a href="{{ route('login') }}" class="px-5 py-2 text-sm font-semibold text-slate-700 hover:text-primary transition-colors">Sign In</a>
-                @if (Route::has('register'))
-                    <a href="{{ route('register') }}" class="inline-flex justify-center items-center bg-primary hover:bg-indigo-500 text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-md shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-0.5 transition-all duration-300">
-                        Start Free
-                    </a>
-                @endif
+                <a href="{{ route('register') }}" class="bg-primary hover:bg-indigo-500 text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-lift hover:shadow-indigo-500/50 transition-all duration-300">
+                    Get Started
+                </a>
+            @endauth
+        </div>
+
+        <!-- Mobile Nav Toggle -->
+        <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 text-slate-900 dark:text-white">
+            <span class="material-symbols-outlined text-3xl" x-text="mobileMenuOpen ? 'close' : 'menu'">menu</span>
+        </button>
+    </div>
+
+    <!-- Mobile Nav Menu -->
+    <div x-show="mobileMenuOpen" 
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 -translate-y-4"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 -translate-y-4"
+         class="md:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-6 absolute top-20 left-0 right-0 shadow-xl">
+        <div class="flex flex-col gap-4">
+            <a class="text-lg font-bold text-slate-900 dark:text-white" href="#features" @click="mobileMenuOpen = false">Features</a>
+            @auth
+                <a class="text-lg font-bold text-slate-900 dark:text-white" href="{{ url('/dashboard') }}">Dashboard</a>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="w-full bg-primary text-white py-4 rounded-xl font-bold shadow-lift">Log Out</button>
+                </form>
+            @else
+                <a class="text-lg font-bold text-slate-900 dark:text-white" href="{{ route('login') }}">Sign In</a>
+                <a class="w-full bg-primary text-white py-4 rounded-xl font-bold text-center shadow-lift" href="{{ route('register') }}">Get Started</a>
             @endauth
         </div>
     </div>
@@ -90,17 +130,17 @@
                 A clean, distraction-free environment mirroring the computer-delivered IELTS format. Get real-time feedback and detailed band score analysis.
             </p>
             <div class="flex flex-wrap gap-4 pt-4">
-                <a href="{{ route('register') }}" class="inline-flex justify-center items-center bg-primary hover:bg-indigo-500 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:-translate-y-1 transition-all duration-300">
+                <a href="{{ route('register') }}" class="inline-flex justify-center items-center bg-primary hover:bg-indigo-500 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lift hover:shadow-indigo-500/50 hover:-translate-y-1 transition-all duration-300">
                     Start Practicing
                 </a>
-                <a href="#features" class="inline-flex justify-center items-center bg-white hover:bg-slate-50 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white border border-slate-200 dark:border-slate-700 px-8 py-4 rounded-xl font-bold text-lg hover:-translate-y-1 transition-all duration-300">
+                <a href="#features" class="inline-flex justify-center items-center bg-white hover:bg-slate-50 text-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-white border border-slate-200 dark:border-slate-700 px-8 py-4 rounded-xl font-bold text-lg hover:-translate-y-1 hover:shadow-premium transition-all duration-300">
                     Explore Features
                 </a>
             </div>
         </div>
         <div class="relative">
             <div class="absolute -inset-4 bg-gradient-to-r from-primary to-violet-500 opacity-20 blur-3xl rounded-full"></div>
-            <div class="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden aspect-[4/3] flex flex-col">
+            <div class="relative bg-white dark:bg-slate-900 rounded-3xl shadow-premium border border-slate-200 dark:border-slate-800 overflow-hidden aspect-[4/3] flex flex-col">
                 <div class="bg-slate-100 dark:bg-slate-800 px-4 py-2 flex items-center gap-2 border-b border-slate-200 dark:border-slate-700">
                     <div class="flex gap-1.5">
                         <div class="w-3 h-3 rounded-full bg-red-400"></div>
@@ -117,17 +157,17 @@
                             <div class="h-2 bg-slate-100 dark:bg-slate-800 rounded"></div>
                             <div class="h-2 bg-slate-100 dark:bg-slate-800 rounded w-5/6"></div>
                         </div>
-                        <div class="h-40 bg-slate-50 dark:bg-slate-800/50 rounded-lg flex items-center justify-center">
+                        <div class="h-40 bg-slate-50 dark:bg-slate-800/50 rounded-xl flex items-center justify-center">
                             <span class="material-symbols-outlined text-slate-300 text-4xl">image</span>
                         </div>
                     </div>
                     <div class="w-1/2 border-l border-slate-100 dark:border-slate-800 pl-6 flex flex-col gap-6">
                         <div class="h-8 w-8 rounded bg-primary/20 flex items-center justify-center text-primary font-bold">1</div>
                         <div class="space-y-4">
-                            <div class="h-10 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"></div>
-                            <div class="h-10 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"></div>
+                            <div class="h-10 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-base"></div>
+                            <div class="h-10 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-base"></div>
                         </div>
-                        <div class="mt-auto h-12 bg-primary rounded-lg flex items-center justify-center text-white text-sm font-bold">Next Question</div>
+                        <div class="mt-auto h-12 bg-primary rounded-base flex items-center justify-center text-white text-sm font-bold">Next Question</div>
                     </div>
                 </div>
             </div>
@@ -158,36 +198,36 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <!-- Feature 1 -->
-            <div class="feature-card bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-100 dark:border-slate-800 transition-all cursor-default">
-                <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-primary mb-6">
-                    <span class="material-symbols-outlined">laptop_mac</span>
-                </div>
-                <h3 class="text-xl font-bold mb-3 dark:text-white">Real Interface</h3>
-                <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Experience the exact UI and controls used in the actual computer-delivered IELTS exam.</p>
-            </div>
+            <div class="feature-card bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-premium hover:shadow-lift hover:-translate-y-1 transition-all cursor-default">
+    <div class="size-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-primary mb-6 shadow-sm">
+        <span class="material-symbols-outlined text-2xl font-light">laptop_mac</span>
+    </div>
+    <h3 class="text-xl font-black mb-3 dark:text-white tracking-tight">Real Interface</h3>
+    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">Experience the exact UI and controls used in the actual computer-delivered IELTS exam.</p>
+</div>
             <!-- Feature 2 -->
-            <div class="feature-card bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-100 dark:border-slate-800 transition-all cursor-default">
-                <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-primary mb-6">
-                    <span class="material-symbols-outlined">edit_note</span>
+            <div class="feature-card bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-premium hover:shadow-lift hover:-translate-y-1 transition-all cursor-default">
+                <div class="size-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-primary mb-6 shadow-sm">
+                    <span class="material-symbols-outlined text-2xl font-light">edit_note</span>
                 </div>
-                <h3 class="text-xl font-bold mb-3 dark:text-white">Writing Counter</h3>
-                <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Live word counts and time management alerts to keep your essays on track and structured.</p>
+                <h3 class="text-xl font-black mb-3 dark:text-white tracking-tight">Writing Counter</h3>
+                <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">Live word counts and time management alerts to keep your essays on track and structured.</p>
             </div>
             <!-- Feature 3 -->
-            <div class="feature-card bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-100 dark:border-slate-800 transition-all cursor-default">
-                <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-primary mb-6">
-                    <span class="material-symbols-outlined">mic</span>
+            <div class="feature-card bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-premium hover:shadow-lift hover:-translate-y-1 transition-all cursor-default">
+                <div class="size-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-primary mb-6 shadow-sm">
+                    <span class="material-symbols-outlined text-2xl font-light">mic</span>
                 </div>
-                <h3 class="text-xl font-bold mb-3 dark:text-white">Speaking Practice</h3>
-                <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">AI-powered speaking modules with voice recognition and immediate fluency feedback.</p>
+                <h3 class="text-xl font-black mb-3 dark:text-white tracking-tight">Speaking Practice</h3>
+                <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">AI-powered speaking modules with voice recognition and immediate fluency feedback.</p>
             </div>
             <!-- Feature 4 -->
-            <div class="feature-card bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-100 dark:border-slate-800 transition-all cursor-default">
-                <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-primary mb-6">
-                    <span class="material-symbols-outlined">menu_book</span>
+            <div class="feature-card bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-premium hover:shadow-lift hover:-translate-y-1 transition-all cursor-default">
+                <div class="size-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-primary mb-6 shadow-sm">
+                    <span class="material-symbols-outlined text-2xl font-light">menu_book</span>
                 </div>
-                <h3 class="text-xl font-bold mb-3 dark:text-white">Full Modules</h3>
-                <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Comprehensive tests for Listening and Reading with automatic grading and explanations.</p>
+                <h3 class="text-xl font-black mb-3 dark:text-white tracking-tight">Full Modules</h3>
+                <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">Comprehensive tests for Listening and Reading with automatic grading and explanations.</p>
             </div>
         </div>
     </div>
@@ -195,7 +235,7 @@
 
 <!-- Progress Highlight -->
 <section class="mx-6 mb-24">
-    <div class="max-w-7xl mx-auto bg-gradient-to-br from-primary to-violet-700 rounded-[2.5rem] overflow-hidden relative p-8 md:p-16 lg:p-24">
+    <div class="max-w-7xl mx-auto bg-gradient-to-br from-primary to-violet-700 rounded-3xl overflow-hidden relative p-8 md:p-16 lg:p-24 shadow-lift">
         <div class="absolute inset-0 opacity-10 dot-pattern"></div>
         <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div class="text-white space-y-6">
@@ -214,7 +254,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-premium">
                 <div class="flex items-center justify-between mb-8">
                     <span class="text-white font-bold">Estimated Band Score</span>
                     <span class="bg-emerald-400 text-slate-900 px-3 py-1 rounded-full text-xs font-bold">+1.5 Improvement</span>
@@ -246,7 +286,7 @@
         <h2 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">Ready to boost your score?</h2>
         <p class="text-xl text-slate-600 dark:text-slate-400">Join thousands of students who have already achieved their dream scores using MockDasher.</p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="{{ route('register') }}" class="inline-flex justify-center items-center bg-primary hover:bg-indigo-500 text-white px-10 py-5 rounded-2xl font-bold text-xl shadow-xl shadow-indigo-500/40 hover:shadow-indigo-500/60 hover:-translate-y-1 transition-all duration-300">
+            <a href="{{ route('register') }}" class="inline-flex justify-center items-center bg-primary hover:bg-indigo-500 text-white px-10 py-5 rounded-2xl font-bold text-xl shadow-lift hover:shadow-indigo-500/60 hover:-translate-y-1 transition-all duration-300">
                 Create Your Free Account
             </a>
         </div>

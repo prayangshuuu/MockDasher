@@ -25,16 +25,17 @@ class ReadingTestController extends Controller
         }
 
         // Enforce 60-minute limit
-        $elapsedSeconds = now()->diffInSeconds($attempt->started_at);
+        $elapsedSeconds = (int) now()->diffInSeconds($attempt->started_at);
         $totalSeconds = 3600; // 60 minutes
-        $remainingSeconds = max(0, $totalSeconds - $elapsedSeconds);
+        $remainingSeconds = (int) max(0, $totalSeconds - $elapsedSeconds);
 
         if ($remainingSeconds <= 0) {
             return $this->forceSubmit($attempt);
         }
 
-        $test = $attempt->test;
-        $passages = $test->readingPassages()
+        $testSet = $attempt->testSet;
+        $test = $testSet->test;
+        $passages = $testSet->readingPassages()
             ->with(['questionGroups' => fn ($q) => $q->with(['questions.options'])])
             ->orderBy('passage_number')
             ->get();
@@ -130,15 +131,49 @@ class ReadingTestController extends Controller
             }
         }
 
+        // Mark completed
         $attempt->update(['status' => 'completed', 'completed_at' => now()]);
 
-        return redirect()->route('dashboard')->with('success', 'Reading test submitted successfully!');
+        // Evaluate answers and persist score + band
+        $result = $attempt->evaluate();
+
+        return redirect()->route('user.reading.result', $attempt->id);
+    }
+
+    /**
+     * Show the result page after submission.
+     */
+    public function result(ReadingAttempt $attempt)
+    {
+        if ((int) $attempt->user_id !== (int) auth()->id()) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        if ($attempt->status !== 'completed') {
+            return redirect()->route('user.reading.show', $attempt->id);
+        }
+
+        $testSet = $attempt->testSet;
+        $test = $testSet->test;
+        $passages = $testSet->readingPassages()
+            ->with(['questionGroups' => fn ($q) => $q->with(['questions.options'])])
+            ->orderBy('passage_number')
+            ->get();
+
+        $answers = $attempt->answers()->with('question')->get()->keyBy('question_id');
+
+        $totalQuestions = $passages->flatMap(fn($p) => $p->questionGroups->flatMap(fn($g) => $g->questions))->count();
+
+        return view('user.reading-test.result', compact(
+            'attempt', 'test', 'passages', 'answers', 'totalQuestions'
+        ));
     }
 
     protected function forceSubmit(ReadingAttempt $attempt)
     {
         $attempt->update(['status' => 'completed', 'completed_at' => now()]);
+        $attempt->evaluate();
 
-        return redirect()->route('dashboard')->with('success', 'Time expired. Reading test submitted automatically.');
+        return redirect()->route('user.reading.result', $attempt->id);
     }
 }

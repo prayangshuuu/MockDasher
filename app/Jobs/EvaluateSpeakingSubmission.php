@@ -30,21 +30,21 @@ class EvaluateSpeakingSubmission implements ShouldQueue
      */
     public function handle(GeminiEvaluationService $service): void
     {
-        $attempt = TestAttempt::with(['test.speakingQuestions'])->find($this->testAttemptId);
+        $attempt = TestAttempt::with(['testSet.speakingQuestions'])->find($this->testAttemptId);
 
         if (!$attempt) {
             Log::error("EvaluateSpeakingSubmission: TestAttempt {$this->testAttemptId} not found.");
             return;
         }
 
-        $questionsRaw = $attempt->test->speakingQuestions()->orderBy('part')->get();
+        $questionsRaw = $attempt->testSet->speakingQuestions()->orderBy('part')->get();
         if ($questionsRaw->isEmpty()) {
             return;
         }
 
         $questions = [];
         foreach ($questionsRaw as $q) {
-            $questions[] = "Part {$q->part}: {$q->prompt_text}";
+            $questions[] = "Part {$q->part}: {$q->question_text}";
         }
 
         $transcriptToUse = empty(trim($this->transcript)) ? "No transcript provided by user." : strip_tags($this->transcript);

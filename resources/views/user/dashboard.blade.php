@@ -23,12 +23,12 @@
 
 <!-- Stats Grid -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-    <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100 flex items-center justify-between">
+    <div class="bg-white p-6 rounded-2xl shadow-premium border border-slate-100 flex items-center justify-between group hover:border-primary/30 transition-all">
         <div>
-            <p class="text-slate-500 text-sm font-medium">{{ __('messages.target_score') }}</p>
-            <p class="text-2xl font-bold mt-1 text-slate-900">{{ number_format($targetScore, 1) }} <span class="text-sm font-medium text-slate-400">/ 9.0</span></p>
+            <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">{{ __('messages.target_score') }}</p>
+            <p class="text-3xl font-black mt-1 text-slate-900">{{ number_format($targetScore, 1) }} <span class="text-xs font-medium text-slate-400">/ 9.0</span></p>
         </div>
-        <div class="relative size-14">
+        <div class="relative size-14 group-hover:scale-110 transition-transform">
             <svg class="size-full -rotate-90" viewbox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
                 <circle class="stroke-slate-100" cx="18" cy="18" fill="none" r="16" stroke-width="3"></circle>
                 <circle class="stroke-primary" cx="18" cy="18" fill="none" r="16" stroke-dasharray="100" stroke-dashoffset="{{ 100 - (min(9, $targetScore) / 9 * 100) }}" stroke-linecap="round" stroke-width="3"></circle>
@@ -37,43 +37,45 @@
         </div>
     </div>
     
-    <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100">
-        <p class="text-slate-500 text-sm font-medium">{{ __('messages.tests_taken') }}</p>
+    <div class="bg-white p-6 rounded-2xl shadow-premium border border-slate-100 group hover:border-emerald-500/30 transition-all">
+        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">{{ __('messages.tests_taken') }}</p>
         <div class="flex items-end justify-between mt-1">
-            <p class="text-2xl font-bold text-slate-900">{{ $testsTakenCount }}</p>
-            <span class="bg-emerald-50 text-emerald-600 text-[10px] px-2 py-0.5 rounded-full font-bold mb-1">+{{ $user->testAttempts()->where('created_at', '>=', now()->startOfWeek())->count() }} this week</span>
+            <p class="text-3xl font-black text-slate-900">{{ $testsTakenCount }}</p>
+            <span class="bg-emerald-50 text-emerald-600 text-[10px] px-2 py-0.5 rounded-full font-bold mb-1 shadow-sm">+{{ $user->testAttempts()->where('created_at', '>=', now()->startOfWeek())->count() }} this week</span>
         </div>
-        <div class="w-full bg-slate-100 h-1.5 rounded-full mt-4">
-            <div class="bg-emerald-500 h-1.5 rounded-full" x-data="{ width: '{{ min(100, ($testsTakenCount / 20) * 100) }}%' }" :style="`width: ${width}`"></div>
+        <div class="w-full bg-slate-100 h-1.5 rounded-full mt-4 overflow-hidden">
+            <div class="bg-emerald-500 h-1.5 rounded-full transition-all duration-1000" x-data="{ width: '{{ min(100, ($testsTakenCount / 20) * 100) }}%' }" :style="`width: ${width}`"></div>
         </div>
     </div>
     
-    <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100">
-        <p class="text-slate-500 text-sm font-medium">{{ __('messages.avg_band_score') }}</p>
+    <div class="bg-white p-6 rounded-2xl shadow-premium border border-slate-100 group hover:border-indigo-500/30 transition-all">
+        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">{{ __('messages.avg_band_score') }}</p>
         <div class="flex items-end justify-between mt-1">
-            <p class="text-2xl font-bold text-slate-900">{{ $avgBandScore !== null ? number_format($avgBandScore, 1) : 'N/A' }}</p>
+            <p class="text-3xl font-black text-slate-900">{{ $avgBandScore !== null ? number_format($avgBandScore, 1) : 'N/A' }}</p>
             @if($avgBandScore !== null)
-                <span class="bg-indigo-50 text-indigo-600 text-[10px] px-2 py-0.5 rounded-full font-bold mb-1">Band {{ number_format($avgBandScore, 1) }}</span>
+                <span class="bg-indigo-50 text-indigo-600 text-[10px] px-2 py-0.5 rounded-full font-bold mb-1 shadow-sm">Band {{ number_format($avgBandScore, 1) }}</span>
             @endif
         </div>
         <div class="flex gap-1 mt-4">
             @for($i = 0; $i < 5; $i++)
-                <div class="flex-1 h-3 {{ $avgBandScore !== null && $i < floor($avgBandScore - 2) ? 'bg-indigo-500' : 'bg-indigo-100' }} rounded-sm"></div>
+                <div class="flex-1 h-2 {{ $avgBandScore !== null && $i < floor($avgBandScore - 2) ? 'bg-indigo-500' : 'bg-slate-100' }} rounded-full"></div>
             @endfor
         </div>
     </div>
     
-    <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100 border-l-4 border-l-orange-500">
-        <p class="text-slate-500 text-sm font-medium">{{ __('messages.days_to_exam') }}</p>
-        <p class="text-2xl font-bold mt-1 text-slate-900">
+    <div class="bg-white p-6 rounded-2xl shadow-premium border border-slate-100 border-l-4 border-l-orange-500 group hover:border-orange-500/30 transition-all">
+        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">{{ __('messages.days_to_exam') }}</p>
+        <p class="text-3xl font-black mt-1 text-slate-900">
             {{ $daysToExam ?? 'N/A' }} 
             @if($user->exam_date)
-                <span class="text-xs font-normal text-slate-400">{{ $user->exam_date->format('M d, Y') }}</span>
+                <span class="text-xs font-black text-slate-400 uppercase">{{ $user->exam_date->format('M d') }}</span>
             @endif
         </p>
-        <div class="flex items-center gap-1 mt-4 text-orange-600">
-            <span class="material-symbols-outlined text-sm">schedule</span>
-            <span class="text-[10px] font-bold uppercase tracking-widest">Time to intensity up</span>
+        <div class="flex items-center gap-2 mt-4 text-orange-600">
+            <div class="size-5 bg-orange-50 rounded-base flex items-center justify-center">
+                <span class="material-symbols-outlined text-[14px]">schedule</span>
+            </div>
+            <span class="text-[10px] font-black uppercase tracking-widest">Intensity Required</span>
         </div>
     </div>
 </div>
@@ -81,7 +83,7 @@
 <!-- Performance Insights Section -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
     <!-- Score Chart -->
-    <div class="lg:col-span-2 bg-white p-8 rounded-3xl shadow-layered border border-slate-100 relative overflow-hidden">
+    <div class="lg:col-span-2 bg-white p-8 rounded-3xl shadow-premium border border-slate-100 relative overflow-hidden">
         <div class="flex items-center justify-between mb-8">
             <div>
                 <h3 class="text-lg font-bold text-slate-900">{{ __('messages.score_improvement') }}</h3>
@@ -121,22 +123,22 @@
     </div>
     
     <!-- Radar/Module Breakdown -->
-    <div class="bg-white p-8 rounded-3xl shadow-layered border border-slate-100">
-        <h3 class="text-lg font-bold text-slate-900 mb-6">{{ __('messages.module_breakdown') }}</h3>
+    <div class="bg-white p-8 rounded-3xl shadow-premium border border-slate-100 group">
+        <h3 class="text-lg font-black text-slate-900 mb-6 uppercase tracking-tight">{{ __('messages.module_breakdown') }}</h3>
         <div class="space-y-6">
             @foreach($moduleBreakdown as $module)
                 <div>
-                    <div class="flex justify-between text-xs font-bold mb-2">
-                        <span class="text-slate-600">{{ $module['name'] }}</span>
+                    <div class="flex justify-between text-[10px] font-black uppercase tracking-widest mb-2">
+                        <span class="text-slate-500">{{ $module['name'] }}</span>
                         @if($module['score'] !== null)
-                            <span class="{{ $module['type'] === 'primary' ? 'text-primary' : 'text-slate-300' }}">{{ number_format($module['score'], 1) }}</span>
+                            <span class="{{ $module['type'] === 'primary' ? 'text-primary' : 'text-slate-400' }}">{{ number_format($module['score'], 1) }}</span>
                         @else
-                            <span class="text-slate-400">Pending</span>
+                            <span class="text-slate-300">N/A</span>
                         @endif
                     </div>
                     <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                         @if($module['score'] !== null)
-                            <div class="{{ $module['type'] === 'primary' ? 'bg-primary' : 'bg-slate-300' }} h-full rounded-full" x-data="{ width: '{{ $module['percentage'] }}%' }" :style="`width: ${width}`"></div>
+                            <div class="{{ $module['type'] === 'primary' ? 'bg-primary' : 'bg-slate-400' }} h-full rounded-full transition-all duration-1000" x-data="{ width: '{{ $module['percentage'] }}%' }" :style="`width: ${width}`"></div>
                         @else
                             <div class="bg-slate-200 h-full rounded-full w-0"></div>
                         @endif
@@ -144,8 +146,8 @@
                 </div>
             @endforeach
         </div>
-        <a href="{{ route('user.history.index') }}" class="block w-full mt-8 py-3 rounded-xl border-2 border-slate-100 text-slate-600 text-sm font-bold hover:bg-slate-50 transition-colors text-center">
-            View Detailed Analysis
+        <a href="{{ route('user.history.index') }}" class="block w-full mt-8 py-3 rounded-xl border-2 border-slate-50 text-slate-400 text-xs font-black uppercase tracking-widest hover:bg-slate-50 hover:text-primary transition-all text-center">
+            Detailed Analysis
         </a>
     </div>
 </div>
@@ -158,7 +160,7 @@
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         @forelse($recommendedTests as $test)
-            <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-100 hover-lift flex flex-col group">
+            <div class="bg-white p-6 rounded-2xl shadow-premium border border-slate-100 hover-lift flex flex-col group">
                 <div class="flex items-center justify-between mb-4">
                     <span class="bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">{{ $test->exam_type }}</span>
                     <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase">{{ __('messages.new') ?? 'New' }}</span>
@@ -194,7 +196,7 @@
 </div>
 
 <!-- Recent Activity/History -->
-<div class="bg-white rounded-3xl shadow-soft border border-slate-100 overflow-hidden">
+<div class="bg-white rounded-3xl shadow-premium border border-slate-100 overflow-hidden">
     <div class="p-6 border-b border-slate-100 flex items-center justify-between">
         <h3 class="text-lg font-bold text-slate-900">{{ __('messages.recent_test_history') }}</h3>
         <button class="text-slate-400 hover:text-slate-600"><span class="material-symbols-outlined">more_horiz</span></button>

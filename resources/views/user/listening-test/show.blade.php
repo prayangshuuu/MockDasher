@@ -40,7 +40,7 @@
 @endsection
 
 @section('content')
-<div x-data="listeningApp('{{ Storage::url($test->audio_path) }}', '{{ route('user.listening.autosave', $attempt->id) }}', '{{ route('user.listening.submit', $attempt->id) }}')"
+<div x-data="listeningApp('{{ $sections->first() ? Storage::url($sections->first()->audio_path) : '' }}', '{{ route('user.listening.autosave', $attempt->id) }}', '{{ route('user.listening.submit', $attempt->id) }}')"
      class="flex-1 flex flex-col overflow-hidden"
      @trigger-review.window="showReview = true">
     
@@ -84,7 +84,7 @@
         <!-- Question List -->
         <div class="flex-1 overflow-y-auto custom-scrollbar bg-slate-50 dark:bg-slate-900/50 p-12">
             <div class="max-w-4xl mx-auto space-y-10">
-                @foreach($test->sections as $section)
+                @foreach($sections as $section)
                     <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-sm bg-white dark:bg-slate-900/40 p-10 rounded-[40px] border border-slate-200 dark:border-slate-800">
                         <div class="flex items-center gap-4">
                             <div class="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
@@ -95,63 +95,53 @@
                             </h2>
                         </div>
                         
-                        @foreach($section->questionGroups as $group)
-                            <div class="space-y-6 pl-14">
-                                @if($group->group_instruction)
-                                    <div class="p-6 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl border border-primary/20 text-slate-800 dark:text-slate-200 font-bold text-sm leading-relaxed italic shadow-sm">
-                                        {{ $group->group_instruction }}
-                                    </div>
-                                @endif
+                        <div class="space-y-8 pl-14">
+                            @foreach($section->questions as $qi => $question)
+                                @php $qNum = 1 + $sections->where('section_number', '<', $section->section_number)->flatMap(fn($s) => $s->questions)->count() + $qi; @endphp
+                                <div id="question-{{ $question->id }}" class="group/q" @click="activeQuestion = {{ $question->id }}">
+                                    <div class="flex items-start gap-6">
+                                        <div class="size-10 rounded-2xl flex items-center justify-center shrink-0 border-2 transition-all"
+                                             :class="[
+                                                activeQuestion === {{ $question->id }} ? 'border-primary bg-primary text-white shadow-lg' : 'border-slate-100 dark:border-slate-800 text-slate-400 bg-white dark:bg-slate-900'
+                                             ]">
+                                            <span class="text-sm font-black">{{ $qNum }}</span>
+                                        </div>
+                                        
+                                        <div class="flex-1 pt-1">
+                                            <div class="text-[17px] font-bold text-slate-900 dark:text-white leading-relaxed mb-6">
+                                                {!! nl2br(e($question->question_text)) !!}
+                                            </div>
 
-                                <div class="space-y-8">
-                                    @foreach($group->questions as $qi => $question)
-                                        @php $qNum = 1 + $test->sections->where('section_number', '<', $section->section_number)->flatMap(fn($s) => $s->questionGroups->flatMap(fn($g) => $g->questions))->count() + $qi; @endphp
-                                        <div id="question-{{ $question->id }}" class="group/q" @click="activeQuestion = {{ $question->id }}">
-                                            <div class="flex items-start gap-6">
-                                                <div class="size-10 rounded-2xl flex items-center justify-center shrink-0 border-2 transition-all"
-                                                     :class="[
-                                                        activeQuestion === {{ $question->id }} ? 'border-primary bg-primary text-white shadow-lg' : 'border-slate-100 dark:border-slate-800 text-slate-400 bg-white dark:bg-slate-900'
-                                                     ]">
-                                                    <span class="text-sm font-black">{{ $qNum }}</span>
-                                                </div>
-                                                
-                                                <div class="flex-1 pt-1">
-                                                    <div class="text-[17px] font-bold text-slate-900 dark:text-white leading-relaxed mb-6">
-                                                        {!! nl2br(e($question->question_text)) !!}
+                                            <!-- Answer Input Area -->
+                                            <div class="max-w-md">
+                                                @if($question->question_type === 'multiple_choice')
+                                                    <div class="grid grid-cols-1 gap-2">
+                                                        @foreach($question->options as $oi => $opt)
+                                                            <label class="flex items-center gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-800 cursor-pointer transition-all hover:border-primary/30"
+                                                                   :class="answers[{{ $question->id }}] == '{{ str_replace("'", "\'", $opt->option_text) }}' ? 'bg-primary/5 border-primary/50 text-slate-900 dark:text-white' : 'text-slate-500'">
+                                                                <input type="radio" name="q_{{ $question->id }}" value="{{ $opt->option_text }}" x-model="answers[{{ $question->id }}]" class="size-4 text-primary focus:ring-primary">
+                                                                <span class="text-sm font-bold flex items-center gap-3">
+                                                                    <span class="opacity-40">{{ chr(65+$oi) }}.</span>
+                                                                    {{ $opt->option_text }}
+                                                                </span>
+                                                            </label>
+                                                        @endforeach
                                                     </div>
-
-                                                    <!-- Answer Input Area -->
-                                                    <div class="max-w-md">
-                                                        @if($question->question_type === 'multiple_choice')
-                                                            <div class="grid grid-cols-1 gap-2">
-                                                                @foreach($question->options as $oi => $opt)
-                                                                    <label class="flex items-center gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-800 cursor-pointer transition-all hover:border-primary/30"
-                                                                           :class="answers[{{ $question->id }}] == '{{ str_replace("'", "\'", $opt->option_text) }}' ? 'bg-primary/5 border-primary/50 text-slate-900 dark:text-white' : 'text-slate-500'">
-                                                                        <input type="radio" name="q_{{ $question->id }}" value="{{ $opt->option_text }}" x-model="answers[{{ $question->id }}]" class="size-4 text-primary focus:ring-primary">
-                                                                        <span class="text-sm font-bold flex items-center gap-3">
-                                                                            <span class="opacity-40">{{ chr(65+$oi) }}.</span>
-                                                                            {{ $opt->option_text }}
-                                                                        </span>
-                                                                    </label>
-                                                                @endforeach
-                                                            </div>
-                                                        @else
-                                                            <input type="text" x-model="answers[{{ $question->id }}]" 
-                                                                   class="w-full bg-white dark:bg-slate-950 border-2 border-slate-100 dark:border-slate-800 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none italic"
-                                                                   placeholder="Click to enter answer...">
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                                
-                                                <button @click.stop="toggleFlag({{ $question->id }})" class="transition-colors" :class="flags[{{ $question->id }}] ? 'text-rose-500' : 'text-slate-200 hover:text-slate-400'">
-                                                    <span class="material-symbols-outlined text-3xl font-light" :class="flags[{{ $question->id }}] ? 'fill-1' : ''">flag</span>
-                                                </button>
+                                                @else
+                                                    <input type="text" x-model="answers[{{ $question->id }}]" 
+                                                           class="w-full bg-white dark:bg-slate-950 border-2 border-slate-100 dark:border-slate-800 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none italic"
+                                                           placeholder="Click to enter answer...">
+                                                @endif
                                             </div>
                                         </div>
-                                    @endforeach
+                                        
+                                        <button @click.stop="toggleFlag({{ $question->id }})" class="transition-colors" :class="flags[{{ $question->id }}] ? 'text-rose-500' : 'text-slate-200 hover:text-slate-400'">
+                                            <span class="material-symbols-outlined text-3xl font-light" :class="flags[{{ $question->id }}] ? 'fill-1' : ''">flag</span>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        @endforeach
+                            @endforeach
+                        </div>
                     </div>
                 @endforeach
             </div>
@@ -162,19 +152,17 @@
     <div class="h-24 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center px-10 z-30 shrink-0">
         <div class="flex-1 flex gap-2 overflow-x-auto py-3 custom-scrollbar">
             @php $qIdx = 1; @endphp
-            @foreach($test->sections as $section)
-                @foreach($section->questionGroups as $group)
-                    @foreach($group->questions as $question)
-                    <button @click="jumpToQuestion({{ $question->id }})"
-                            class="size-12 rounded-2xl border-2 flex items-center justify-center shrink-0 transition-all relative"
-                            :class="[
-                                activeQuestion === {{ $question->id }} ? 'border-primary ring-2 ring-primary/30 scale-110' : 'border-transparent',
-                                answers[{{ $question->id }}] ? 'bg-primary text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
-                            ]">
-                        <span class="text-sm font-black">{{ $qIdx++ }}</span>
-                        <div x-show="flags[{{ $question->id }}]" x-cloak class="absolute -top-1.5 -right-1.5 size-4 bg-rose-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
-                    </button>
-                    @endforeach
+            @foreach($sections as $section)
+                @foreach($section->questions as $question)
+                <button @click="jumpToQuestion({{ $question->id }})"
+                        class="size-12 rounded-2xl border-2 flex items-center justify-center shrink-0 transition-all relative"
+                        :class="[
+                            activeQuestion === {{ $question->id }} ? 'border-primary ring-2 ring-primary/30 scale-110' : 'border-transparent',
+                            answers[{{ $question->id }}] ? 'bg-primary text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'
+                        ]">
+                    <span class="text-sm font-black">{{ $qIdx++ }}</span>
+                    <div x-show="flags[{{ $question->id }}]" x-cloak class="absolute -top-1.5 -right-1.5 size-4 bg-rose-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
+                </button>
                 @endforeach
             @endforeach
         </div>
@@ -204,7 +192,7 @@
                         <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Answered</p>
                         <div class="flex items-end gap-3">
                             <h3 class="text-4xl font-black text-slate-900 dark:text-white leading-none" x-text="Object.keys(answers).filter(id => answers[id] != null && answers[id].trim() !== '').length"></h3>
-                            <span class="text-slate-300 dark:text-slate-600 text-lg font-bold">/ {!! $test->sections->flatMap(fn($s) => $s->questionGroups->flatMap(fn($g) => $g->questions))->count() !!}</span>
+                            <span class="text-slate-300 dark:text-slate-600 text-lg font-bold">/ {!! $sections->flatMap(fn($s) => $s->questions)->count() !!}</span>
                         </div>
                     </div>
                     <div class="p-8 rounded-[32px] bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-900/30 text-rose-600">
@@ -214,15 +202,15 @@
                 </div>
 
                 <div class="space-y-12">
-                    @foreach($test->sections as $section)
+                    @foreach($sections as $section)
                         <div>
                             <h4 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-3 italic">
                                 <span>Section {{ $section->section_number }}</span>
                                 <div class="flex-1 h-px bg-slate-100 dark:bg-slate-800"></div>
                             </h4>
                             <div class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-3">
-                                @foreach($section->questionGroups->flatMap(fn($g) => $g->questions) as $q)
-                                    @php $revNum = 1 + $test->sections->flatMap(fn($s) => $s->questionGroups->flatMap(fn($g) => $g->questions))->filter(fn($qq) => $qq->id < $q->id)->count(); @endphp
+                                @foreach($section->questions as $q)
+                                    @php $revNum = 1 + $sections->flatMap(fn($s) => $s->questions)->filter(fn($qq) => $qq->id < $q->id)->count(); @endphp
                                     <button @click="jumpToQuestion({{ $q->id }}); showReview = false;" 
                                             class="aspect-square rounded-2xl border-2 flex flex-col items-center justify-center transition-all relative"
                                             :class="answers[{{ $q->id }}] ? 'bg-primary border-primary text-white shadow-lg' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400 hover:border-primary/30'">

@@ -13,9 +13,10 @@ class WritingTaskController extends Controller
 {
     public function create($testSetId)
     {
-        $testSet = TestSet::findOrFail($testSetId);
+        $testSet = TestSet::with('test')->findOrFail($testSetId);
+        $tasks = $testSet->writingTasks()->with('images')->orderBy('task_number')->get();
 
-        return view('admin.writing-tasks.create', compact('testSet'));
+        return view('admin.writing-tasks.create', compact('testSet', 'tasks'));
     }
 
     public function store(Request $request, $testSetId)

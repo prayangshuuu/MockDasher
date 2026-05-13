@@ -10,7 +10,7 @@
             <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight dark:text-white">My Test History</h1>
             <p class="text-slate-500 mt-1 max-w-lg dark:text-slate-400">Review all your past mock exams and track your progress across different academic modules.</p>
         </div>
-        <a href="{{ route('dashboard') }}" class="indigo-violet-gradient text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-indigo-500/20 active:scale-95 transition-transform">
+        <a href="{{ route('dashboard') }}" class="indigo-violet-gradient text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lift active:scale-95 transition-transform">
             <span class="material-symbols-outlined text-xl">add</span>
             Take New Test
         </a>
@@ -18,7 +18,7 @@
 
     <!-- Quick Stats Bento Grid -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-soft border-l-4 border-indigo-500">
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-premium border-l-4 border-indigo-500">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Average Band Score</p>
             <div class="flex items-baseline gap-2 mt-2">
                 <span class="text-4xl font-extrabold text-slate-900 dark:text-white">{{ $stats['averageBandScore'] !== null ? number_format($stats['averageBandScore'], 1) : 'N/A' }}</span>
@@ -32,14 +32,14 @@
                 </span>
             </div>
         </div>
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-soft border-l-4 border-tertiary">
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-premium border-l-4 border-tertiary">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tests Completed</p>
             <div class="flex items-baseline gap-2 mt-2">
                 <span class="text-4xl font-extrabold text-slate-900 dark:text-white">{{ $stats['testsCompleted'] }}</span>
                 <span class="text-slate-400 font-medium text-sm">/ 20 Target</span>
             </div>
         </div>
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-soft border-l-4 border-emerald-500">
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-premium border-l-4 border-emerald-500">
             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Strongest Module</p>
             <div class="flex items-center gap-2 mt-2">
                 @if($stats['strongestModule']['name'])
@@ -55,12 +55,12 @@
     </div>
 
     <!-- History Table Card -->
-    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800 overflow-hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-premium border border-slate-100 dark:border-slate-800 overflow-hidden">
         <div class="px-8 py-6 border-b border-slate-50 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
             <h2 class="text-lg font-bold text-slate-900 dark:text-white">Recent Attempts</h2>
             <div class="flex gap-2">
-                <button class="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 rounded-lg transition-colors">Filter</button>
-                <button class="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 rounded-lg transition-colors">Export CSV</button>
+                <button class="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 rounded-base transition-colors">Filter</button>
+                <button class="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 rounded-base transition-colors">Export CSV</button>
             </div>
         </div>
         <div class="overflow-x-auto">
@@ -115,7 +115,7 @@
                             @if($attempt->status === 'completed')
                                 <a href="{{ route('user.history.show', $attempt->id) }}" class="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition-colors">Review Details</a>
                             @else
-                                <a href="{{ route('user.history.show', $attempt->id) }}" class="px-4 py-2 bg-slate-900 dark:bg-white dark:text-slate-900 text-white text-xs font-bold rounded-lg hover:bg-slate-800 transition-colors">Resume</a>
+                                <a href="{{ route('user.history.show', $attempt->id) }}" class="px-4 py-2 bg-slate-900 dark:bg-white dark:text-slate-900 text-white text-xs font-bold rounded-base hover:bg-slate-800 transition-colors">Resume</a>
                             @endif
                         </td>
                     </tr>
@@ -128,7 +128,7 @@
                                 </div>
                                 <h3 class="text-xl font-extrabold text-slate-900 dark:text-white mb-2">No tests taken yet</h3>
                                 <p class="text-slate-500 dark:text-slate-400 max-w-sm mb-8">Start your first mock exam today to track your progress and get detailed AI-powered feedback.</p>
-                                <a href="{{ route('dashboard') }}" class="indigo-violet-gradient text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-indigo-500/20 active:scale-95 transition-transform inline-block">
+                                <a href="{{ route('dashboard') }}" class="indigo-violet-gradient text-white px-8 py-3 rounded-xl font-bold shadow-lift active:scale-95 transition-transform inline-block">
                                     Start Your First Test
                                 </a>
                             </div>

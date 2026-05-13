@@ -17,10 +17,11 @@
     ];
 
     $sizes = [
-        'sm' => 'px-4 py-2 text-xs rounded-lg',
-        'md' => 'px-6 py-2.5 text-sm rounded-xl',
-        'lg' => 'px-8 py-4 text-xs uppercase tracking-widest rounded-2xl',
-        'icon' => 'size-12 rounded-xl',
+        'xs' => 'px-3 py-1.5 text-[10px] uppercase tracking-wider rounded-base',
+        'sm' => 'px-4 py-2 text-xs rounded-base',
+        'md' => 'px-6 py-2.5 text-sm rounded-base',
+        'lg' => 'px-8 py-4 text-xs uppercase tracking-widest rounded-xl',
+        'icon' => 'size-10 rounded-base p-0',
     ];
 
     $classes = $baseClasses . ' ' . ($variants[$variant] ?? $variants['primary']) . ' ' . ($sizes[$size] ?? $sizes['md']);
@@ -28,12 +29,20 @@
 
 @if($href)
     <a href="{{ $href }}" {{ $attributes->merge(['class' => $classes]) }}>
-        @if($icon) <span class="material-symbols-outlined {{ $size === 'icon' ? 'text-xl' : 'text-lg' }}">{{ $icon }}</span> @endif
-        {{ $slot }}
+        @if($icon) 
+            <div class="flex items-center justify-center {{ $size === 'icon' ? 'size-full' : '' }}">
+                <span class="material-symbols-outlined {{ $size === 'icon' ? 'text-[20px]' : 'text-[18px]' }}">{{ $icon }}</span> 
+            </div>
+        @endif
+        @if($size !== 'icon') {{ $slot }} @endif
     </a>
 @else
     <button {{ $attributes->merge(['class' => $classes, 'type' => 'submit']) }}>
-        @if($icon) <span class="material-symbols-outlined {{ $size === 'icon' ? 'text-xl' : 'text-lg' }}">{{ $icon }}</span> @endif
-        {{ $slot }}
+        @if($icon) 
+            <div class="flex items-center justify-center {{ $size === 'icon' ? 'size-full' : '' }}">
+                <span class="material-symbols-outlined {{ $size === 'icon' ? 'text-[20px]' : 'text-[18px]' }}">{{ $icon }}</span> 
+            </div>
+        @endif
+        @if($size !== 'icon') {{ $slot }} @endif
     </button>
 @endif

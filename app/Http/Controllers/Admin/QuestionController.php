@@ -89,6 +89,7 @@ class QuestionController extends Controller
 
     public function edit(Question $question)
     {
+        $question->load('options');
         $morphType = $question->questionable_type;
         if ($morphType === ListeningSection::class) {
             $type = 'listening';
@@ -98,7 +99,9 @@ class QuestionController extends Controller
             $type = 'reading';
         }
 
-        return view('admin.questions.create', compact('question', 'type'));
+        $parent = $question->questionable;
+
+        return view('admin.questions.create', compact('question', 'type', 'parent'));
     }
 
     public function update(Request $request, Question $question)

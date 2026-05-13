@@ -1,7 +1,7 @@
 <!-- Fixed Side Navigation -->
-<aside class="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col z-50">
+<div class="h-full w-full bg-white dark:bg-slate-900 flex flex-col">
     <div class="p-6 flex items-center gap-3">
-        <div class="size-9 bg-primary rounded-lg flex items-center justify-center text-white">
+        <div class="size-9 bg-primary rounded-base flex items-center justify-center text-white">
             <span class="material-symbols-outlined text-2xl">bolt</span>
         </div>
         <div>
@@ -21,7 +21,7 @@
             <x-nav-link-admin href="{{ route('profile.show') }}" icon="settings">Settings</x-nav-link-admin>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" class="w-full flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-red-500 rounded-lg transition-colors group">
+                <button type="submit" class="w-full flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-red-500 rounded-base transition-colors group">
                     <span class="material-symbols-outlined">logout</span>
                     <span class="text-sm font-medium">Logout</span>
                 </button>
@@ -39,4 +39,4 @@
             </div>
         </div>
     </div>
-</aside>
+</div>

@@ -24,11 +24,22 @@
                         "display": ["Inter", "sans-serif"]
                     },
                     borderRadius: {
-                        "DEFAULT": "0.5rem",
+                        "xs": "0.375rem",
+                        "sm": "0.5rem",
+                        "base": "0.75rem",
+                        "DEFAULT": "0.75rem",
+                        "md": "0.75rem",
                         "lg": "1rem",
                         "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "3xl": "2.5rem",
                         "full": "9999px"
                     },
+                    boxShadow: {
+                        'soft': 'var(--shadow-soft)',
+                        'premium': 'var(--shadow-premium)',
+                        'lift': 'var(--shadow-lift)',
+                    }
                 },
             },
         }
@@ -48,7 +59,7 @@
     </div>
 
     <!-- Main Card -->
-    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-[0_20px_50px_rgba(80,72,229,0.05),0_1px_3px_rgba(0,0,0,0.02)] border border-slate-100 dark:border-slate-800 p-8 md:p-10">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-premium border border-slate-100 dark:border-slate-800 p-8 md:p-10">
         <div class="mb-8">
             <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">Sign in to MockDasher</h2>
             <p class="text-slate-500 dark:text-slate-400 mt-1 text-sm">Enter your details below to continue</p>
@@ -67,7 +78,7 @@
             <div class="space-y-2">
                 <label for="email" class="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Email</label>
                 <div class="relative">
-                    <input id="email" name="email" value="{{ old('email') }}" type="email" required autofocus class="w-full h-12 px-4 rounded-lg border {{ $errors->has('email') ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-200 dark:border-slate-700 focus:ring-primary/20 focus:border-primary' }} bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all duration-200" placeholder="name@company.com" />
+                    <input id="email" name="email" value="{{ old('email') }}" type="email" required autofocus class="w-full h-12 px-4 rounded-base border {{ $errors->has('email') ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-200 dark:border-slate-700 focus:ring-primary/20 focus:border-primary' }} bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all duration-200" placeholder="name@company.com" />
                 </div>
                 @error('email')
                     <p class="text-xs text-red-500 mt-1 ml-1 font-medium">{{ $message }}</p>
@@ -83,7 +94,7 @@
                     @endif
                 </div>
                 <div class="relative">
-                    <input id="password" name="password" :type="showPassword ? 'text' : 'password'" required autocomplete="current-password" class="w-full h-12 px-4 rounded-lg border {{ $errors->has('password') ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-200 dark:border-slate-700 focus:ring-primary/20 focus:border-primary' }} bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all duration-200" placeholder="••••••••" />
+                    <input id="password" name="password" :type="showPassword ? 'text' : 'password'" required autocomplete="current-password" class="w-full h-12 px-4 rounded-base border {{ $errors->has('password') ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-200 dark:border-slate-700 focus:ring-primary/20 focus:border-primary' }} bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 transition-all duration-200" placeholder="••••••••" />
                     <button @click="showPassword = !showPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600" type="button">
                         <span class="material-symbols-outlined text-[20px]" x-text="showPassword ? 'visibility_off' : 'visibility'">visibility</span>
                     </button>
@@ -100,7 +111,7 @@
             </div>
 
             <!-- Sign In Button -->
-            <button class="w-full h-12 bg-gradient-to-r from-primary to-[#6366f1] hover:opacity-90 text-white font-semibold rounded-lg shadow-lg shadow-primary/20 transition-all active:scale-[0.98] mt-2" type="submit">
+            <button class="w-full h-12 bg-gradient-to-r from-primary to-[#6366f1] hover:opacity-90 text-white font-semibold rounded-base shadow-lift transition-all active:scale-[0.98] mt-2" type="submit">
                 Sign In
             </button>
         </form>
@@ -116,7 +127,7 @@
         </div>
 
         <!-- Social Button -->
-        <button class="w-full h-12 flex items-center justify-center gap-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors duration-200 group">
+        <button class="w-full h-12 flex items-center justify-center gap-3 border border-slate-200 dark:border-slate-700 rounded-base bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors duration-200 group">
             <svg class="size-5" viewbox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"></path>
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>

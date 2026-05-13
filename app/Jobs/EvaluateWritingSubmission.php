@@ -28,14 +28,14 @@ class EvaluateWritingSubmission implements ShouldQueue
      */
     public function handle(GeminiEvaluationService $service): void
     {
-        $attempt = TestAttempt::with(['writingAnswers.writingTask', 'test.writingTasks'])->find($this->testAttemptId);
+        $attempt = TestAttempt::with(['writingAnswers.writingTask', 'testSet.writingTasks'])->find($this->testAttemptId);
 
         if (!$attempt) {
             Log::error("EvaluateWritingSubmission: TestAttempt {$this->testAttemptId} not found.");
             return;
         }
 
-        $tasks = $attempt->test->writingTasks()->orderBy('task_number')->get();
+        $tasks = $attempt->testSet->writingTasks()->orderBy('task_number')->get();
         if ($tasks->isEmpty()) {
             return;
         }
@@ -49,8 +49,8 @@ class EvaluateWritingSubmission implements ShouldQueue
         $task1Answer = $task1 && $answers->has($task1->id) ? $answers->get($task1->id)->answer_text : null;
         $task2Answer = $task2 && $answers->has($task2->id) ? $answers->get($task2->id)->answer_text : null;
 
-        $task1Prompt = $task1 ? $task1->prompt : 'No Task 1 assigned.';
-        $task2Prompt = $task2 ? $task2->prompt : 'No Task 2 assigned.';
+        $task1Prompt = $task1 ? $task1->task_prompt : 'No Task 1 assigned.';
+        $task2Prompt = $task2 ? $task2->task_prompt : 'No Task 2 assigned.';
 
         // Ensure we strip tags as TinyMCE or similar might save HTML.
         $task1AnswerPlain = $task1Answer ? strip_tags($task1Answer) : 'No answer provided.';

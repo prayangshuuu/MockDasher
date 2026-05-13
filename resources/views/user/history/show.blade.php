@@ -15,12 +15,12 @@
     </nav>
 
     <!-- Main Score Hero -->
-    <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-[48px] shadow-2xl border border-slate-200/50 dark:border-slate-800 p-12 md:p-16 flex flex-col md:flex-row items-center gap-12">
+    <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-3xl shadow-lift border border-slate-200/50 dark:border-slate-800 p-12 md:p-16 flex flex-col md:flex-row items-center gap-12">
         <div class="absolute top-0 right-0 -translate-y-12 translate-x-12 size-64 bg-primary/5 rounded-full blur-3xl"></div>
         
         <div class="relative z-10 flex-col items-center flex">
-            <div class="size-48 rounded-[60px] bg-gradient-to-br from-primary to-violet-600 p-1 shadow-2xl shadow-primary/20 hover:scale-105 transition-transform">
-                <div class="w-full h-full bg-white dark:bg-slate-900 rounded-[58px] flex flex-col items-center justify-center">
+            <div class="size-48 rounded-full bg-gradient-to-br from-primary to-violet-600 p-1 shadow-lift hover:scale-105 transition-transform">
+                <div class="w-full h-full bg-white dark:bg-slate-900 rounded-full flex flex-col items-center justify-center">
                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Band Score</span>
                     <div class="text-7xl font-black text-slate-900 dark:text-white leading-none tracking-tighter tabular-nums">
                         {{ $attempt->overall_band !== null ? number_format($attempt->overall_band, 1) : 'N/A' }}
@@ -64,10 +64,10 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         
         <!-- Reading Module -->
-        <div class="group bg-white dark:bg-slate-900 rounded-[40px] p-10 border border-slate-200/60 dark:border-slate-800 shadow-soft hover:shadow-xl transition-all">
+        <div class="group bg-white dark:bg-slate-900 rounded-3xl p-10 border border-slate-200/60 dark:border-slate-800 shadow-premium hover:shadow-lift transition-all">
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center gap-4">
-                    <div class="size-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div class="size-14 rounded-xl bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
                         <span class="material-symbols-outlined text-3xl font-light">auto_stories</span>
                     </div>
                     <div>
@@ -91,10 +91,10 @@
         </div>
 
         <!-- Listening Module -->
-        <div class="group bg-white dark:bg-slate-900 rounded-[40px] p-10 border border-slate-200/60 dark:border-slate-800 shadow-soft hover:shadow-xl transition-all">
+        <div class="group bg-white dark:bg-slate-900 rounded-3xl p-10 border border-slate-200/60 dark:border-slate-800 shadow-premium hover:shadow-lift transition-all">
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center gap-4">
-                    <div class="size-14 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div class="size-14 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                         <span class="material-symbols-outlined text-3xl font-light">headphones</span>
                     </div>
                     <div>
@@ -118,10 +118,10 @@
         </div>
 
         <!-- Writing Module -->
-        <div class="group bg-white dark:bg-slate-900 rounded-[40px] p-10 border border-slate-200/60 dark:border-slate-800 shadow-soft hover:shadow-xl transition-all">
+        <div class="group bg-white dark:bg-slate-900 rounded-3xl p-10 border border-slate-200/60 dark:border-slate-800 shadow-premium hover:shadow-lift transition-all">
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center gap-4">
-                    <div class="size-14 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div class="size-14 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                         <span class="material-symbols-outlined text-3xl font-light">edit_square</span>
                     </div>
                     <div>
@@ -158,10 +158,10 @@
         </div>
 
         <!-- Speaking Module -->
-        <div class="group bg-white dark:bg-slate-900 rounded-[40px] p-10 border border-slate-200/60 dark:border-slate-800 shadow-soft hover:shadow-xl transition-all">
+        <div class="group bg-white dark:bg-slate-900 rounded-3xl p-10 border border-slate-200/60 dark:border-slate-800 shadow-premium hover:shadow-lift transition-all">
             <div class="flex items-center justify-between mb-8">
                 <div class="flex items-center gap-4">
-                    <div class="size-14 rounded-2xl bg-rose-500/10 text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div class="size-14 rounded-xl bg-rose-500/10 text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform">
                         <span class="material-symbols-outlined text-3xl font-light">record_voice_over</span>
                     </div>
                     <div>
@@ -205,7 +205,7 @@
         <h2 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">AI Examiner Reports</h2>
         
         @if($attempt->aiWritingEvaluation)
-        <div id="writing-feedback" class="bg-white dark:bg-slate-900 rounded-[40px] p-10 md:p-14 border border-amber-200 dark:border-amber-900 shadow-xl shadow-amber-500/5 transition-all">
+        <div id="writing-feedback" class="bg-white dark:bg-slate-900 rounded-3xl p-10 md:p-14 border border-amber-200 dark:border-amber-900 shadow-lift transition-all">
             <div class="flex items-center gap-4 mb-8">
                 <div class="size-12 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-lg shadow-amber-500/20">
                     <span class="material-symbols-outlined">edit_square</span>
@@ -218,7 +218,7 @@
         @endif
 
         @if($attempt->aiSpeakingEvaluation)
-        <div id="speaking-feedback" class="bg-white dark:bg-slate-900 rounded-[40px] p-10 md:p-14 border border-rose-200 dark:border-rose-900 shadow-xl shadow-rose-500/5 transition-all">
+        <div id="speaking-feedback" class="bg-white dark:bg-slate-900 rounded-3xl p-10 md:p-14 border border-rose-200 dark:border-rose-900 shadow-lift transition-all">
             <div class="flex items-center gap-4 mb-8">
                 <div class="size-12 rounded-xl bg-rose-500 text-white flex items-center justify-center shadow-lg shadow-rose-500/20">
                     <span class="material-symbols-outlined">record_voice_over</span>
@@ -233,16 +233,16 @@
     @endif
 
     <!-- Call to Action -->
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-6 p-10 bg-slate-900 dark:bg-white rounded-[40px]">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-6 p-10 bg-slate-900 dark:bg-white rounded-3xl shadow-lift">
         <div class="text-white dark:text-slate-900 text-center sm:text-left">
             <h3 class="text-xl font-black tracking-tight">Ready to improve?</h3>
             <p class="text-slate-400 dark:text-slate-500 text-sm font-medium">Analyze your weak points and try another specialized module.</p>
         </div>
         <div class="flex gap-4">
-            <a href="{{ route('user.history.index') }}" class="px-8 py-4 bg-white dark:bg-slate-950 text-slate-900 dark:text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all">
+            <a href="{{ route('user.history.index') }}" class="px-8 py-4 bg-white dark:bg-slate-950 text-slate-900 dark:text-white rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all">
                 View All Results
             </a>
-            <a href="{{ route('dashboard') }}" class="px-8 py-4 bg-primary text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-xl shadow-primary/20">
+            <a href="{{ route('dashboard') }}" class="px-8 py-4 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lift">
                 Back to Dashboard
             </a>
         </div>

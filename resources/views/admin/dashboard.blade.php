@@ -13,7 +13,7 @@
     <!-- Page Header -->
     <x-admin.page-header title="System Overview" description="Key performance indicators and recent system activity.">
         <x-slot:actions>
-            <div class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded-xl shadow-sm">
+            <div class="flex items-center gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded-base shadow-sm">
                 <span class="material-symbols-outlined text-emerald-500 animate-pulse">check_circle</span>
                 <span class="text-xs font-black uppercase tracking-widest text-slate-500">System Live</span>
             </div>
@@ -51,7 +51,7 @@
     <!-- Analytics & Actions -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Chart Section -->
-        <div class="lg:col-span-2 glass-card p-10 rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-soft">
+        <div class="lg:col-span-2 glass-card p-10 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-premium">
             <div class="flex justify-between items-center mb-10">
                 <div>
                     <h3 class="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">System Engagement</h3>
@@ -84,7 +84,7 @@
 
         <div class="space-y-8">
             <!-- Quick Action Card -->
-            <div class="bg-gradient-to-br from-primary via-indigo-700 to-indigo-900 p-8 rounded-[2.5rem] text-white shadow-xl shadow-primary/20 relative overflow-hidden group">
+            <div class="bg-gradient-to-br from-primary via-indigo-700 to-indigo-900 p-8 rounded-3xl text-white shadow-lift relative overflow-hidden group">
                 <div class="relative z-10">
                     <h3 class="text-xl font-extrabold mb-2 tracking-tight">Expand Library</h3>
                     <p class="text-sm opacity-80 mb-8 leading-relaxed font-medium">Publish new IELTS books and sets for your candidates using the high-conversion toolset.</p>
@@ -96,7 +96,7 @@
             </div>
 
             <!-- System Health Card -->
-            <div class="glass-card p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800">
+            <div class="glass-card p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-premium">
                 <h4 class="text-xs font-black uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
                     <span class="material-symbols-outlined text-primary text-xl">dataset</span>
                     Database Latency
@@ -126,7 +126,7 @@
     </div>
 
     <!-- Recent Activity Table -->
-    <div class="glass-card rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden">
+    <div class="glass-card rounded-3xl border border-slate-200 dark:border-slate-800 shadow-premium overflow-hidden">
         <div class="p-10 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
             <div>
                 <h3 class="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">Recent Infrastructure Updates</h3>
@@ -145,7 +145,7 @@
                         <tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-b border-slate-50 dark:border-slate-800/50 last:border-0">
                             <td class="px-10 py-6">
                                 <div class="flex items-center gap-5">
-                                    <div class="size-12 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-all">
+                                    <div class="size-12 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-all">
                                         <span class="material-symbols-outlined text-2xl">menu_book</span>
                                     </div>
                                     <div>

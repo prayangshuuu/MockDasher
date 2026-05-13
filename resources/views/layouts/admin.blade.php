@@ -24,28 +24,53 @@
                         "display": ["Inter", "sans-serif"]
                     },
                     borderRadius: {
-                        "DEFAULT": "0.5rem",
+                        "xs": "0.375rem",
+                        "sm": "0.5rem",
+                        "DEFAULT": "0.75rem",
+                        "md": "0.75rem",
                         "lg": "1rem",
                         "xl": "1.5rem",
+                        "2xl": "2rem",
+                        "3xl": "2.5rem",
                         "full": "9999px"
                     },
+                    boxShadow: {
+                        'soft': 'var(--shadow-soft)',
+                        'premium': 'var(--shadow-premium)',
+                        'lift': 'var(--shadow-lift)',
+                    }
                 },
             },
         }
     </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex antialiased">
+<body x-data="{ sidebarOpen: false }" class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex antialiased">
     
-    @include('layouts.partials.admin-sidebar')
+    <!-- Mobile Sidebar Backdrop -->
+    <div x-show="sidebarOpen" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click="sidebarOpen = false" 
+         class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] lg:hidden"></div>
+
+    <div :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'" 
+         class="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col z-[70] transition-transform duration-300 ease-in-out">
+        @include('layouts.partials.admin-sidebar')
+    </div>
 
     <!-- Main Content -->
-    <main class="flex-1 ml-64 min-h-screen flex flex-col relative">
+    <main class="flex-1 lg:ml-64 min-h-screen flex flex-col relative w-full">
         @include('layouts.partials.admin-navbar')
 
 
         <!-- Dynamic Content -->
-        <div class="p-8 flex-1">
+        <div class="p-4 md:p-8 flex-1 w-full max-w-full overflow-x-hidden">
             @if(session('success'))
                 <div class="max-w-7xl mx-auto mb-6 bg-emerald-50 border border-emerald-200 text-emerald-600 px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-300">
                     <span class="material-symbols-outlined text-emerald-500">check_circle</span>

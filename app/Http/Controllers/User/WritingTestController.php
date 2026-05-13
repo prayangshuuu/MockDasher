@@ -35,7 +35,7 @@ class WritingTestController extends Controller
             return $this->forceSubmit($attempt);
         }
 
-        $tasks = $attempt->test->writingTasks()->with('images')->orderBy('task_number')->get();
+        $tasks = $attempt->testSet->writingTasks()->with('images')->orderBy('task_number')->get();
         $answers = $attempt->writingAnswers->keyBy('writing_task_id');
 
         return view('user.writing-test.show', compact('attempt', 'tasks', 'answers', 'remainingSeconds'));

@@ -9,11 +9,19 @@ use Illuminate\Http\Request;
 
 class ReadingPassageController extends Controller
 {
+    /**
+     * Show the Reading Manager — lists all existing passages with question counts,
+     * and provides a quick-add form at the bottom.
+     */
     public function create($testSetId)
     {
-        $testSet = TestSet::findOrFail($testSetId);
+        $testSet = TestSet::with(['test'])->findOrFail($testSetId);
+        $passages = ReadingPassage::where('test_set_id', $testSet->id)
+            ->with(['questionGroups' => fn ($q) => $q->with('questions.options')->orderBy('sort_order')])
+            ->orderBy('passage_number')
+            ->get();
 
-        return view('admin.reading-passages.create', compact('testSet'));
+        return view('admin.reading-passages.create', compact('testSet', 'passages'));
     }
 
     public function store(Request $request, $testSetId)
@@ -28,11 +36,13 @@ class ReadingPassageController extends Controller
 
         $testSet->readingPassages()->create($validated);
 
-        return redirect()->route('admin.test_sets.show', $testSetId)->with('success', 'Reading passage added successfully.');
+        return redirect()->route('admin.reading-passages.create', $testSetId)->with('success', 'Reading passage added successfully.');
     }
 
     public function edit(ReadingPassage $reading_passage)
     {
+        $reading_passage->load(['testSet.test', 'questionGroups' => fn ($q) => $q->with('questions.options')->orderBy('sort_order')]);
+
         return view('admin.reading-passages.edit', compact('reading_passage'));
     }
 
@@ -46,7 +56,7 @@ class ReadingPassageController extends Controller
 
         $reading_passage->update($validated);
 
-        return redirect()->route('admin.test_sets.show', $reading_passage->test_set_id)->with('success', 'Reading passage updated successfully.');
+        return redirect()->route('admin.reading-passages.edit', $reading_passage->id)->with('success', 'Reading passage updated successfully.');
     }
 
     public function destroy(ReadingPassage $reading_passage)
@@ -54,6 +64,6 @@ class ReadingPassageController extends Controller
         $testSetId = $reading_passage->test_set_id;
         $reading_passage->delete();
 
-        return redirect()->route('admin.test_sets.show', $testSetId)->with('success', 'Reading passage deleted successfully.');
+        return redirect()->route('admin.reading-passages.create', $testSetId)->with('success', 'Reading passage deleted successfully.');
     }
 }

@@ -14,12 +14,12 @@
     <x-admin.page-header title="Manage Tests" description="Create, organize, and monitor your mock examination library.">
         <x-slot:actions>
             <form action="{{ route('admin.tests.index') }}" method="GET" class="flex gap-3">
-                <select name="type" onchange="this.form.submit()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-bold shadow-sm focus:ring-primary/20 transition-all">
+                <select name="type" onchange="this.form.submit()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-base px-4 py-2.5 text-sm font-bold shadow-sm focus:ring-primary/20 transition-all">
                     <option value="">All Types</option>
                     <option value="Academic" {{ request('type') == 'Academic' ? 'selected' : '' }}>Academic</option>
                     <option value="General" {{ request('type') == 'General' ? 'selected' : '' }}>General Training</option>
                 </select>
-                <select name="status" onchange="this.form.submit()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm font-bold shadow-sm focus:ring-primary/20 transition-all">
+                <select name="status" onchange="this.form.submit()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-base px-4 py-2.5 text-sm font-bold shadow-sm focus:ring-primary/20 transition-all">
                     <option value="">All Status</option>
                     <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>Published</option>
                     <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
@@ -34,9 +34,9 @@
     <!-- Tests List Container -->
     <div class="space-y-4">
         @forelse($tests as $test)
-            <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-soft flex flex-col md:flex-row md:items-center justify-between gap-6 group hover:border-primary/50 transition-all">
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-premium flex flex-col md:flex-row md:items-center justify-between gap-6 group hover:border-primary/50 transition-all">
                 <div class="flex items-center gap-5">
-                    <div class="size-14 rounded-2xl flex items-center justify-center shrink-0 {{ $test->exam_type === 'Academic' ? 'bg-indigo-50 dark:bg-indigo-900/40 text-primary' : 'bg-sky-50 dark:bg-sky-900/40 text-sky-500' }}">
+                    <div class="size-14 rounded-xl flex items-center justify-center shrink-0 {{ $test->exam_type === 'Academic' ? 'bg-indigo-50 dark:bg-indigo-900/40 text-primary' : 'bg-sky-50 dark:bg-sky-900/40 text-sky-500' }}">
                         <span class="material-symbols-outlined text-3xl">{{ $test->exam_type === 'Academic' ? 'school' : 'public' }}</span>
                     </div>
                     <div>
