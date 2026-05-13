@@ -19,4 +19,11 @@ class TestSetController extends Controller
         $test_set->delete();
         return back()->with('success', 'Test set deleted successfully.');
     }
+
+    public function store(\App\Models\Test $test)
+    {
+        $nextNumber = ($test->testSets()->max('set_number') ?? 0) + 1;
+        $test->testSets()->create(['set_number' => $nextNumber]);
+        return back()->with('success', 'New test set added.');
+    }
 }

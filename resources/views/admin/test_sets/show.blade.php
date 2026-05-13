@@ -27,111 +27,73 @@
         </x-slot:actions>
     </x-admin.page-header>
 
-    <!-- 4-Column Module Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Writing Module -->
-        <div class="glass-card rounded-[2.5rem] overflow-hidden premium-shadow group hover:border-primary/30 transition-all flex flex-col">
-            <div class="h-40 bg-indigo-50 dark:bg-slate-800 relative flex items-center justify-center p-6 overflow-hidden">
-                <div class="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity bg-gradient-to-br from-primary to-blue-600"></div>
-                <div class="size-16 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center shadow-sm z-10">
-                    <span class="material-symbols-outlined text-3xl text-primary">edit_note</span>
-                </div>
-            </div>
-            <div class="p-6 flex-1 flex flex-col">
-                <h3 class="text-lg font-black text-slate-900 dark:text-white mb-4">Writing Module</h3>
-                <div class="space-y-3 mb-6 flex-1">
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-slate-500">Tasks added</span>
-                        <span class="font-bold text-slate-900 dark:text-white">{{ $test_set->writingTasks->count() }}</span>
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-slate-500">Status</span>
-                        <x-admin.badge variant="success" label="Configured" />
-                    </div>
-                </div>
-                <x-admin.button :href="route('admin.writing-tasks.create', $test_set->id)" block>
-                    Manage Tasks
-                </x-admin.button>
-            </div>
-        </div>
+    <!-- ─── Modules List (Non-Card Layout) ─── -->
+    <div class="space-y-4">
+        @php
+            $modules = [
+                [
+                    'name' => 'Listening Module',
+                    'icon' => 'headphones',
+                    'color' => 'var(--color-primary)',
+                    'bg' => 'color-mix(in_srgb, var(--color-primary)_10%, transparent)',
+                    'count' => $test_set->listeningSections->count(),
+                    'label' => 'Sections',
+                    'route' => route('admin.listening-sections.create', $test_set->id),
+                    'status' => 'Active'
+                ],
+                [
+                    'name' => 'Reading Module',
+                    'icon' => 'menu_book',
+                    'color' => '#F59E0B',
+                    'bg' => 'color-mix(in_srgb, #F59E0B_10%, transparent)',
+                    'count' => $test_set->readingPassages->count(),
+                    'label' => 'Passages',
+                    'route' => route('admin.reading-passages.create', $test_set->id),
+                    'status' => 'Optimized'
+                ],
+                [
+                    'name' => 'Writing Module',
+                    'icon' => 'edit_note',
+                    'color' => 'var(--color-success)',
+                    'bg' => 'color-mix(in_srgb, var(--color-success)_10%, transparent)',
+                    'count' => $test_set->writingTasks->count(),
+                    'label' => 'Tasks',
+                    'route' => route('admin.writing-tasks.create', $test_set->id),
+                    'status' => 'Configured'
+                ],
+                [
+                    'name' => 'Speaking Module',
+                    'icon' => 'record_voice_over',
+                    'color' => '#8B5CF6',
+                    'bg' => 'color-mix(in_srgb, #8B5CF6_10%, transparent)',
+                    'count' => $test_set->speakingQuestions->count(),
+                    'label' => 'Parts',
+                    'route' => route('admin.speaking-questions.create', $test_set->id),
+                    'status' => 'Ready'
+                ],
+            ];
+        @endphp
 
-        <!-- Speaking Module -->
-        <div class="glass-card rounded-[2.5rem] overflow-hidden premium-shadow group hover:border-primary/30 transition-all flex flex-col">
-            <div class="h-40 bg-blue-50 dark:bg-slate-800 relative flex items-center justify-center p-6 overflow-hidden">
-                <div class="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity bg-gradient-to-br from-blue-500 to-cyan-500"></div>
-                <div class="size-16 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center shadow-sm z-10">
-                    <span class="material-symbols-outlined text-3xl text-blue-500">record_voice_over</span>
-                </div>
-            </div>
-            <div class="p-6 flex-1 flex flex-col">
-                <h3 class="text-lg font-black text-slate-900 dark:text-white mb-4">Speaking Module</h3>
-                <div class="space-y-3 mb-6 flex-1">
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-slate-500">Parts added</span>
-                        <span class="font-bold text-slate-900 dark:text-white">{{ $test_set->speakingQuestions->count() }}</span>
+        @foreach($modules as $mod)
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-[var(--radius-lg)] border border-[var(--color-divider)] bg-[var(--color-bg-primary)] hover:border-[color-mix(in_srgb,{{ $mod['color'] }}_30%,transparent)] transition-all group">
+                <div class="flex items-center gap-4">
+                    <div class="flex size-12 shrink-0 items-center justify-center rounded-2xl transition-transform group-hover:scale-110" style="background: {{ $mod['bg'] }}; color: {{ $mod['color'] }}">
+                        <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 1">{{ $mod['icon'] }}</span>
                     </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-slate-500">Status</span>
-                        <x-admin.badge variant="success" label="Configured" />
+                    <div>
+                        <h3 class="text-base font-bold text-[var(--color-text-primary)]">{{ $mod['name'] }}</h3>
+                        <p class="text-xs text-[var(--color-text-secondary)] font-medium">
+                            {{ $mod['count'] }} {{ $mod['label'] }} &bull; <span class="text-[var(--color-success)]">{{ $mod['status'] }}</span>
+                        </p>
                     </div>
                 </div>
-                <x-admin.button :href="route('admin.speaking-questions.create', $test_set->id)" block class="from-blue-600 to-cyan-600">
-                    Manage Parts
-                </x-admin.button>
-            </div>
-        </div>
-
-        <!-- Listening Module -->
-        <div class="glass-card rounded-[2.5rem] overflow-hidden premium-shadow group hover:border-primary/30 transition-all flex flex-col">
-            <div class="h-40 bg-purple-50 dark:bg-slate-800 relative flex items-center justify-center p-6 overflow-hidden">
-                <div class="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity bg-gradient-to-br from-purple-500 to-pink-500"></div>
-                <div class="size-16 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center shadow-sm z-10">
-                    <span class="material-symbols-outlined text-3xl text-purple-500">headphones</span>
+                <div class="flex items-center gap-3">
+                    <x-ui.button variant="outline" :href="$mod['route']" class="text-xs px-4 py-2 rounded-xl">
+                        Manage {{ str_replace(' Module', '', $mod['name']) }}
+                    </x-ui.button>
                 </div>
             </div>
-            <div class="p-6 flex-1 flex flex-col">
-                <h3 class="text-lg font-black text-slate-900 dark:text-white mb-4">Listening Module</h3>
-                <div class="space-y-3 mb-6 flex-1">
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-slate-500">Sections</span>
-                        <span class="font-bold text-slate-900 dark:text-white">{{ $test_set->listeningSections->count() }}</span>
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-slate-500">Audio Sync</span>
-                        <x-admin.badge variant="success" label="Active" />
-                    </div>
-                </div>
-                <x-admin.button :href="route('admin.listening-sections.create', $test_set->id)" block class="from-purple-600 to-pink-600">
-                    Manage Audio
-                </x-admin.button>
-            </div>
-        </div>
-
-        <!-- Reading Module -->
-        <div class="glass-card rounded-[2.5rem] overflow-hidden premium-shadow group hover:border-primary/30 transition-all flex flex-col">
-            <div class="h-40 bg-orange-50 dark:bg-slate-800 relative flex items-center justify-center p-6 overflow-hidden">
-                <div class="absolute inset-0 opacity-10 group-hover:opacity-20 transition-opacity bg-gradient-to-br from-orange-500 to-red-500"></div>
-                <div class="size-16 bg-white dark:bg-slate-900 rounded-2xl flex items-center justify-center shadow-sm z-10">
-                    <span class="material-symbols-outlined text-3xl text-orange-500">menu_book</span>
-                </div>
-            </div>
-            <div class="p-6 flex-1 flex flex-col">
-                <h3 class="text-lg font-black text-slate-900 dark:text-white mb-4">Reading Module</h3>
-                <div class="space-y-3 mb-6 flex-1">
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-slate-500">Passages</span>
-                        <span class="font-bold text-slate-900 dark:text-white">{{ $test_set->readingPassages->count() }}</span>
-                    </div>
-                    <div class="flex items-center justify-between text-sm">
-                        <span class="text-slate-500">Layout</span>
-                        <x-admin.badge variant="success" label="Optimized" />
-                    </div>
-                </div>
-                <x-admin.button :href="route('admin.reading-passages.create', $test_set->id)" block class="from-orange-500 to-red-500">
-                    Manage Reading
-                </x-admin.button>
-            </div>
-        </div>
+        @endforeach
     </div>
 
     <!-- Bottom Summary Section -->

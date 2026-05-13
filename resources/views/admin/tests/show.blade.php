@@ -95,62 +95,48 @@
         <div class="lg:col-span-2">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-bold text-[var(--color-text-primary)]">Test Sets (Modules)</h3>
+                <form action="{{ route('admin.test_sets.store', $test) }}" method="POST">
+                    @csrf
+                    <x-ui.button type="submit" variant="outline" class="text-xs">
+                        <span class="material-symbols-outlined text-sm">add</span>
+                        Add New Set
+                    </x-ui.button>
+                </form>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-3">
                 @forelse($test->testSets->sortBy('set_number') as $testSet)
-                    <x-ui.card class="relative overflow-hidden group">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="flex items-center gap-3">
-                                <div class="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-[var(--color-primary)]">
-                                    <span class="text-lg font-bold">0{{ $testSet->set_number }}</span>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-[var(--radius-base)] border border-[var(--color-divider)] bg-[var(--color-bg-primary)] hover:border-[var(--color-primary)] transition-all group">
+                        <div class="flex items-center gap-4">
+                            <div class="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-[var(--color-primary)] font-bold text-sm">
+                                0{{ $testSet->set_number }}
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-[var(--color-text-primary)]">Test Set {{ $testSet->set_number }}</h4>
+                                <div class="flex items-center gap-3 mt-0.5">
+                                    <span class="text-[10px] text-[var(--color-text-secondary)] uppercase tracking-wider font-bold">4 Modules Configured</span>
+                                    <x-ui.badge variant="success" class="px-1.5 py-0 text-[9px]">Active</x-ui.badge>
                                 </div>
-                                <div>
-                                    <h4 class="text-base font-bold text-[var(--color-text-primary)]">Set {{ $testSet->set_number }}</h4>
-                                    <p class="text-xs text-[var(--color-text-secondary)]">4 Modules</p>
-                                </div>
-                            </div>
-                            <x-ui.badge variant="success">Active</x-ui.badge>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2 mb-6">
-                            <div class="p-2 rounded bg-[var(--color-bg-secondary)] border border-[var(--color-divider)] text-center">
-                                <p class="text-[10px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">Listening</p>
-                                <p class="text-sm font-bold text-[var(--color-text-primary)]">{{ collect($testSet->listeningSections ?? [])->count() }}</p>
-                            </div>
-                            <div class="p-2 rounded bg-[var(--color-bg-secondary)] border border-[var(--color-divider)] text-center">
-                                <p class="text-[10px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">Reading</p>
-                                <p class="text-sm font-bold text-[var(--color-text-primary)]">{{ collect($testSet->readingPassages ?? [])->count() }}</p>
-                            </div>
-                            <div class="p-2 rounded bg-[var(--color-bg-secondary)] border border-[var(--color-divider)] text-center">
-                                <p class="text-[10px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">Writing</p>
-                                <p class="text-sm font-bold text-[var(--color-text-primary)]">{{ collect($testSet->writingTasks ?? [])->count() }}</p>
-                            </div>
-                            <div class="p-2 rounded bg-[var(--color-bg-secondary)] border border-[var(--color-divider)] text-center">
-                                <p class="text-[10px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">Speaking</p>
-                                <p class="text-sm font-bold text-[var(--color-text-primary)]">{{ collect($testSet->speakingQuestions ?? [])->count() }}</p>
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-between border-t border-[var(--color-divider)] pt-4 mt-auto">
+                        <div class="flex items-center gap-4">
                             <form action="{{ route('admin.test_sets.destroy', $testSet) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this test set?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-xs font-semibold text-[var(--color-error)] hover:opacity-80 transition-opacity">Delete</button>
+                                <button type="submit" class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-error)] hover:opacity-70 transition-opacity">Delete</button>
                             </form>
-                            <x-ui.button href="{{ route('admin.test_sets.show', $testSet->id) }}" variant="outline" class="text-xs px-3 py-1">
-                                Manage Set
+                            <x-ui.button href="{{ route('admin.test_sets.show', $testSet->id) }}" variant="outline" class="text-xs px-4 py-1.5 rounded-lg">
+                                Manage
                             </x-ui.button>
                         </div>
-                    </x-ui.card>
-                @empty
-                    <div class="md:col-span-2">
-                        <x-ui.empty-state
-                            icon="layers_clear"
-                            title="No Test Sets"
-                            description="This exam doesn't have any test sets yet."
-                        />
                     </div>
+                @empty
+                    <x-ui.empty-state
+                        icon="layers_clear"
+                        title="No Test Sets"
+                        description="This exam doesn't have any test sets yet."
+                    />
                 @endforelse
             </div>
         </div>

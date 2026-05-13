@@ -72,10 +72,20 @@
                                 @endif
                             </td>
 
-                            <td class="px-5 py-4 sm:px-6 text-right">
-                                <x-ui.button variant="outline" href="{{ route('admin.tests.show', $test) }}" class="text-xs px-4 py-1.5 font-medium">
-                                    Manage
-                                </x-ui.button>
+                            <td class="px-5 py-4 sm:px-6">
+                                <div class="flex items-center justify-end gap-2">
+                                    <x-ui.button variant="outline" href="{{ route('admin.tests.show', $test) }}" class="text-xs px-3 py-1.5 font-medium">
+                                        Manage
+                                    </x-ui.button>
+                                    
+                                    <form action="{{ route('admin.tests.destroy', $test) }}" method="POST" onsubmit="return confirm('Delete Exam: Are you sure? This will remove all associated test sets and module data.')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="p-2 rounded-[var(--radius-xs)] text-[var(--color-text-secondary)] hover:text-[var(--color-error)] hover:bg-[color-mix(in_srgb,var(--color-error)_10%,transparent)] transition-colors">
+                                            <span class="material-symbols-outlined text-lg">delete</span>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @empty

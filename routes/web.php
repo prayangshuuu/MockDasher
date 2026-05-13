@@ -68,6 +68,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/test_sets/{test_set}', [TestSetController::class, 'show'])->name('test_sets.show');
+        Route::post('/tests/{test}/test_sets', [TestSetController::class, 'store'])->name('test_sets.store');
         Route::delete('/test_sets/{test_set}', [TestSetController::class, 'destroy'])->name('test_sets.destroy');
 
         Route::get('/test_sets/{test_set}/writing-tasks/create', [WritingTaskController::class, 'create'])->name('writing-tasks.create');

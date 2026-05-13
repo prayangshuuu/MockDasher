@@ -91,6 +91,15 @@
 
                     </div>
 
+                    {{-- Info Note --}}
+                    <div class="mt-6 flex items-start gap-3 rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-primary)_5%,transparent)] border border-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] p-4">
+                        <span class="material-symbols-outlined text-[var(--color-primary)] text-lg">info</span>
+                        <div>
+                            <p class="text-sm font-bold text-[var(--color-primary)]">Automatic Test Sets</p>
+                            <p class="text-xs text-[var(--color-text-secondary)] mt-0.5">Creating this exam will automatically generate 4 empty Test Sets (Set 1–4) for you to configure with module content.</p>
+                        </div>
+                    </div>
+
                     {{-- Form Footer --}}
                     <div class="mt-8 pt-6 border-t border-[var(--color-divider)] flex items-center justify-end gap-3">
                         <x-ui.button type="button" variant="secondary" href="{{ route('admin.tests.index') }}">Cancel</x-ui.button>

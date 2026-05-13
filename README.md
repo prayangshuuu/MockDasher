@@ -80,6 +80,17 @@ Ensure your local development environment meets the following requirements:
 
 ---
 
+## Default Login Credentials 🔐
+
+After running the seeders (`php artisan db:seed`), you can access the platform using these default accounts:
+
+| Role      | Email                  | Password   |
+| :-------- | :--------------------- | :--------- |
+| **Admin** | `admin@prayangshu.com` | `password` |
+| **User**  | `user@prayangshu.com`  | `password` |
+
+---
+
 ## Deployment
 
 To deploy MockDasher to a production server:
