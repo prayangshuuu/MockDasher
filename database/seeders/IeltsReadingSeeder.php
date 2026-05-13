@@ -172,7 +172,32 @@ class IeltsReadingSeeder extends Seeder
             ]
         );
 
-        $this->command->info('✅ IELTS 20 (2025) Test 1 seeded: 3 reading passages (40Q) + 2 writing tasks.');
+        // ── Speaking Questions ──
+        $speakingData = [
+            // Part 1: Introduction & Interview (45s per question)
+            ['part' => 1, 'question_text' => 'How much walking do you do in your daily life?', 'time_limit' => 45, 'preparation_instructions' => null],
+            ['part' => 1, 'question_text' => 'Did you walk more when you were at school than now?', 'time_limit' => 45, 'preparation_instructions' => null],
+            ['part' => 1, 'question_text' => 'What places are there to go for a walk near where you live?', 'time_limit' => 45, 'preparation_instructions' => null],
+            ['part' => 1, 'question_text' => 'Would you ever like to go on a walking holiday?', 'time_limit' => 45, 'preparation_instructions' => null],
+            // Part 2: Long Turn (2:15 = 135s total)
+            ['part' => 2, 'question_text' => "Describe a play or a film you have seen that you would like to see again with friends.\n\nYou should say:\n• what play or film you'd like to go to see again\n• who you would go with\n• what other people have said about this play or film\n• and explain why you would like to see this play or film again with friends.", 'time_limit' => 135, 'preparation_instructions' => 'You will have to talk about the topic for one to two minutes. You have one minute to think about what you are going to say. You can make some notes to help you if you wish.'],
+            // Part 3: Discussion (90s per question)
+            ['part' => 3, 'question_text' => 'What are the most popular kinds of plays or shows at theatres in your country?', 'time_limit' => 90, 'preparation_instructions' => null],
+            ['part' => 3, 'question_text' => 'How easy is it to get tickets to the theatre?', 'time_limit' => 90, 'preparation_instructions' => null],
+            ['part' => 3, 'question_text' => 'Do you think theatres need to do more to attract younger audiences?', 'time_limit' => 90, 'preparation_instructions' => null],
+            ['part' => 3, 'question_text' => 'What do you think attracts people to working as an actor?', 'time_limit' => 90, 'preparation_instructions' => null],
+            ['part' => 3, 'question_text' => 'What are some of the qualities that a person needs to have if they want to become an actor?', 'time_limit' => 90, 'preparation_instructions' => null],
+            ['part' => 3, 'question_text' => 'Can you think of any disadvantages of working as an actor?', 'time_limit' => 90, 'preparation_instructions' => null],
+        ];
+
+        foreach ($speakingData as $sq) {
+            \App\Models\SpeakingQuestion::updateOrCreate(
+                ['test_set_id' => $testSet->id, 'part' => $sq['part'], 'question_text' => $sq['question_text']],
+                ['time_limit' => $sq['time_limit'], 'preparation_instructions' => $sq['preparation_instructions']]
+            );
+        }
+
+        $this->command->info('✅ IELTS 20 (2025) Test 1 seeded: 3 reading passages (40Q) + 2 writing tasks + 11 speaking questions.');
     }
 
     private function createGroup(ReadingPassage $passage, string $type, string $instruction, int $order): ReadingQuestionGroup

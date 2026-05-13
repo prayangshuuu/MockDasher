@@ -65,6 +65,11 @@ class TestAttempt extends Model
         return $this->hasOne(AiSpeakingEvaluation::class);
     }
 
+    public function speakingAnswers()
+    {
+        return $this->hasMany(SpeakingAnswer::class, 'test_attempt_id');
+    }
+
     public function getOverallBandAttribute(): ?float
     {
         $scores = [];

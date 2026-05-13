@@ -13,9 +13,11 @@ class SpeakingQuestionController extends Controller
 {
     public function create($testSetId)
     {
-        $testSet = TestSet::findOrFail($testSetId);
+        $testSet = TestSet::with('test')->findOrFail($testSetId);
+        $questions = $testSet->speakingQuestions()->orderBy('part')->orderBy('id')->get();
+        $parts = $questions->groupBy('part');
 
-        return view('admin.speaking-questions.create', compact('testSet'));
+        return view('admin.speaking-questions.create', compact('testSet', 'questions', 'parts'));
     }
 
     public function store(Request $request, $testSetId)

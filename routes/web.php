@@ -39,6 +39,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/tests/attempts/{attempt}/writing/submit', [WritingTestController::class, 'submit'])->name('user.writing.submit');
 
     Route::get('/tests/attempts/{attempt}/speaking', [SpeakingTestController::class, 'show'])->name('user.speaking.show');
+    Route::post('/tests/attempts/{attempt}/speaking/upload-audio', [SpeakingTestController::class, 'uploadAudio'])->name('user.speaking.uploadAudio');
     Route::post('/tests/attempts/{attempt}/speaking/submit', [SpeakingTestController::class, 'submit'])->name('user.speaking.submit');
 
     Route::get('/tests/attempts/{attempt}/listening', [ListeningTestController::class, 'show'])->name('user.listening.show');
