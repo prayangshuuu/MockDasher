@@ -73,7 +73,6 @@
                 ['label' => 'Dashboard',     'icon' => 'dashboard',     'route' => 'admin.dashboard',     'match' => 'admin.dashboard'],
                 ['label' => 'Users',         'icon' => 'group',         'route' => 'admin.users.index',   'match' => 'admin.users.*'],
                 ['label' => 'Exams & Tests', 'icon' => 'library_books', 'route' => 'admin.tests.index',   'match' => 'admin.tests.*'],
-                ['label' => 'Question Bank', 'icon' => 'database',      'route' => 'admin.dashboard',     'match' => 'admin.questions.*'], // Placeholder route
                 ['label' => 'Settings',      'icon' => 'settings',      'route' => 'profile.show',        'match' => 'profile.*'],
             ];
         @endphp

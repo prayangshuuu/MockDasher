@@ -74,10 +74,10 @@
 
                             <td class="px-5 py-4 sm:px-6 text-right">
                                 <div class="flex items-center justify-end gap-2">
-                                    <a href="#" class="flex size-8 items-center justify-center rounded-[var(--radius-xs)] text-[var(--color-text-secondary)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] hover:text-[var(--color-primary)]" title="Edit">
+                                    <a href="{{ route('admin.tests.edit', $test) }}" class="flex size-8 items-center justify-center rounded-[var(--radius-xs)] text-[var(--color-text-secondary)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] hover:text-[var(--color-primary)]" title="Edit">
                                         <span class="material-symbols-outlined text-small">edit</span>
                                     </a>
-                                    <form action="#" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this exam?');">
+                                    <form action="{{ route('admin.tests.destroy', $test) }}" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this exam?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="flex size-8 items-center justify-center rounded-[var(--radius-xs)] text-[var(--color-text-secondary)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-error)_10%,transparent)] hover:text-[var(--color-error)]" title="Delete">
