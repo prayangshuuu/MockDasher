@@ -133,7 +133,11 @@
                         </div>
 
                         <div class="flex items-center justify-between border-t border-[var(--color-divider)] pt-4 mt-auto">
-                            <button class="text-xs font-semibold text-[var(--color-error)] hover:opacity-80 transition-opacity">Delete</button>
+                            <form action="{{ route('admin.test_sets.destroy', $testSet) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this test set?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-xs font-semibold text-[var(--color-error)] hover:opacity-80 transition-opacity">Delete</button>
+                            </form>
                             <x-ui.button href="{{ route('admin.test_sets.show', $testSet->id) }}" variant="outline" class="text-xs px-3 py-1">
                                 Manage Set
                             </x-ui.button>

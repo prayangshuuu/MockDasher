@@ -13,4 +13,10 @@ class TestSetController extends Controller
 
         return view('admin.test_sets.show', compact('test_set'));
     }
+
+    public function destroy(TestSet $test_set)
+    {
+        $test_set->delete();
+        return back()->with('success', 'Test set deleted successfully.');
+    }
 }

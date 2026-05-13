@@ -121,7 +121,7 @@
                             @if($attempt->status === 'completed')
                                 <x-ui.button variant="outline" href="{{ route('user.history.show', $attempt->id) }}" class="text-xs px-3 py-1.5">Review</x-ui.button>
                             @else
-                                <x-ui.button variant="primary" href="{{ route('user.history.show', $attempt->id) }}" class="text-xs px-3 py-1.5">Resume</x-ui.button>
+                                <x-ui.button variant="primary" href="{{ route('user.tests.start', $attempt->testSet->test_id) }}" class="text-xs px-3 py-1.5">Resume</x-ui.button>
                             @endif
                         </td>
                     </tr>

@@ -5,33 +5,30 @@
 @section('test_title', 'IELTS ' . $test->book_number)
 
 @section('timer_area')
-<div id="timer-widget" class="flex items-center gap-3 bg-white dark:bg-slate-800 border-2 px-4 py-2 rounded-2xl shadow-sm transition-all border-slate-100 dark:border-slate-700">
-    <span class="material-symbols-outlined text-xl text-primary" id="timer-icon">timer</span>
-    <div class="flex items-baseline gap-1.5">
-        <span class="text-2xl font-black font-mono tracking-tighter tabular-nums text-slate-900 dark:text-white" id="timer-display">30:00</span>
-        <span class="text-[10px] font-black uppercase tracking-widest opacity-40">Remaining</span>
-    </div>
+<div id="timer-widget" class="flex items-center gap-2 rounded-full border border-[var(--color-divider)] bg-[var(--color-bg-primary)] px-4 py-1.5 transition-all">
+    <span class="material-symbols-outlined text-lg text-[var(--color-primary)]" id="timer-icon">timer</span>
+    <span class="text-lg font-bold tabular-nums tracking-tight text-[var(--color-text-primary)] font-mono" id="timer-display">30:00</span>
+    <span class="hidden text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:inline">Remaining</span>
 </div>
 @endsection
 
 @section('top_right_actions')
-<div class="flex items-center gap-6">
-    <div id="save-indicator" class="flex items-center gap-2 text-emerald-500">
+<div class="flex items-center gap-3">
+    <div id="save-indicator" class="flex items-center gap-1.5 text-[var(--color-success)]">
         <span class="material-symbols-outlined text-sm">check_circle</span>
-        <span class="text-[10px] font-black uppercase tracking-widest">Saved</span>
+        <span class="text-[10px] font-bold uppercase tracking-wider">Saved</span>
     </div>
-    <div class="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
-    <button onclick="showReviewPanel()" class="flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-black rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 shadow-lg shadow-slate-200 dark:shadow-none">
+    <x-ui.button variant="primary" onclick="showReviewPanel()" class="text-xs">
         <span class="material-symbols-outlined text-sm">assignment_turned_in</span>
-        End Test
-    </button>
+        <span class="hidden sm:inline">End Test</span>
+    </x-ui.button>
 </div>
 @endsection
 
 @section('content')
 <div id="listening-app" class="flex-1 flex flex-col overflow-hidden">
     {{-- Audio Control Panel --}}
-    <div class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-6 flex flex-col items-center gap-4 z-40 relative shadow-md">
+    <div class="bg-[var(--color-bg-primary)] border-b border-[var(--color-divider)] p-6 flex flex-col items-center gap-4 z-40 relative shadow-sm">
         <audio id="main-audio" preload="auto">
             @if($sections->first() && $sections->first()->audio_path)
             <source src="{{ Storage::url($sections->first()->audio_path) }}" type="audio/mpeg">
@@ -39,67 +36,67 @@
         </audio>
 
         <div class="w-full max-w-4xl flex items-center gap-8">
-            <button onclick="toggleAudio()" id="play-btn" class="size-16 rounded-full exam-gradient flex items-center justify-center text-white shadow-xl shadow-primary/30 hover:scale-105 transition-all active:scale-95">
-                <span class="material-symbols-outlined text-4xl font-black fill-1" id="play-icon">play_arrow</span>
+            <button onclick="toggleAudio()" id="play-btn" class="flex size-14 items-center justify-center rounded-full bg-[var(--color-primary)] text-white transition-transform active:scale-95 hover:opacity-90">
+                <span class="material-symbols-outlined text-3xl font-bold" id="play-icon">play_arrow</span>
             </button>
-            <div class="flex-1 space-y-3">
-                <div class="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+            <div class="flex-1 space-y-2">
+                <div class="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-secondary)]">
                     <span id="audio-current">00:00</span>
                     <span id="audio-duration">00:00</span>
                 </div>
-                <div onclick="seekAudio(event)" class="h-3 bg-slate-100 dark:bg-slate-800 rounded-full cursor-pointer relative group overflow-hidden border border-slate-200 dark:border-slate-700">
-                    <div class="h-full exam-gradient transition-all duration-300 relative shadow-inner" id="audio-progress" style="width:0%">
-                        <div class="absolute right-0 top-1/2 -translate-y-1/2 size-4 bg-white rounded-full border-2 border-primary shadow-sm scale-0 group-hover:scale-100 transition-transform"></div>
+                <div onclick="seekAudio(event)" class="h-2 bg-[var(--color-bg-secondary)] rounded-full cursor-pointer relative group overflow-hidden border border-[var(--color-divider)]">
+                    <div class="h-full bg-[var(--color-primary)] transition-all duration-300 relative" id="audio-progress" style="width:0%">
+                        <div class="absolute right-0 top-1/2 -translate-y-1/2 size-3 bg-white rounded-full border border-[var(--color-primary)] scale-0 group-hover:scale-100 transition-transform"></div>
                     </div>
                 </div>
             </div>
-            <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl border border-slate-200 dark:border-slate-700">
-                <span class="material-symbols-outlined text-slate-400 text-xl">volume_up</span>
-                <input type="range" id="vol-slider" value="0.8" min="0" max="1" step="0.1" oninput="updateVolume()" class="w-20 accent-primary h-1">
+            <div class="flex items-center gap-3 bg-[var(--color-bg-secondary)] p-2.5 rounded-[var(--radius-base)] border border-[var(--color-divider)]">
+                <span class="material-symbols-outlined text-[var(--color-text-secondary)] text-lg">volume_up</span>
+                <input type="range" id="vol-slider" value="0.8" min="0" max="1" step="0.1" oninput="updateVolume()" class="w-20 accent-[var(--color-primary)] h-1">
             </div>
         </div>
-        <div class="text-[10px] font-bold text-rose-500 uppercase tracking-widest flex items-center gap-2">
-            <span class="size-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+        <div class="text-[10px] font-bold text-[var(--color-error)] uppercase tracking-wider flex items-center gap-2">
+            <span class="size-1.5 rounded-full bg-[var(--color-error)] animate-pulse"></span>
             Note: In the real exam, audio can only be played once.
         </div>
     </div>
 
     {{-- Main Question Area --}}
-    <div class="flex-1 overflow-y-auto custom-scrollbar bg-slate-50 dark:bg-slate-900/50 p-12">
+    <div class="flex-1 overflow-y-auto custom-scrollbar bg-[var(--color-bg-secondary)] p-6 sm:p-12">
         <div class="max-w-4xl mx-auto space-y-10">
             @php $globalQ = 0; @endphp
             @foreach($sections as $section)
-            <div class="space-y-8 bg-white dark:bg-slate-900/40 p-10 rounded-[40px] border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div class="space-y-8 bg-[var(--color-bg-primary)] p-8 sm:p-10 rounded-[var(--radius-xl)] border border-[var(--color-divider)] shadow-sm">
                 <div class="flex items-center gap-4">
-                    <div class="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                        <span class="material-symbols-outlined text-2xl font-black">music_note</span>
+                    <div class="flex size-10 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-[var(--color-primary)]">
+                        <span class="material-symbols-outlined text-2xl font-bold">music_note</span>
                     </div>
                     <div>
-                        <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight italic">Section {{ $section->section_number }}</h2>
-                        <p class="text-sm text-slate-500 font-bold">{{ $section->instruction_text }}</p>
+                        <h2 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight">Section {{ $section->section_number }}</h2>
+                        <p class="text-sm text-[var(--color-text-secondary)] font-medium">{{ $section->instruction_text }}</p>
                     </div>
                 </div>
 
-                <div class="space-y-8 pl-14">
+                <div class="space-y-8 sm:pl-14">
                     @foreach($section->questions as $qi => $question)
                     @php $globalQ++; @endphp
                     <div id="question-{{ $question->id }}" class="group/q">
-                        <div class="flex items-start gap-6">
-                            <div class="size-10 rounded-2xl flex items-center justify-center shrink-0 border-2 transition-all border-slate-100 dark:border-slate-800 text-slate-400 bg-white dark:bg-slate-900 q-badge" data-qid="{{ $question->id }}">
-                                <span class="text-sm font-black">{{ $globalQ }}</span>
+                        <div class="flex items-start gap-4 sm:gap-6">
+                            <div class="flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-xs)] bg-[var(--color-bg-secondary)] text-xs font-bold text-[var(--color-text-primary)] q-badge border border-[var(--color-divider)] transition-all" data-qid="{{ $question->id }}">
+                                {{ $globalQ }}
                             </div>
                             <div class="flex-1 pt-1">
-                                <div class="text-[17px] font-bold text-slate-900 dark:text-white leading-relaxed mb-6">
+                                <div class="text-base font-semibold text-[var(--color-text-primary)] leading-relaxed mb-6">
                                     {!! nl2br(e($question->question_text)) !!}
                                 </div>
                                 <div class="max-w-md">
                                     @if($question->question_type === 'multiple_choice')
                                     <div class="grid grid-cols-1 gap-2">
                                         @foreach($question->options as $oi => $opt)
-                                        <label class="listening-option flex items-center gap-4 p-4 rounded-xl border border-slate-100 dark:border-slate-800 cursor-pointer transition-all hover:border-primary/30 text-slate-500" data-qid="{{ $question->id }}" data-val="{{ $opt->option_text }}">
-                                            <input type="radio" name="q_{{ $question->id }}" value="{{ $opt->option_text }}" class="size-4 text-primary focus:ring-primary" onchange="setAnswer({{ $question->id }}, this.value)" {{ (($savedAnswers[$question->id] ?? '') === $opt->option_text) ? 'checked' : '' }}>
-                                            <span class="text-sm font-bold flex items-center gap-3">
-                                                <span class="opacity-40">{{ chr(65+$oi) }}.</span>
+                                        <label class="listening-option flex cursor-pointer items-center gap-3 rounded-[var(--radius-base)] border border-[var(--color-divider)] p-3.5 transition-all hover:border-[var(--color-primary)] text-[var(--color-text-secondary)]" data-qid="{{ $question->id }}" data-val="{{ $opt->option_text }}">
+                                            <input type="radio" name="q_{{ $question->id }}" value="{{ $opt->option_text }}" class="size-4 accent-[var(--color-primary)]" onchange="setAnswer({{ $question->id }}, this.value)" {{ (($savedAnswers[$question->id] ?? '') === $opt->option_text) ? 'checked' : '' }}>
+                                            <span class="text-sm flex items-center gap-2">
+                                                <span class="font-semibold text-[var(--color-text-secondary)]">{{ chr(65+$oi) }}.</span>
                                                 {{ $opt->option_text }}
                                             </span>
                                         </label>
@@ -107,13 +104,13 @@
                                     </div>
                                     @else
                                     <input type="text" value="{{ $savedAnswers[$question->id] ?? '' }}" oninput="setAnswer({{ $question->id }}, this.value)"
-                                           class="w-full bg-white dark:bg-slate-950 border-2 border-slate-100 dark:border-slate-800 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none italic"
+                                           class="w-full bg-[var(--color-bg-primary)] border border-[var(--color-divider)] rounded-[var(--radius-base)] px-4 py-3 text-sm focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-all outline-none"
                                            placeholder="Type your answer...">
                                     @endif
                                 </div>
                             </div>
-                            <button onclick="toggleFlag({{ $question->id }})" class="flag-btn transition-colors text-slate-200 hover:text-slate-400" data-qid="{{ $question->id }}" data-flagged="{{ !empty($flaggedAnswers[$question->id]) ? '1' : '0' }}">
-                                <span class="material-symbols-outlined text-3xl font-light">flag</span>
+                            <button onclick="toggleFlag({{ $question->id }})" class="flag-btn shrink-0 text-[var(--color-divider)] transition-colors hover:text-[var(--color-error)]" data-qid="{{ $question->id }}" data-flagged="{{ !empty($flaggedAnswers[$question->id]) ? '1' : '0' }}">
+                                <span class="material-symbols-outlined text-xl">flag</span>
                             </button>
                         </div>
                     </div>
@@ -125,16 +122,16 @@
     </div>
 
     {{-- Bottom Answer Sheet --}}
-    <div class="h-24 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center px-10 z-30 shrink-0">
-        <div class="flex-1 flex gap-2 overflow-x-auto py-3 custom-scrollbar">
+    <div class="flex h-16 shrink-0 items-center border-t border-[var(--color-divider)] bg-[var(--color-bg-primary)] px-4 sm:px-6 lg:px-8 z-30">
+        <div class="flex flex-1 gap-1.5 overflow-x-auto py-2 custom-scrollbar">
             @php $qi = 0; @endphp
             @foreach($sections as $section)
                 @foreach($section->questions as $question)
                 @php $qi++; @endphp
                 <button onclick="jumpToQuestion({{ $question->id }})"
-                        class="nav-btn size-12 rounded-2xl border-2 flex items-center justify-center shrink-0 transition-all relative border-transparent bg-slate-100 dark:bg-slate-800 text-slate-400" data-qid="{{ $question->id }}">
-                    <span class="text-sm font-black">{{ $qi }}</span>
-                    <div class="flag-dot absolute -top-1.5 -right-1.5 size-4 bg-rose-500 border-2 border-white dark:border-slate-900 rounded-full" data-qid="{{ $question->id }}" style="display:none;"></div>
+                        class="nav-btn flex size-9 shrink-0 items-center justify-center rounded-[var(--radius-base)] text-xs font-bold transition-all relative border border-[var(--color-divider)] bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]" data-qid="{{ $question->id }}">
+                    {{ $qi }}
+                    <div class="flag-dot absolute -right-1 -top-1 size-3 rounded-full border-2 border-[var(--color-bg-primary)] bg-[var(--color-error)]" data-qid="{{ $question->id }}" style="display:none;"></div>
                 </button>
                 @endforeach
             @endforeach
@@ -142,45 +139,45 @@
     </div>
 
     {{-- Review Overlay --}}
-    <div id="review-panel" class="fixed inset-0 z-[100] flex items-center justify-center p-8 bg-slate-950/80 backdrop-blur-md" style="display:none;">
-        <div class="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-[40px] shadow-2xl flex flex-col overflow-hidden max-h-full border border-slate-200 dark:border-slate-800">
-            <div class="p-10 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
-                <div class="flex items-center gap-6">
-                    <div class="size-16 rounded-3xl bg-primary/10 text-primary flex items-center justify-center">
-                        <span class="material-symbols-outlined text-4xl font-light">playlist_add_check</span>
+    <div id="review-panel" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/40 backdrop-blur-sm p-6" style="display:none;">
+        <div class="flex max-h-full w-full max-w-3xl flex-col overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-divider)] bg-[var(--color-bg-primary)]">
+            <div class="flex items-center justify-between border-b border-[var(--color-divider)] px-6 py-5 sm:px-8 shrink-0">
+                <div class="flex items-center gap-4">
+                    <div class="flex size-10 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-[var(--color-primary)]">
+                        <span class="material-symbols-outlined text-2xl">playlist_add_check</span>
                     </div>
                     <div>
-                        <h2 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none mb-2">Listening Summary</h2>
-                        <p class="text-slate-500 font-bold text-xs uppercase tracking-widest italic">Review your inputs before submitting.</p>
+                        <h2 class="text-xl font-bold text-[var(--color-text-primary)]">Listening Summary</h2>
+                        <p class="text-xs text-[var(--color-text-secondary)]">Review your inputs before submitting.</p>
                     </div>
                 </div>
-                <button onclick="hideReviewPanel()" class="size-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-rose-500 transition-colors flex items-center justify-center">
+                <button onclick="hideReviewPanel()" class="flex size-8 items-center justify-center rounded-[var(--radius-xs)] text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-bg-secondary)] hover:text-[var(--color-error)]">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
-            <div class="flex-1 overflow-y-auto p-12 custom-scrollbar">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                    <div class="p-8 rounded-[32px] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700">
-                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Answered</p>
-                        <div class="flex items-end gap-3">
-                            <h3 class="text-4xl font-black text-slate-900 dark:text-white leading-none" id="review-answered">0</h3>
-                            <span class="text-slate-300 dark:text-slate-600 text-lg font-bold">/ {{ $sections->flatMap(fn($s) => $s->questions)->count() }}</span>
+            <div class="flex-1 overflow-y-auto px-6 py-6 sm:px-8 custom-scrollbar">
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <div class="rounded-[var(--radius-base)] bg-[var(--color-bg-secondary)] p-4">
+                        <p class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)]">Answered</p>
+                        <div class="mt-1 flex items-baseline gap-1">
+                            <h3 class="text-2xl font-bold text-[var(--color-text-primary)] leading-none" id="review-answered">0</h3>
+                            <span class="text-sm font-semibold text-[var(--color-text-secondary)]">/ {{ $sections->flatMap(fn($s) => $s->questions)->count() }}</span>
                         </div>
                     </div>
-                    <div class="p-8 rounded-[32px] bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-900/30 text-rose-600">
-                        <p class="text-[10px] font-black uppercase tracking-widest text-rose-500 mb-2">Flagged</p>
-                        <h3 class="text-4xl font-black leading-none" id="review-flagged">0</h3>
+                    <div class="rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-error)_6%,transparent)] p-4">
+                        <p class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-error)]">Flagged</p>
+                        <h3 class="mt-1 text-2xl font-bold text-[var(--color-error)] leading-none" id="review-flagged">0</h3>
                     </div>
                 </div>
-                <div class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-3" id="review-grid"></div>
+                <div class="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-2" id="review-grid"></div>
             </div>
-            <div class="p-10 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between shrink-0">
-                <button onclick="hideReviewPanel()" class="px-8 py-4 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+            <div class="flex items-center justify-between border-t border-[var(--color-divider)] bg-[var(--color-bg-secondary)] px-6 py-4 sm:px-8 shrink-0">
+                <button onclick="hideReviewPanel()" class="text-sm font-semibold text-[var(--color-text-secondary)] transition-opacity hover:opacity-70">
                     Back to Test
                 </button>
-                <button onclick="confirmSubmit()" class="px-12 py-5 bg-slate-900 dark:bg-white text-white dark:text-black rounded-[28px] text-sm font-black uppercase tracking-[0.2em] shadow-2xl hover:scale-[1.02] transition-all active:scale-95">
+                <x-ui.button variant="primary" onclick="confirmSubmit()">
                     Submit My Result
-                </button>
+                </x-ui.button>
             </div>
         </div>
     </div>
@@ -215,8 +212,8 @@
         if (timeRemaining <= 0) { document.getElementById('listening-submit-form').submit(); return; }
         timerEl.textContent = formatTime(timeRemaining);
         if (timeRemaining <= 300) {
-            timerWidget.classList.add('border-rose-500', 'bg-rose-50');
-            timerEl.classList.add('text-rose-600');
+            timerWidget.classList.add('border-[var(--color-error)]', 'bg-[color-mix(in_srgb,var(--color-error)_10%,transparent)]');
+            timerEl.classList.add('text-[var(--color-error)]');
         }
     }, 1000);
 
@@ -259,14 +256,7 @@
     window.toggleFlag = function(qId) {
         flags[qId] = !flags[qId];
         const btn = document.querySelector('.flag-btn[data-qid="'+qId+'"]');
-        const icon = btn.querySelector('.material-symbols-outlined');
-        if (flags[qId]) {
-            btn.classList.remove('text-slate-200'); btn.classList.add('text-rose-500');
-            icon.classList.add('fill-1');
-        } else {
-            btn.classList.remove('text-rose-500'); btn.classList.add('text-slate-200');
-            icon.classList.remove('fill-1');
-        }
+        if (btn) btn.style.color = flags[qId] ? 'var(--color-error)' : 'var(--color-divider)';
         document.querySelectorAll('.flag-dot[data-qid="'+qId+'"]').forEach(d => d.style.display = flags[qId] ? 'block' : 'none');
         debouncedAutosave();
     };
@@ -275,7 +265,7 @@
     Object.keys(flags).forEach(qId => {
         if (flags[qId]) {
             const btn = document.querySelector('.flag-btn[data-qid="'+qId+'"]');
-            if (btn) { btn.classList.remove('text-slate-200'); btn.classList.add('text-rose-500'); btn.querySelector('.material-symbols-outlined').classList.add('fill-1'); }
+            if (btn) btn.style.color = 'var(--color-error)';
             document.querySelectorAll('.flag-dot[data-qid="'+qId+'"]').forEach(d => d.style.display = 'block');
         }
     });
@@ -286,13 +276,9 @@
     function updateNavBtn(qId) {
         const btn = document.querySelector('.nav-btn[data-qid="'+qId+'"]');
         if (!btn) return;
-        if (answers[qId] && answers[qId].trim() !== '') {
-            btn.classList.remove('bg-slate-100', 'text-slate-400');
-            btn.classList.add('bg-primary', 'text-white');
-        } else {
-            btn.classList.remove('bg-primary', 'text-white');
-            btn.classList.add('bg-slate-100', 'text-slate-400');
-        }
+        const filled = answers[qId] && answers[qId].trim() !== '';
+        btn.className = 'nav-btn flex size-9 shrink-0 items-center justify-center rounded-[var(--radius-base)] text-xs font-bold transition-all relative border ' +
+            (filled ? 'bg-[var(--color-primary)] border-[var(--color-primary)] text-white' : 'border-[var(--color-divider)] bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]');
     }
 
     window.jumpToQuestion = function(qId) {
@@ -334,16 +320,21 @@
             const hasAnswer = answers[qId] && answers[qId].trim() !== '';
             const isFlagged = !!flags[qId];
             const div = document.createElement('button');
-            div.className = 'aspect-square rounded-2xl border-2 flex flex-col items-center justify-center transition-all relative ' + (hasAnswer ? 'bg-primary border-primary text-white shadow-lg' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400 hover:border-primary/30');
-            div.innerHTML = '<span class="text-xs font-black">' + n + '</span>' + (isFlagged ? '<div class="absolute -top-1 -right-1 size-3 bg-rose-500 rounded-full border-2 border-white dark:border-slate-900"></div>' : '');
+            div.className = 'review-bubble flex aspect-square items-center justify-center rounded-[var(--radius-base)] border text-xs font-bold transition-all relative ' +
+                (hasAnswer ? 'bg-[var(--color-primary)] border-[var(--color-primary)] text-white' : 'border-[var(--color-divider)] bg-[var(--color-bg-primary)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)]');
+            div.innerHTML = n + (isFlagged ? '<div class="absolute -top-0.5 -right-0.5 size-2.5 bg-[var(--color-error)] rounded-full border-2 border-[var(--color-bg-primary)]"></div>' : '');
             div.onclick = () => { jumpToQuestion(parseInt(qId)); hideReviewPanel(); };
             grid.appendChild(div);
         });
 
         document.getElementById('review-panel').style.display = 'flex';
+        document.getElementById('review-panel').classList.remove('hidden');
     };
 
-    window.hideReviewPanel = function() { document.getElementById('review-panel').style.display = 'none'; };
+    window.hideReviewPanel = function() {
+        document.getElementById('review-panel').style.display = 'none';
+        document.getElementById('review-panel').classList.add('hidden');
+    };
 
     window.confirmSubmit = function() {
         if (confirm('End Listening Test: Are you ready to submit your answers?')) {

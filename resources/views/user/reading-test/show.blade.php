@@ -352,18 +352,34 @@
     }
 
     window.confirmSubmit = function() {
-        document.getElementById('review-answered').textContent = Object.values(answers).filter(v => v && v.trim() !== '').length;
-        document.getElementById('review-flagged').textContent = Object.values(flags).filter(v => v).length;
-        if (confirm('Final Submission: Your reading test will be closed for grading. Are you sure?')) { populateHiddenInputs(); document.getElementById('final-submit-form').submit(); }
+        const answeredCount = Object.values(answers).filter(v => v && typeof v === 'string' && v.trim() !== '').length;
+        const flaggedCount = Object.values(flags).filter(v => v === true).length;
+        
+        const answeredEl = document.getElementById('review-answered');
+        const flaggedEl = document.getElementById('review-flagged');
+        if (answeredEl) answeredEl.textContent = answeredCount;
+        if (flaggedEl) flaggedEl.textContent = flaggedCount;
+
+        if (confirm('Final Submission: Your reading test will be closed for grading. Are you sure?')) { 
+            populateHiddenInputs(); 
+            const form = document.getElementById('final-submit-form');
+            if (form) form.submit();
+        }
     };
 
     const ro = document.getElementById('review-overlay');
-    new MutationObserver(function() {
-        if (!ro.classList.contains('hidden')) {
-            document.getElementById('review-answered').textContent = Object.values(answers).filter(v => v && v.trim() !== '').length;
-            document.getElementById('review-flagged').textContent = Object.values(flags).filter(v => v).length;
-        }
-    }).observe(ro, { attributes: true, attributeFilter: ['class'] });
+    if (ro) {
+        new MutationObserver(function() {
+            if (!ro.classList.contains('hidden')) {
+                const answeredCount = Object.values(answers).filter(v => v && typeof v === 'string' && v.trim() !== '').length;
+                const flaggedCount = Object.values(flags).filter(v => v === true).length;
+                const answeredEl = document.getElementById('review-answered');
+                const flaggedEl = document.getElementById('review-flagged');
+                if (answeredEl) answeredEl.textContent = answeredCount;
+                if (flaggedEl) flaggedEl.textContent = flaggedCount;
+            }
+        }).observe(ro, { attributes: true, attributeFilter: ['class'] });
+    }
 })();
 </script>
 @endpush

@@ -5,35 +5,33 @@
 @section('test_title', 'IELTS Writing Exam')
 
 @section('timer_area')
-<div id="timer-widget" class="flex items-center gap-3 bg-white dark:bg-slate-800 border-2 px-4 py-2 rounded-2xl shadow-sm transition-all border-slate-100 dark:border-slate-700">
-    <span class="material-symbols-outlined text-xl text-primary" id="timer-icon">timer</span>
-    <div class="flex items-baseline gap-1.5">
-        <span class="text-2xl font-black font-mono tracking-tighter tabular-nums text-slate-900 dark:text-white" id="timer-display">--:--</span>
-        <span class="text-[10px] font-black uppercase tracking-widest opacity-40">Remaining</span>
-    </div>
+<div id="timer-widget" class="flex items-center gap-2 rounded-full border border-[var(--color-divider)] bg-[var(--color-bg-primary)] px-4 py-1.5 transition-all">
+    <span class="material-symbols-outlined text-lg text-[var(--color-primary)]" id="timer-icon">timer</span>
+    <span class="text-lg font-bold tabular-nums tracking-tight text-[var(--color-text-primary)] font-mono" id="timer-display">--:--</span>
+    <span class="hidden text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:inline">left</span>
 </div>
 @endsection
 
 @section('top_right_actions')
-<div class="flex items-center gap-4">
-    <div id="save-indicator" class="flex items-center gap-2 text-emerald-500">
+<div class="flex items-center gap-3">
+    <div id="save-indicator" class="flex items-center gap-1.5 text-[var(--color-success)]">
         <span class="material-symbols-outlined text-sm">check_circle</span>
-        <span class="text-[10px] font-black uppercase tracking-widest">Saved</span>
+        <span class="text-[10px] font-bold uppercase tracking-wider">Saved</span>
     </div>
-    <button onclick="submitWritingTest()" class="flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-black rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 shadow-lg shadow-slate-200 dark:shadow-none">
+    <x-ui.button variant="primary" onclick="submitWritingTest()" class="text-xs">
         <span class="material-symbols-outlined text-sm">send</span>
-        End Exam
-    </button>
+        <span class="hidden sm:inline">End Exam</span>
+    </x-ui.button>
 </div>
 @endsection
 
 @section('content')
 <div class="flex-1 flex flex-col overflow-hidden">
     {{-- Task Tabs --}}
-    <div class="h-12 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-8 gap-6 z-10">
+    <div class="flex h-11 shrink-0 items-center gap-1 border-b border-[var(--color-divider)] bg-[var(--color-bg-primary)] px-4 sm:px-6 lg:px-8">
         @foreach($tasks as $index => $task)
             <button onclick="switchWritingTask({{ $index }})"
-                    class="writing-tab h-full flex items-center gap-2 px-4 text-xs font-black uppercase tracking-widest transition-all border-b-2"
+                    class="writing-tab h-full flex items-center gap-2 px-4 text-xs font-bold uppercase tracking-wider transition-colors border-b-2"
                     data-tab="{{ $index }}" id="wtab-{{ $index }}">
                 <span class="material-symbols-outlined text-sm">edit_note</span>
                 Task {{ $task->task_number }}
@@ -46,68 +44,68 @@
         @foreach($tasks as $index => $task)
         <div class="writing-panel flex-1 flex overflow-hidden" data-tab="{{ $index }}" style="display:none;">
             {{-- Left: Task Description --}}
-            <div class="w-1/2 overflow-y-auto custom-scrollbar bg-slate-50 dark:bg-slate-900/50 p-10 border-r border-slate-200 dark:border-slate-800">
+            <div class="w-1/2 overflow-y-auto border-r border-[var(--color-divider)] bg-[var(--color-bg-primary)] p-6 sm:p-8 lg:p-12 custom-scrollbar">
                 <div class="max-w-2xl mx-auto">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-lg text-[10px] font-black uppercase tracking-widest mb-6">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-[var(--color-primary)] rounded-[var(--radius-base)] text-[10px] font-bold uppercase tracking-widest mb-6">
                         <span class="material-symbols-outlined text-xs">info</span>
                         Writing Task {{ $task->task_number }}
                     </div>
 
-                    <h2 class="text-3xl font-black text-slate-900 dark:text-white mb-6 tracking-tight leading-tight">
+                    <h2 class="text-2xl font-bold text-[var(--color-text-primary)] tracking-tight mb-6">
                         {{ $task->task_title ?: 'Simulation Prompt' }}
                     </h2>
 
                     @if($task->task_description)
-                        <div class="p-6 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-soft mb-8 text-slate-600 dark:text-slate-300 font-medium leading-relaxed italic">
+                        <div class="p-6 bg-[var(--color-bg-secondary)] rounded-[var(--radius-base)] border border-[var(--color-divider)] mb-8 text-[var(--color-text-secondary)] font-medium leading-relaxed italic">
                             {{ $task->task_description }}
                         </div>
                     @endif
 
                     @if($task->images->count() > 0)
-                        <div class="rounded-3xl border-4 border-white dark:border-slate-800 shadow-xl overflow-hidden mb-8 bg-white dark:bg-slate-900">
+                        <div class="rounded-[var(--radius-lg)] border border-[var(--color-divider)] overflow-hidden mb-8 bg-[var(--color-bg-secondary)]">
                             <img src="{{ Storage::url($task->images->first()->image_path) }}" class="w-full h-auto object-contain max-h-[500px]" alt="Task Content">
                         </div>
                     @endif
 
                     @if($task->task_prompt)
-                        <div class="p-8 bg-indigo-50 dark:bg-indigo-900/20 rounded-3xl border-2 border-primary/20 text-slate-800 dark:text-slate-200 font-bold leading-relaxed shadow-lg">
-                            <span class="block text-[10px] font-black uppercase tracking-widest text-primary mb-2">Detailed Prompt</span>
+                        <div class="p-8 bg-[color-mix(in_srgb,var(--color-primary)_5%,transparent)] rounded-[var(--radius-lg)] border border-[color-mix(in_srgb,var(--color-primary)_20%,transparent)] text-[var(--color-text-primary)] font-semibold leading-relaxed">
+                            <span class="block text-[10px] font-bold uppercase tracking-widest text-[var(--color-primary)] mb-2">Detailed Prompt</span>
                             <div class="whitespace-pre-line">{{ $task->task_prompt }}</div>
                         </div>
                     @endif
 
                     @if($task->instruction_text)
-                        <div class="mt-6 flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800">
-                            <span class="material-symbols-outlined text-amber-500 text-lg">info</span>
-                            <span class="text-sm font-bold text-amber-700 dark:text-amber-400">{{ $task->instruction_text }}</span>
+                        <div class="mt-6 flex items-center gap-3 p-4 rounded-[var(--radius-base)] bg-[color-mix(in_srgb,#F59E0B_10%,transparent)] border border-[color-mix(in_srgb,#F59E0B_20%,transparent)]">
+                            <span class="material-symbols-outlined text-[#B45309] text-lg">info</span>
+                            <span class="text-sm font-bold text-[#92400E]">{{ $task->instruction_text }}</span>
                         </div>
                     @endif
                 </div>
             </div>
 
             {{-- Right: Answer Editor --}}
-            <div class="w-1/2 flex flex-col bg-white dark:bg-slate-950">
+            <div class="w-1/2 flex flex-col bg-[var(--color-bg-secondary)]">
                 <div class="flex-1 relative">
                     <textarea id="textarea-{{ $task->id }}"
                               data-task-id="{{ $task->id }}"
                               data-min-words="{{ $task->minimum_word_count }}"
                               oninput="updateWordCount({{ $task->id }}, {{ $task->minimum_word_count }}); scheduleAutosave();"
-                              class="writing-textarea absolute inset-0 w-full h-full p-12 text-lg font-medium bg-transparent border-none focus:ring-0 resize-none custom-scrollbar leading-relaxed placeholder:text-slate-300 dark:placeholder:text-slate-700 outline-none"
+                              class="writing-textarea absolute inset-0 w-full h-full p-8 sm:p-12 text-base leading-relaxed bg-transparent border-none focus:ring-0 resize-none custom-scrollbar placeholder:text-[var(--color-text-secondary)] text-[var(--color-text-primary)] outline-none"
                               placeholder="Start typing your response here...">{{ $answers[$task->id]->answer_text ?? '' }}</textarea>
                 </div>
-                <div class="h-16 border-t border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between shrink-0">
+                <div class="flex h-16 shrink-0 items-center justify-between border-t border-[var(--color-divider)] bg-[var(--color-bg-primary)] px-8">
                     <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all bg-slate-50 border-slate-200 text-slate-500" id="wc-badge-{{ $task->id }}">
-                            <span class="text-xs font-black tabular-nums" id="wc-{{ $task->id }}">0</span>
-                            <span class="text-[10px] font-bold uppercase tracking-widest opacity-60">Words</span>
+                        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] border transition-all bg-[var(--color-bg-secondary)] border-[var(--color-divider)] text-[var(--color-text-secondary)]" id="wc-badge-{{ $task->id }}">
+                            <span class="text-xs font-bold tabular-nums" id="wc-{{ $task->id }}">0</span>
+                            <span class="text-[10px] font-semibold uppercase tracking-wider opacity-80">Words</span>
                         </div>
-                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        <div class="text-[10px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">
                             Target: {{ $task->minimum_word_count }} min.
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="size-2 rounded-full bg-primary animate-pulse"></span>
-                        <span class="text-[10px] font-black uppercase tracking-widest text-primary">Live Sync Active</span>
+                        <span class="size-2 rounded-full bg-[var(--color-primary)] animate-pulse"></span>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-primary)]">Live Sync Active</span>
                     </div>
                 </div>
             </div>
@@ -153,15 +151,15 @@
         currentTab = idx;
         document.querySelectorAll('.writing-panel').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.writing-tab').forEach(el => {
-            el.classList.remove('border-primary', 'text-primary');
-            el.classList.add('border-transparent', 'text-slate-400');
+            el.classList.remove('border-[var(--color-primary)]', 'text-[var(--color-primary)]');
+            el.classList.add('border-transparent', 'text-[var(--color-text-secondary)]');
         });
         const panel = document.querySelector('.writing-panel[data-tab="'+idx+'"]');
         const tab = document.getElementById('wtab-'+idx);
         if (panel) panel.style.display = 'flex';
         if (tab) {
-            tab.classList.remove('border-transparent', 'text-slate-400');
-            tab.classList.add('border-primary', 'text-primary');
+            tab.classList.remove('border-transparent', 'text-[var(--color-text-secondary)]');
+            tab.classList.add('border-[var(--color-primary)]', 'text-[var(--color-primary)]');
         }
     };
     switchWritingTask(0);
@@ -182,9 +180,9 @@
         if (wcEl) wcEl.textContent = count;
         if (badge) {
             if (count >= minWords) {
-                badge.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all bg-emerald-50 border-emerald-200 text-emerald-700';
+                badge.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] border transition-all bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)] border-[color-mix(in_srgb,var(--color-success)_20%,transparent)] text-[var(--color-success)]';
             } else {
-                badge.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-xl border transition-all bg-slate-50 border-slate-200 text-slate-500';
+                badge.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] border transition-all bg-[var(--color-bg-secondary)] border-[var(--color-divider)] text-[var(--color-text-secondary)]';
             }
         }
     };

@@ -47,7 +47,7 @@ class IeltsTestSeeder extends Seeder
             ['test_set_id' => $testSet->id, 'passage_number' => 3],
             [
                 'title' => 'Stress and social media',
-                'content' => '<p><em>Passage 3 content covers the topic of stress, firefighter studies, social media influence on stress, and related psychological mechanisms.</em></p>',
+                'content' => $this->passage3Content(),
             ]
         );
 
@@ -510,5 +510,17 @@ class IeltsTestSeeder extends Seeder
 <p><strong>F.</strong> Any prospect of the elm returning relies heavily on trees being either resistant to, or tolerant of, the disease. This means a widespread reintroduction would involve existing or new hybrid strains derived from resistant, generally non-native elm species. A new generation of seedlings have been bred and tested to see if they can withstand the fungus by cutting a small slit on the bark and injecting a tiny amount of the pathogen. "The effects are very quick," says Russell. "You return in four to six weeks and trees that are resistant show no symptoms, whereas those that are susceptible show leaf loss and may even have died completely."</p>
 
 <p><strong>G.</strong> All of this raises questions of social acceptance, acknowledges Russell. "If we\'re putting elm back into the landscape, a small element of it is not native - are we bothered about that?" For her, the environmental case for reintroducing elm is strong. "They will host wildlife, which is a good thing." Others are more wary. "On the face of it, it seems like a good idea," says Elliot. The problem, he suggests, is that, "You\'re replacing a native species with a horticultural analogue. You\'re effectively cloning." There\'s also the risk of introducing new diseases. Rather than plant new elms, the Woodland Trust emphasises providing space to those elms that have survived independently. "Sometimes the best thing you can do is just give nature time to recover... over time, you might get resistance," says Elliot.</p>';
+    }
+    private function passage3Content(): string
+    {
+        return '<p><strong>The impact of stress and social media on mental health</strong></p>
+
+<p>In recent years, the relationship between stress and social media has become a significant area of psychological research. Studies focusing on high-stress professions, such as firefighters, have provided valuable insights into how individuals respond to pressure. Researchers found that while firefighters are generally well-equipped to handle acute stress during emergencies, the chronic stress associated with their work can have long-term effects on their well-being.</p>
+
+<p>One interesting finding is the "mechanism in the brain" that produces heightened sensitivity to external threats. This mechanism, while useful in dangerous situations, can become overactive in the context of social media. When individuals are constantly exposed to negative news or stressful posts in their feeds, their brains may remain in a state of high alert, leading to increased anxiety and a decreased ability to process information effectively.</p>
+
+<p>Experiments involving students have also shown that cortisol levels and heart rates are significantly affected when they are placed in stressful situations or exposed to negative social media content. Interestingly, the tone of the content people post on social media tends to reflect the nature of the posts in their own feeds—a phenomenon known as emotional contagion. This suggests that our tendency to be affected by other people\'s moods can be used positively if we curate our social media environment to include more uplifting content.</p>
+
+<p>Furthermore, stress created by social media posts can lead individuals to take unnecessary precautions or feel a sense of impending doom, even when the actual threat is minimal. The key to managing this stress lies in understanding these psychological mechanisms and taking proactive steps to limit exposure to triggers while fostering a more balanced digital life.</p>';
     }
 }

@@ -5,116 +5,113 @@
 @section('test_title', 'IELTS Speaking Exam')
 
 @section('timer_area')
-<div id="timer-widget" class="flex items-center gap-3 bg-white dark:bg-slate-800 border-2 px-4 py-2 rounded-2xl shadow-sm transition-all border-slate-100 dark:border-slate-700">
-    <span class="material-symbols-outlined text-xl text-primary" id="timer-icon">timer</span>
-    <div class="flex items-baseline gap-1.5">
-        <span class="text-2xl font-black font-mono tracking-tighter tabular-nums text-slate-900 dark:text-white" id="timer-display">00:00</span>
-        <span class="text-[10px] font-black uppercase tracking-widest opacity-40" id="timer-label">Per Question</span>
-    </div>
+<div id="timer-widget" class="flex items-center gap-2 rounded-full border border-[var(--color-divider)] bg-[var(--color-bg-primary)] px-4 py-1.5 transition-all">
+    <span class="material-symbols-outlined text-lg text-[var(--color-primary)]" id="timer-icon">timer</span>
+    <span class="text-lg font-bold tabular-nums tracking-tight text-[var(--color-text-primary)] font-mono" id="timer-display">00:00</span>
+    <span class="hidden text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:inline" id="timer-label">Per Question</span>
 </div>
 @endsection
 
 @section('top_right_actions')
-<div class="flex items-center gap-4">
-    <div id="rec-indicator" class="flex items-center gap-2 text-slate-400">
-        <span class="size-2 rounded-full bg-slate-300" id="rec-dot"></span>
-        <span class="text-[10px] font-black uppercase tracking-widest" id="rec-label">Standby</span>
+<div class="flex items-center gap-3">
+    <div id="rec-indicator" class="flex items-center gap-1.5 text-[var(--color-text-secondary)]">
+        <span class="size-2 rounded-full bg-[var(--color-divider)]" id="rec-dot"></span>
+        <span class="text-[10px] font-bold uppercase tracking-wider" id="rec-label">Standby</span>
     </div>
-    <div class="h-6 w-px bg-slate-200 dark:bg-slate-800"></div>
-    <button onclick="endInterview()" class="flex items-center gap-2 px-5 py-2.5 bg-slate-900 dark:bg-white text-white dark:text-black rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 shadow-lg shadow-slate-200 dark:shadow-none">
+    <x-ui.button variant="primary" onclick="endInterview()" class="text-xs">
         <span class="material-symbols-outlined text-sm">check_circle</span>
-        Complete Interview
-    </button>
+        <span class="hidden sm:inline">Complete Interview</span>
+    </x-ui.button>
 </div>
 @endsection
 
 @section('content')
-<div id="speaking-app" class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-slate-950">
+<div id="speaking-app" class="flex-1 flex flex-col overflow-hidden bg-[var(--color-bg-secondary)]">
     {{-- Stage Progress --}}
-    <div class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-12 gap-12 z-10 shrink-0">
+    <div class="flex h-14 shrink-0 items-center gap-8 border-b border-[var(--color-divider)] bg-[var(--color-bg-primary)] px-6 sm:px-12">
         @foreach($parts as $partNumber => $questions)
-            <div class="part-progress flex items-center gap-4 transition-all opacity-30" data-part="{{ $partNumber }}" id="progress-{{ $partNumber }}">
-                <div class="size-8 rounded-lg flex items-center justify-center text-xs font-black bg-slate-100 text-slate-400 transition-all" id="progress-badge-{{ $partNumber }}">
+            <div class="part-progress flex items-center gap-3 transition-all opacity-40" data-part="{{ $partNumber }}" id="progress-{{ $partNumber }}">
+                <div class="flex size-7 items-center justify-center rounded-[var(--radius-xs)] text-xs font-bold bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)] transition-all" id="progress-badge-{{ $partNumber }}">
                     {{ $partNumber }}
                 </div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400" id="progress-text-{{ $partNumber }}">Part {{ $partNumber }}</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-secondary)]" id="progress-text-{{ $partNumber }}">Part {{ $partNumber }}</span>
             </div>
             @if(!$loop->last)
-                <div class="w-8 h-px bg-slate-200 dark:bg-slate-800"></div>
+                <div class="h-px w-6 bg-[var(--color-divider)]"></div>
             @endif
         @endforeach
     </div>
 
     {{-- Main Interview Area --}}
-    <div class="flex-1 overflow-y-auto custom-scrollbar p-12">
+    <div class="flex-1 overflow-y-auto custom-scrollbar p-6 sm:p-12">
         <div class="max-w-4xl mx-auto flex flex-col items-center text-center">
             @foreach($parts as $partNumber => $questions)
             <div class="part-panel w-full space-y-10" data-part="{{ $partNumber }}" style="display:none;">
                 {{-- Part Header --}}
                 <div class="space-y-4">
-                    <div class="inline-flex items-center gap-3 px-4 py-1.5 bg-primary/10 text-primary rounded-full text-[10px] font-black uppercase tracking-widest">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-[var(--color-primary)] rounded-[var(--radius-base)] text-[10px] font-bold uppercase tracking-widest">
                         <span class="material-symbols-outlined text-sm">record_voice_over</span>
                         IELTS Speaking Part {{ $partNumber }}
                     </div>
-                    <h2 class="text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+                    <h2 class="text-4xl font-bold text-[var(--color-text-primary)] tracking-tight leading-tight">
                         @if($partNumber == 1) Introduction &amp; Interview
                         @elseif($partNumber == 2) Long Turn Topic
                         @else Discussion
                         @endif
                     </h2>
                     @if($partNumber == 1)
-                        <p class="text-slate-500 font-bold text-lg">The examiner asks about yourself and familiar topics. Answer each question in about 45 seconds.</p>
+                        <p class="text-[var(--color-text-secondary)] font-medium text-base">The examiner asks about yourself and familiar topics. Answer each question in about 45 seconds.</p>
                     @elseif($partNumber == 2)
-                        <p class="text-slate-500 font-bold text-lg">Talk about the topic for 1-2 minutes. You have 1 minute to prepare.</p>
+                        <p class="text-[var(--color-text-secondary)] font-medium text-base">Talk about the topic for 1-2 minutes. You have 1 minute to prepare.</p>
                     @else
-                        <p class="text-slate-500 font-bold text-lg">In-depth discussion questions. Answer each in about 90 seconds.</p>
+                        <p class="text-[var(--color-text-secondary)] font-medium text-base">In-depth discussion questions. Answer each in about 90 seconds.</p>
                     @endif
                 </div>
 
                 {{-- Questions --}}
                 <div class="grid grid-cols-1 gap-6 w-full text-left">
                     @foreach($questions as $qi => $question)
-                    <div class="question-card p-8 rounded-3xl bg-slate-50 dark:bg-slate-900/50 border-2 border-slate-100 dark:border-slate-800 transition-all" data-qid="{{ $question->id }}" id="sq-{{ $question->id }}">
+                    <div class="question-card p-6 sm:p-8 rounded-[var(--radius-xl)] bg-[var(--color-bg-primary)] border border-[var(--color-divider)] transition-all" data-qid="{{ $question->id }}" id="sq-{{ $question->id }}">
                         {{-- Prep Instructions (Part 2) --}}
                         @if($question->preparation_instructions)
-                        <div class="mb-6 p-4 rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 text-sm font-bold flex items-start gap-3">
-                            <span class="material-symbols-outlined text-lg mt-0.5">lightbulb</span>
+                        <div class="mb-6 flex items-start gap-3 p-4 rounded-[var(--radius-base)] bg-[color-mix(in_srgb,#F59E0B_10%,transparent)] border border-[color-mix(in_srgb,#F59E0B_20%,transparent)] text-[#92400E] text-sm font-bold">
+                            <span class="material-symbols-outlined text-[#B45309] text-lg mt-0.5">lightbulb</span>
                             <span>{{ $question->preparation_instructions }}</span>
                         </div>
                         @endif
 
-                        <div class="flex gap-6">
-                            <div class="size-12 rounded-xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center shrink-0 border border-slate-100 dark:border-slate-700">
-                                <span class="text-sm font-black text-primary">{{ $qi + 1 }}</span>
+                        <div class="flex gap-4 sm:gap-6">
+                            <div class="flex size-10 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-[var(--color-primary)] font-bold shrink-0">
+                                <span class="text-sm">{{ $qi + 1 }}</span>
                             </div>
                             <div class="flex-1">
-                                <div class="text-xl font-bold text-slate-900 dark:text-white leading-[1.6] whitespace-pre-line">{{ $question->question_text }}</div>
+                                <div class="text-lg font-semibold text-[var(--color-text-primary)] leading-relaxed whitespace-pre-line">{{ $question->question_text }}</div>
 
                                 {{-- TTS: Play question audio --}}
                                 <div class="mt-4 flex items-center gap-3">
-                                    <button onclick="playTTS({{ $question->id }}, this)" class="tts-btn flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 text-primary text-xs font-black uppercase tracking-widest hover:bg-primary/20 transition-all" data-text="{{ addslashes(strip_tags($question->question_text)) }}">
+                                    <button onclick="playTTS({{ $question->id }}, this)" class="tts-btn flex items-center gap-2 px-3 py-1.5 rounded-[var(--radius-xs)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-[var(--color-primary)] text-xs font-bold uppercase tracking-wider hover:opacity-80 transition-opacity" data-text="{{ addslashes(strip_tags($question->question_text)) }}">
                                         <span class="material-symbols-outlined text-sm">volume_up</span>
                                         Listen to Question
                                     </button>
-                                    <span class="text-[10px] font-bold text-slate-400 flex items-center gap-1">
+                                    <span class="text-[10px] font-semibold text-[var(--color-text-secondary)] flex items-center gap-1">
                                         <span class="material-symbols-outlined text-xs">timer</span>
                                         {{ $question->time_limit }}s limit
                                     </span>
                                 </div>
 
                                 {{-- Record + Answer area --}}
-                                <div class="mt-6 p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-4">
+                                <div class="mt-6 p-5 sm:p-6 rounded-[var(--radius-lg)] bg-[var(--color-bg-secondary)] border border-[var(--color-divider)] space-y-4">
                                     <div class="flex items-center justify-between">
-                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Your Response</span>
+                                        <span class="text-[10px] font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">Your Response</span>
                                         <div class="flex items-center gap-2">
-                                            <span class="recording-time text-xs font-mono font-black text-slate-400 tabular-nums" id="rec-time-{{ $question->id }}">00:00</span>
-                                            <span class="max-badge text-[10px] font-black text-slate-300" id="max-badge-{{ $question->id }}">/ {{ floor($question->time_limit / 60) }}:{{ str_pad($question->time_limit % 60, 2, '0', STR_PAD_LEFT) }}</span>
+                                            <span class="recording-time text-xs font-mono font-bold text-[var(--color-text-primary)] tabular-nums" id="rec-time-{{ $question->id }}">00:00</span>
+                                            <span class="max-badge text-[10px] font-semibold text-[var(--color-text-secondary)]" id="max-badge-{{ $question->id }}">/ {{ floor($question->time_limit / 60) }}:{{ str_pad($question->time_limit % 60, 2, '0', STR_PAD_LEFT) }}</span>
                                         </div>
                                     </div>
 
                                     <div class="flex items-center gap-4">
                                         <button onclick="toggleRecording({{ $question->id }}, {{ $question->time_limit }})"
-                                                class="rec-btn size-16 rounded-2xl flex items-center justify-center transition-all active:scale-95 shadow-lg bg-slate-900 text-white"
+                                                class="rec-btn flex size-14 items-center justify-center rounded-[var(--radius-base)] transition-transform active:scale-95 bg-[var(--color-text-primary)] text-[var(--color-bg-primary)] hover:opacity-90"
                                                 id="rec-btn-{{ $question->id }}">
                                             <span class="material-symbols-outlined text-2xl" id="rec-icon-{{ $question->id }}">mic</span>
                                         </button>
@@ -127,17 +124,17 @@
                                         {{-- Status badges --}}
                                         <div id="status-{{ $question->id }}">
                                             @if(!empty($existingAnswers[$question->id]))
-                                                <span class="px-3 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest">Recorded</span>
+                                                <span class="px-2.5 py-1 rounded-[var(--radius-xs)] bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)] text-[var(--color-success)] text-[10px] font-bold uppercase tracking-wider">Recorded</span>
                                             @else
-                                                <span class="px-3 py-1 rounded-lg bg-slate-100 text-slate-400 text-[10px] font-black uppercase tracking-widest">Not recorded</span>
+                                                <span class="px-2.5 py-1 rounded-[var(--radius-xs)] bg-[var(--color-divider)] text-[var(--color-text-secondary)] text-[10px] font-bold uppercase tracking-wider">Not recorded</span>
                                             @endif
                                         </div>
                                     </div>
 
                                     {{-- STT Transcript --}}
-                                    <div class="transcript-area" id="transcript-area-{{ $question->id }}" style="{{ empty($existingAnswers[$question->id]) ? 'display:none' : '' }}">
-                                        <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Transcript (auto-generated)</span>
-                                        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-400 italic min-h-[60px]" id="transcript-{{ $question->id }}">{{ $existingAnswers[$question->id] ?? 'Transcript will appear after recording...' }}</div>
+                                    <div class="transcript-area mt-4" id="transcript-area-{{ $question->id }}" style="{{ empty($existingAnswers[$question->id]) ? 'display:none' : '' }}">
+                                        <span class="block text-[10px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">Transcript (auto-generated)</span>
+                                        <div class="p-4 rounded-[var(--radius-base)] bg-[var(--color-bg-primary)] border border-[var(--color-divider)] text-sm text-[var(--color-text-secondary)] italic min-h-[60px]" id="transcript-{{ $question->id }}">{{ $existingAnswers[$question->id] ?? 'Transcript will appear after recording...' }}</div>
                                     </div>
                                 </div>
                             </div>
@@ -147,20 +144,20 @@
                 </div>
 
                 {{-- Part Navigation --}}
-                <div class="pt-8 flex items-center justify-center gap-8">
+                <div class="pt-8 flex items-center justify-center gap-6">
                     @if($partNumber > 1)
-                        <button onclick="switchPart({{ $partNumber - 1 }})" class="px-8 py-4 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                        <button onclick="switchPart({{ $partNumber - 1 }})" class="text-xs font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">
                             ← Previous Part
                         </button>
                     @endif
                     @if($partNumber < count($parts))
-                        <button onclick="switchPart({{ $partNumber + 1 }})" class="px-10 py-5 bg-primary text-white rounded-2xl text-sm font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:scale-105 transition-all">
+                        <x-ui.button variant="primary" onclick="switchPart({{ $partNumber + 1 }})">
                             Next Part →
-                        </button>
+                        </x-ui.button>
                     @else
-                        <button onclick="endInterview()" class="px-10 py-5 bg-emerald-600 text-white rounded-2xl text-sm font-black uppercase tracking-[0.2em] shadow-xl shadow-emerald-500/20 hover:scale-105 transition-all">
+                        <x-ui.button variant="primary" onclick="endInterview()">
                             End Interview
-                        </button>
+                        </x-ui.button>
                     @endif
                 </div>
             </div>
@@ -204,25 +201,25 @@
     window.switchPart = function(num) {
         currentPart = num;
         document.querySelectorAll('.part-panel').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.part-progress').forEach(el => el.classList.add('opacity-30'));
+        document.querySelectorAll('.part-progress').forEach(el => el.classList.add('opacity-40'));
         const panel = document.querySelector('.part-panel[data-part="'+num+'"]');
         const prog = document.getElementById('progress-'+num);
         if (panel) panel.style.display = 'block';
-        if (prog) prog.classList.remove('opacity-30');
+        if (prog) prog.classList.remove('opacity-40');
         // Update badge
         document.querySelectorAll('.part-progress').forEach(el => {
             const p = parseInt(el.dataset.part);
             const badge = document.getElementById('progress-badge-'+p);
             const text = document.getElementById('progress-text-'+p);
             if (p === num) {
-                badge.className = 'size-8 rounded-lg flex items-center justify-center text-xs font-black exam-gradient text-white shadow-lg transition-all';
-                text.classList.remove('text-slate-400'); text.classList.add('text-primary');
+                badge.className = 'flex size-7 items-center justify-center rounded-[var(--radius-xs)] text-xs font-bold bg-[var(--color-primary)] text-white transition-all';
+                text.classList.remove('text-[var(--color-text-secondary)]'); text.classList.add('text-[var(--color-primary)]');
             } else if (p < num) {
-                badge.className = 'size-8 rounded-lg flex items-center justify-center text-xs font-black bg-emerald-500 text-white transition-all';
-                text.classList.remove('text-primary'); text.classList.add('text-slate-400');
+                badge.className = 'flex size-7 items-center justify-center rounded-[var(--radius-xs)] text-xs font-bold bg-[var(--color-success)] text-white transition-all';
+                text.classList.remove('text-[var(--color-primary)]'); text.classList.add('text-[var(--color-text-secondary)]');
             } else {
-                badge.className = 'size-8 rounded-lg flex items-center justify-center text-xs font-black bg-slate-100 text-slate-400 transition-all';
-                text.classList.remove('text-primary'); text.classList.add('text-slate-400');
+                badge.className = 'flex size-7 items-center justify-center rounded-[var(--radius-xs)] text-xs font-bold bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)] transition-all';
+                text.classList.remove('text-[var(--color-primary)]'); text.classList.add('text-[var(--color-text-secondary)]');
             }
         });
     };
@@ -285,13 +282,13 @@
             // UI
             const btn = document.getElementById('rec-btn-'+qid);
             const icon = document.getElementById('rec-icon-'+qid);
-            btn.className = 'rec-btn size-16 rounded-2xl flex items-center justify-center transition-all active:scale-95 shadow-lg bg-rose-500 text-white animate-pulse';
+            btn.className = 'rec-btn flex size-14 items-center justify-center rounded-[var(--radius-base)] transition-transform active:scale-95 bg-[var(--color-error)] text-[var(--color-bg-primary)] animate-pulse';
             icon.textContent = 'stop';
 
-            document.getElementById('rec-dot').className = 'size-2 rounded-full bg-rose-500 animate-ping';
+            document.getElementById('rec-dot').className = 'size-2 rounded-full bg-[var(--color-error)] animate-ping';
             document.getElementById('rec-label').textContent = 'Recording';
-            document.getElementById('rec-label').className = 'text-[10px] font-black uppercase tracking-widest text-rose-500';
-            document.getElementById('rec-indicator').className = 'flex items-center gap-2 bg-rose-50 border border-rose-200 rounded-lg px-3 py-1.5 text-rose-600';
+            document.getElementById('rec-label').className = 'text-[10px] font-bold uppercase tracking-wider text-[var(--color-error)]';
+            document.getElementById('rec-indicator').className = 'flex items-center gap-1.5 text-[var(--color-error)]';
 
             // Timer
             updateRecTimer(qid);
@@ -340,12 +337,12 @@
         // Reset UI
         const btn = document.getElementById('rec-btn-'+qid);
         const icon = document.getElementById('rec-icon-'+qid);
-        if (btn) btn.className = 'rec-btn size-16 rounded-2xl flex items-center justify-center transition-all active:scale-95 shadow-lg bg-slate-900 text-white';
+        if (btn) btn.className = 'rec-btn flex size-14 items-center justify-center rounded-[var(--radius-base)] transition-transform active:scale-95 bg-[var(--color-text-primary)] text-[var(--color-bg-primary)] hover:opacity-90';
         if (icon) icon.textContent = 'mic';
-        document.getElementById('rec-dot').className = 'size-2 rounded-full bg-slate-300';
+        document.getElementById('rec-dot').className = 'size-2 rounded-full bg-[var(--color-divider)]';
         document.getElementById('rec-label').textContent = 'Standby';
-        document.getElementById('rec-label').className = 'text-[10px] font-black uppercase tracking-widest text-slate-400';
-        document.getElementById('rec-indicator').className = 'flex items-center gap-2 text-slate-400';
+        document.getElementById('rec-label').className = 'text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-secondary)]';
+        document.getElementById('rec-indicator').className = 'flex items-center gap-1.5 text-[var(--color-text-secondary)]';
         document.getElementById('timer-display').textContent = '00:00';
 
         activeQid = null;
@@ -368,7 +365,7 @@
 
         // Status
         const status = document.getElementById('status-'+qid);
-        if (status) status.innerHTML = '<span class="px-3 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest">Recorded</span>';
+        if (status) status.innerHTML = '<span class="px-2.5 py-1 rounded-[var(--radius-xs)] bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)] text-[var(--color-success)] text-[10px] font-bold uppercase tracking-wider">Recorded</span>';
 
         // Upload to server
         const formData = new FormData();
@@ -379,7 +376,7 @@
 
         try {
             const uploadStatus = document.getElementById('status-'+qid);
-            if (uploadStatus) uploadStatus.innerHTML = '<span class="px-3 py-1 rounded-lg bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest animate-pulse">Uploading...</span>';
+            if (uploadStatus) uploadStatus.innerHTML = '<span class="px-2.5 py-1 rounded-[var(--radius-xs)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] text-[var(--color-primary)] text-[10px] font-bold uppercase tracking-wider animate-pulse">Uploading...</span>';
 
             await fetch(uploadUrl, {
                 method: 'POST',
@@ -387,11 +384,11 @@
                 body: formData
             });
 
-            if (uploadStatus) uploadStatus.innerHTML = '<span class="px-3 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest flex items-center gap-1"><span class="material-symbols-outlined text-xs">cloud_done</span> Saved</span>';
+            if (uploadStatus) uploadStatus.innerHTML = '<span class="px-2.5 py-1 rounded-[var(--radius-xs)] bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)] text-[var(--color-success)] text-[10px] font-bold uppercase tracking-wider flex items-center gap-1"><span class="material-symbols-outlined text-xs">cloud_done</span> Saved</span>';
         } catch(e) {
             console.error('Upload failed:', e);
             const uploadStatus = document.getElementById('status-'+qid);
-            if (uploadStatus) uploadStatus.innerHTML = '<span class="px-3 py-1 rounded-lg bg-rose-50 text-rose-600 text-[10px] font-black uppercase tracking-widest">Upload failed</span>';
+            if (uploadStatus) uploadStatus.innerHTML = '<span class="px-2.5 py-1 rounded-[var(--radius-xs)] bg-[color-mix(in_srgb,var(--color-error)_10%,transparent)] text-[var(--color-error)] text-[10px] font-bold uppercase tracking-wider">Upload failed</span>';
         }
     }
 

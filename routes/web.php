@@ -32,7 +32,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
 
     // User Test Routes
-    Route::post('/tests/{test}/start', [TestController::class, 'start'])->name('user.tests.start');
+    Route::match(['get', 'post'], '/tests/{test}/start', [TestController::class, 'start'])->name('user.tests.start');
 
     Route::get('/tests/attempts/{attempt}/writing', [WritingTestController::class, 'show'])->name('user.writing.show');
     Route::post('/tests/attempts/{attempt}/writing/autosave', [WritingTestController::class, 'autosave'])->name('user.writing.autosave');
@@ -68,6 +68,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
         Route::get('/test_sets/{test_set}', [TestSetController::class, 'show'])->name('test_sets.show');
+        Route::delete('/test_sets/{test_set}', [TestSetController::class, 'destroy'])->name('test_sets.destroy');
 
         Route::get('/test_sets/{test_set}/writing-tasks/create', [WritingTaskController::class, 'create'])->name('writing-tasks.create');
         Route::post('/test_sets/{test_set}/writing-tasks', [WritingTaskController::class, 'store'])->name('writing-tasks.store');

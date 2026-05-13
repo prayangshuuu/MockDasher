@@ -283,10 +283,17 @@
 
                             {{-- Action --}}
                             <td class="px-5 py-4 sm:px-6">
-                                <a href="{{ route('user.history.show', $attempt->id) }}"
-                                   class="text-sm font-semibold text-[var(--color-primary)] transition-opacity hover:opacity-80">
-                                    Review
-                                </a>
+                                @if($attempt->status === 'completed')
+                                    <a href="{{ route('user.history.show', $attempt->id) }}"
+                                       class="text-sm font-semibold text-[var(--color-primary)] transition-opacity hover:opacity-80">
+                                        Review
+                                    </a>
+                                @else
+                                    <a href="{{ route('user.tests.start', $attempt->testSet->test_id) }}"
+                                       class="text-sm font-semibold text-[var(--color-primary)] transition-opacity hover:opacity-80">
+                                        Resume
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                     @empty
