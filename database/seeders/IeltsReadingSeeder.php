@@ -197,7 +197,219 @@ class IeltsReadingSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ IELTS 20 (2025) Test 1 seeded: 3 reading passages (40Q) + 2 writing tasks + 11 speaking questions.');
+        // ── Listening Sections & Questions ──
+        $sec1 = \App\Models\ListeningSection::updateOrCreate(
+            ['test_set_id' => $testSet->id, 'section_number' => 1],
+            ['instruction_text' => 'Complete the table below. Write ONE WORD AND/OR A NUMBER for each answer.', 'passage_text' => null]
+        );
+        $sec2 = \App\Models\ListeningSection::updateOrCreate(
+            ['test_set_id' => $testSet->id, 'section_number' => 2],
+            ['instruction_text' => 'Choose the correct letter, A, B or C.', 'passage_text' => null]
+        );
+        $sec3 = \App\Models\ListeningSection::updateOrCreate(
+            ['test_set_id' => $testSet->id, 'section_number' => 3],
+            ['instruction_text' => 'Choose TWO letters, A-E.', 'passage_text' => null]
+        );
+        $sec4 = \App\Models\ListeningSection::updateOrCreate(
+            ['test_set_id' => $testSet->id, 'section_number' => 4],
+            ['instruction_text' => 'Complete the notes below. Write ONE WORD ONLY for each answer.', 'passage_text' => null]
+        );
+
+        // Section 1: Fill-in-blank Q1-10
+        $s1Questions = [
+            ['Good for people who are especially keen on ______', 'fish'],
+            ['The ______ is a good place for a drink', 'roof'],
+            ['______ food, good for sharing', 'Spanish'],
+            ['A limited selection of ______ food on the menu', 'vegetarian'],
+            ['The ______', 'Audley'],
+            ['At the top of a ______', 'hotel'],
+            ['All the ______ are very good', 'reviews'],
+            ['Only uses ______ ingredients', 'local'],
+            ['Set lunch costs £______ per person', 'thirty|30'],
+            ['Portions probably of ______ size', 'average'],
+        ];
+        foreach ($s1Questions as $sq) {
+            \App\Models\Question::updateOrCreate(
+                ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec1->id, 'question_text' => $sq[0]],
+                ['question_type' => 'short_answer', 'correct_answer' => $sq[1]]
+            );
+        }
+
+        // Section 2: MCQ Q11-16
+        $s2McqData = [
+            ['Heather says pottery differs from other art forms because', 'A', [
+                'A' => 'it lasts longer in the ground.',
+                'B' => 'it is practised by more people.',
+                'C' => 'it can be repaired more easily.',
+            ]],
+            ['Archaeologists sometimes identify the use of ancient pottery from', 'B', [
+                'A' => 'the clay it was made with.',
+                'B' => 'the marks that are on it.',
+                'C' => 'the basic shape of it.',
+            ]],
+            ['Some people join Heather\'s pottery class because they want to', 'C', [
+                'A' => 'create an item that looks very old.',
+                'B' => 'find something that they are good at.',
+                'C' => 'make something that will outlive them.',
+            ]],
+            ['What does Heather value most about being a potter?', 'A', [
+                'A' => 'its calming effect',
+                'B' => 'its messy nature',
+                'C' => 'its physical benefits',
+            ]],
+            ['Most of the visitors to Edelman Pottery', 'B', [
+                'A' => 'bring friends to join courses.',
+                'B' => 'have never made a pot before.',
+                'C' => 'try to learn techniques too quickly.',
+            ]],
+            ['Heather reminds her visitors that they should', 'C', [
+                'A' => 'put on their aprons.',
+                'B' => 'change their clothes.',
+                'C' => 'take off their jewellery.',
+            ]],
+        ];
+        foreach ($s2McqData as $mcq) {
+            $q = \App\Models\Question::updateOrCreate(
+                ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec2->id, 'question_text' => $mcq[0]],
+                ['question_type' => 'multiple_choice', 'correct_answer' => $mcq[1]]
+            );
+            foreach ($mcq[2] as $letter => $text) {
+                \App\Models\QuestionOption::updateOrCreate(
+                    ['question_id' => $q->id, 'option_text' => $text],
+                    ['is_correct' => ($letter === $mcq[1])]
+                );
+            }
+        }
+
+        // Section 2: Choose TWO Q17-20
+        $s2ChooseTwo = [
+            ['Which TWO things does Heather explain about kilns?', 'A', [
+                'A' => 'what their function is', 'B' => 'when they were invented', 'C' => 'ways of keeping them safe',
+                'D' => 'where to put one in your home', 'E' => 'what some people use instead of one',
+            ]],
+            ['Which TWO things does Heather explain about kilns? (second answer)', 'E', [
+                'A' => 'what their function is', 'B' => 'when they were invented', 'C' => 'ways of keeping them safe',
+                'D' => 'where to put one in your home', 'E' => 'what some people use instead of one',
+            ]],
+            ['Which TWO points does Heather make about a potter\'s tools?', 'C', [
+                'A' => 'Some are hard to hold.', 'B' => 'Some are worth buying.', 'C' => 'Some are essential items.',
+                'D' => 'Some have memorable names.', 'E' => 'Some are available for use by participants.',
+            ]],
+            ['Which TWO points does Heather make about a potter\'s tools? (second answer)', 'E', [
+                'A' => 'Some are hard to hold.', 'B' => 'Some are worth buying.', 'C' => 'Some are essential items.',
+                'D' => 'Some have memorable names.', 'E' => 'Some are available for use by participants.',
+            ]],
+        ];
+        foreach ($s2ChooseTwo as $ct) {
+            $q = \App\Models\Question::updateOrCreate(
+                ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec2->id, 'question_text' => $ct[0]],
+                ['question_type' => 'multiple_choice', 'correct_answer' => $ct[1]]
+            );
+            foreach ($ct[2] as $letter => $text) {
+                \App\Models\QuestionOption::updateOrCreate(
+                    ['question_id' => $q->id, 'option_text' => $text],
+                    ['is_correct' => ($letter === $ct[1])]
+                );
+            }
+        }
+
+        // Section 3: Choose TWO Q21-26
+        $s3ChooseTwo = [
+            ['Which TWO things do the students both believe are responsible for the increase in loneliness?', 'C', [
+                'A' => 'social media', 'B' => 'smaller nuclear families', 'C' => 'urban design',
+                'D' => 'longer lifespans', 'E' => 'a mobile workforce',
+            ]],
+            ['Which TWO things do the students both believe are responsible for the increase in loneliness? (second answer)', 'E', [
+                'A' => 'social media', 'B' => 'smaller nuclear families', 'C' => 'urban design',
+                'D' => 'longer lifespans', 'E' => 'a mobile workforce',
+            ]],
+            ['Which TWO health risks associated with loneliness do the students agree are based on solid evidence?', 'A', [
+                'A' => 'a weakened immune system', 'B' => 'dementia', 'C' => 'cancer',
+                'D' => 'obesity', 'E' => 'cardiovascular disease',
+            ]],
+            ['Which TWO health risks associated with loneliness do the students agree are based on solid evidence? (second answer)', 'C', [
+                'A' => 'a weakened immune system', 'B' => 'dementia', 'C' => 'cancer',
+                'D' => 'obesity', 'E' => 'cardiovascular disease',
+            ]],
+            ['Which TWO opinions do both the students express about the evolutionary theory of loneliness?', 'A', [
+                'A' => 'It has little practical relevance.', 'B' => 'It needs further investigation.', 'C' => 'It is misleading.',
+                'D' => 'It should be more widely accepted.', 'E' => 'It is difficult to understand.',
+            ]],
+            ['Which TWO opinions do both the students express about the evolutionary theory of loneliness? (second answer)', 'B', [
+                'A' => 'It has little practical relevance.', 'B' => 'It needs further investigation.', 'C' => 'It is misleading.',
+                'D' => 'It should be more widely accepted.', 'E' => 'It is difficult to understand.',
+            ]],
+        ];
+        foreach ($s3ChooseTwo as $ct) {
+            $q = \App\Models\Question::updateOrCreate(
+                ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec3->id, 'question_text' => $ct[0]],
+                ['question_type' => 'multiple_choice', 'correct_answer' => $ct[1]]
+            );
+            foreach ($ct[2] as $letter => $text) {
+                \App\Models\QuestionOption::updateOrCreate(
+                    ['question_id' => $q->id, 'option_text' => $text],
+                    ['is_correct' => ($letter === $ct[1])]
+                );
+            }
+        }
+
+        // Section 3: MCQ Q27-30
+        $s3McqData = [
+            ['When comparing loneliness to depression, the students', 'A', [
+                'A' => 'doubt that there will ever be a medical cure for loneliness.',
+                'B' => 'claim that the link between loneliness and mental health is overstated.',
+                'C' => 'express frustration that loneliness is not taken more seriously.',
+            ]],
+            ['Why do the students decide to start their presentation with an example from their own experience?', 'B', [
+                'A' => 'to explain how difficult loneliness can be',
+                'B' => 'to highlight a situation that most students will recognise',
+                'C' => 'to emphasise that feeling lonely is more common for men than women',
+            ]],
+            ['The students agree that talking to strangers is a good strategy for dealing with loneliness because', 'A', [
+                'A' => 'it creates a sense of belonging.',
+                'B' => 'it builds self-confidence.',
+                'C' => 'it makes people feel more positive.',
+            ]],
+            ['The students find it difficult to understand why solitude is considered to be', 'C', [
+                'A' => 'similar to loneliness.',
+                'B' => 'necessary for mental health.',
+                'C' => 'an enjoyable experience.',
+            ]],
+        ];
+        foreach ($s3McqData as $mcq) {
+            $q = \App\Models\Question::updateOrCreate(
+                ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec3->id, 'question_text' => $mcq[0]],
+                ['question_type' => 'multiple_choice', 'correct_answer' => $mcq[1]]
+            );
+            foreach ($mcq[2] as $letter => $text) {
+                \App\Models\QuestionOption::updateOrCreate(
+                    ['question_id' => $q->id, 'option_text' => $text],
+                    ['is_correct' => ($letter === $mcq[1])]
+                );
+            }
+        }
+
+        // Section 4: Fill-in-blank Q31-40
+        $s4Questions = [
+            ['pollution from ______ on the river bank.', 'factories'],
+            ['In 1957, the River Thames in London was declared biologically ______.', 'dead'],
+            ['Seals and even a ______ have been seen in the River Thames.', 'whale'],
+            ['Riverside warehouses are converted to restaurants and ______.', 'apartments'],
+            ['build a riverside ______', 'park'],
+            ['display ______ projects.', 'art'],
+            ['In Paris, ______ are created on the sides of the river every summer.', 'beaches'],
+            ['Over 2 billion passengers already travel by ______ in cities round the world.', 'ferry'],
+            ['Instead of road transport, goods could be transported by large freight barges and electric ______', 'bikes'],
+            ['or, in future, by ______.', 'drone'],
+        ];
+        foreach ($s4Questions as $sq) {
+            \App\Models\Question::updateOrCreate(
+                ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec4->id, 'question_text' => $sq[0]],
+                ['question_type' => 'short_answer', 'correct_answer' => $sq[1]]
+            );
+        }
+
+        $this->command->info('✅ IELTS 20 (2025) Test 1 seeded: 3 reading (40Q) + 2 writing + 11 speaking + 4 listening sections (40Q).');
     }
 
     private function createGroup(ReadingPassage $passage, string $type, string $instruction, int $order): ReadingQuestionGroup

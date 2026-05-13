@@ -28,7 +28,7 @@ class ListeningTestController extends Controller
             $attempt->update(['started_at' => now(), 'status' => 'in_progress']);
         }
 
-        $test = $attempt->test;
+        $test = $attempt->testSet->test;
         $testSet = $attempt->testSet;
         $sections = $testSet->listeningSections()->with(['questions.options'])->orderBy('section_number')->get();
 
@@ -179,6 +179,8 @@ class ListeningTestController extends Controller
             'completed_at' => now(),
         ]);
 
+        $attempt->evaluate();
+
         return redirect()->route('dashboard')->with('success', 'Listening test submitted successfully!');
     }
 
@@ -188,6 +190,7 @@ class ListeningTestController extends Controller
     protected function forceSubmit(ListeningAttempt $attempt)
     {
         $attempt->update(['status' => 'completed', 'completed_at' => now()]);
+        $attempt->evaluate();
 
         return redirect()->route('dashboard')->with('success', 'Time expired. Listening test submitted automatically.');
     }

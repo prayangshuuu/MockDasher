@@ -13,9 +13,10 @@ class ListeningSectionController extends Controller
 {
     public function create($testSetId)
     {
-        $testSet = TestSet::findOrFail($testSetId);
+        $testSet = TestSet::with('test')->findOrFail($testSetId);
+        $sections = $testSet->listeningSections()->with(['questions.options'])->orderBy('section_number')->get();
 
-        return view('admin.listening-sections.create', compact('testSet'));
+        return view('admin.listening-sections.create', compact('testSet', 'sections'));
     }
 
     public function store(Request $request, $testSetId)
