@@ -9,7 +9,7 @@ use App\Models\Test;
 use App\Models\TestSet;
 use Illuminate\Database\Seeder;
 
-class IeltsReadingSeeder extends Seeder
+class IeltsTestSeeder extends Seeder
 {
     public function run(): void
     {
@@ -229,7 +229,7 @@ class IeltsReadingSeeder extends Seeder
             ['Portions probably of ______ size', 'average'],
         ];
         foreach ($s1Questions as $sq) {
-            \App\Models\Question::updateOrCreate(
+            Question::updateOrCreate(
                 ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec1->id, 'question_text' => $sq[0]],
                 ['question_type' => 'short_answer', 'correct_answer' => $sq[1]]
             );
@@ -269,7 +269,7 @@ class IeltsReadingSeeder extends Seeder
             ]],
         ];
         foreach ($s2McqData as $mcq) {
-            $q = \App\Models\Question::updateOrCreate(
+            $q = Question::updateOrCreate(
                 ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec2->id, 'question_text' => $mcq[0]],
                 ['question_type' => 'multiple_choice', 'correct_answer' => $mcq[1]]
             );
@@ -301,7 +301,7 @@ class IeltsReadingSeeder extends Seeder
             ]],
         ];
         foreach ($s2ChooseTwo as $ct) {
-            $q = \App\Models\Question::updateOrCreate(
+            $q = Question::updateOrCreate(
                 ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec2->id, 'question_text' => $ct[0]],
                 ['question_type' => 'multiple_choice', 'correct_answer' => $ct[1]]
             );
@@ -341,7 +341,7 @@ class IeltsReadingSeeder extends Seeder
             ]],
         ];
         foreach ($s3ChooseTwo as $ct) {
-            $q = \App\Models\Question::updateOrCreate(
+            $q = Question::updateOrCreate(
                 ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec3->id, 'question_text' => $ct[0]],
                 ['question_type' => 'multiple_choice', 'correct_answer' => $ct[1]]
             );
@@ -377,7 +377,7 @@ class IeltsReadingSeeder extends Seeder
             ]],
         ];
         foreach ($s3McqData as $mcq) {
-            $q = \App\Models\Question::updateOrCreate(
+            $q = Question::updateOrCreate(
                 ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec3->id, 'question_text' => $mcq[0]],
                 ['question_type' => 'multiple_choice', 'correct_answer' => $mcq[1]]
             );
@@ -403,7 +403,7 @@ class IeltsReadingSeeder extends Seeder
             ['or, in future, by ______.', 'drone'],
         ];
         foreach ($s4Questions as $sq) {
-            \App\Models\Question::updateOrCreate(
+            Question::updateOrCreate(
                 ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec4->id, 'question_text' => $sq[0]],
                 ['question_type' => 'short_answer', 'correct_answer' => $sq[1]]
             );
@@ -423,7 +423,7 @@ class IeltsReadingSeeder extends Seeder
     private function seedQuestions(ReadingQuestionGroup $group, string $type, array $items): void
     {
         // Remove old questions for this group first
-        $group->questions()->each(fn($q) => tap($q, fn($q) => $q->options()->delete())->delete());
+        $group->questions()->each(fn(Question $q) => tap($q, fn(Question $q) => $q->options()->delete())->delete());
 
         foreach ($items as [$text, $answer]) {
             $group->questions()->create([
@@ -436,7 +436,7 @@ class IeltsReadingSeeder extends Seeder
 
     private function seedMCQLetters(ReadingQuestionGroup $group, array $items): void
     {
-        $group->questions()->each(fn($q) => tap($q, fn($q) => $q->options()->delete())->delete());
+        $group->questions()->each(fn(Question $q) => tap($q, fn(Question $q) => $q->options()->delete())->delete());
 
         foreach ($items as [$text, $answer]) {
             $group->questions()->create([
@@ -449,7 +449,7 @@ class IeltsReadingSeeder extends Seeder
 
     private function seedMCQWithOptions(ReadingQuestionGroup $group, array $items): void
     {
-        $group->questions()->each(fn($q) => tap($q, fn($q) => $q->options()->delete())->delete());
+        $group->questions()->each(fn(Question $q) => tap($q, fn(Question $q) => $q->options()->delete())->delete());
 
         foreach ($items as [$text, $options, $correctLetter]) {
             $q = $group->questions()->create([
