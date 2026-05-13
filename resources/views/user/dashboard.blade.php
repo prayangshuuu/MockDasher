@@ -9,23 +9,13 @@
      ═══════════════════════════════════════════════════════════════════════════ --}}
 <section class="mb-8">
     <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--color-text-primary)]">
-        {{ __('messages.welcome', ['name' => explode(' ', $user->name)[0]]) }}
+        Welcome back, {{ explode(' ', $user->name)[0] }}
     </h2>
-    <p class="text-small mt-1">
-        @if($daysToExam !== null && $daysToExam > 0)
-            You have <span class="font-semibold text-[var(--color-primary)]">{{ $daysToExam }} days</span> until your exam. Keep practising.
-        @elseif($daysToExam === 0)
-            Today is your exam day — you've got this!
-        @elseif($daysToExam !== null && $daysToExam < 0)
-            Your exam was {{ abs($daysToExam) }} days ago. Review your results below.
-        @else
-            Track your preparation progress and start a new mock test anytime.
-        @endif
-    </p>
+    <p class="text-small mt-1">Here's an overview of your progress today.</p>
 </section>
 
 {{-- ═══════════════════════════════════════════════════════════════════════════
-     STATS GRID
+     STATS GRID — 4 stat cards (matches controller output)
      ═══════════════════════════════════════════════════════════════════════════ --}}
 <section class="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
@@ -33,7 +23,7 @@
     <x-ui.card>
         <div class="flex items-start justify-between">
             <div>
-                <p class="text-small text-xs font-semibold uppercase tracking-wider">{{ __('messages.target_score') }}</p>
+                <p class="text-small text-xs font-semibold uppercase tracking-wider">Target Score</p>
                 <p class="mt-2 text-3xl font-bold text-[var(--color-text-primary)]">
                     {{ number_format($targetScore, 1) }}
                     <span class="text-xs font-medium text-[var(--color-text-secondary)]">/ 9.0</span>
@@ -49,7 +39,7 @@
     <x-ui.card>
         <div class="flex items-start justify-between">
             <div>
-                <p class="text-small text-xs font-semibold uppercase tracking-wider">{{ __('messages.tests_taken') }}</p>
+                <p class="text-small text-xs font-semibold uppercase tracking-wider">Tests Taken</p>
                 <p class="mt-2 text-3xl font-bold text-[var(--color-text-primary)]">{{ $testsTakenCount }}</p>
             </div>
             <div class="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)]">
@@ -62,13 +52,13 @@
     <x-ui.card>
         <div class="flex items-start justify-between">
             <div>
-                <p class="text-small text-xs font-semibold uppercase tracking-wider">{{ __('messages.avg_band_score') }}</p>
+                <p class="text-small text-xs font-semibold uppercase tracking-wider">Average Band</p>
                 <p class="mt-2 text-3xl font-bold text-[var(--color-text-primary)]">
                     {{ $avgBandScore !== null ? number_format($avgBandScore, 1) : '—' }}
                 </p>
             </div>
             <div class="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)]">
-                <span class="material-symbols-outlined text-xl text-[var(--color-primary)]">analytics</span>
+                <span class="material-symbols-outlined text-xl text-[var(--color-primary)]">trending_up</span>
             </div>
         </div>
     </x-ui.card>
@@ -77,7 +67,7 @@
     <x-ui.card>
         <div class="flex items-start justify-between">
             <div>
-                <p class="text-small text-xs font-semibold uppercase tracking-wider">{{ __('messages.days_to_exam') }}</p>
+                <p class="text-small text-xs font-semibold uppercase tracking-wider">Days to Exam</p>
                 <p class="mt-2 text-3xl font-bold text-[var(--color-text-primary)]">
                     {{ $daysToExam ?? '—' }}
                     @if($user->exam_date)
@@ -90,6 +80,7 @@
             </div>
         </div>
     </x-ui.card>
+
 </section>
 
 {{-- ═══════════════════════════════════════════════════════════════════════════
@@ -102,7 +93,7 @@
         <x-slot:header>
             <div class="flex items-center justify-between">
                 <div>
-                    <h3 class="text-base font-bold text-[var(--color-text-primary)]">{{ __('messages.score_improvement') }}</h3>
+                    <h3 class="text-base font-bold text-[var(--color-text-primary)]">Score Improvement</h3>
                     <p class="text-small text-xs mt-0.5">Your band scores across recent tests</p>
                 </div>
             </div>
@@ -138,7 +129,7 @@
     {{-- Module Breakdown (1/3 width) --}}
     <x-ui.card>
         <x-slot:header>
-            <h3 class="text-base font-bold text-[var(--color-text-primary)]">{{ __('messages.module_breakdown') }}</h3>
+            <h3 class="text-base font-bold text-[var(--color-text-primary)]">Module Breakdown</h3>
         </x-slot:header>
 
         <div class="space-y-5">
@@ -175,7 +166,7 @@
      ═══════════════════════════════════════════════════════════════════════════ --}}
 <section class="mb-10">
     <div class="mb-5 flex items-center justify-between">
-        <h3 class="text-lg font-bold text-[var(--color-text-primary)]">{{ __('messages.recommended_mock_tests') }}</h3>
+        <h3 class="text-lg font-bold text-[var(--color-text-primary)]">Recommended Mock Tests</h3>
         <a href="{{ route('user.history.index') }}" class="text-sm font-semibold text-[var(--color-primary)] transition-opacity hover:opacity-80">
             View All
         </a>
@@ -216,10 +207,11 @@
         @empty
             <div class="col-span-full">
                 <x-ui.card>
-                    <div class="flex flex-col items-center justify-center py-6 text-center">
-                        <span class="material-symbols-outlined mb-2 text-4xl text-[var(--color-divider)]">auto_stories</span>
-                        <p class="text-small text-sm">No tests currently available. Check back later.</p>
-                    </div>
+                    <x-ui.empty-state
+                        icon="auto_stories"
+                        title="No tests available"
+                        description="No tests currently available. Check back later."
+                    />
                 </x-ui.card>
             </div>
         @endforelse
@@ -233,7 +225,7 @@
     <x-ui.card :flush="true">
         <x-slot:header>
             <div class="flex items-center justify-between">
-                <h3 class="text-base font-bold text-[var(--color-text-primary)]">{{ __('messages.recent_test_history') }}</h3>
+                <h3 class="text-base font-bold text-[var(--color-text-primary)]">Recent Test History</h3>
                 <a href="{{ route('user.history.index') }}" class="text-sm font-semibold text-[var(--color-primary)] transition-opacity hover:opacity-80">
                     See All
                 </a>
@@ -300,10 +292,11 @@
                     @empty
                         <tr>
                             <td colspan="5" class="px-5 py-10 text-center sm:px-6">
-                                <div class="flex flex-col items-center">
-                                    <span class="material-symbols-outlined mb-2 text-3xl text-[var(--color-divider)]">history</span>
-                                    <p class="text-small text-sm">No test history yet. Start your first mock test above!</p>
-                                </div>
+                                <x-ui.empty-state
+                                    icon="history"
+                                    title="No test history yet"
+                                    description="Start your first mock test to see your history here."
+                                />
                             </td>
                         </tr>
                     @endforelse

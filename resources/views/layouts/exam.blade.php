@@ -25,7 +25,7 @@
     {{-- ═══════════════════════════════════════════════════════════════════════
          TOP BAR — Flat, distraction-free
          ═══════════════════════════════════════════════════════════════════════ --}}
-    <header class="z-50 flex h-14 shrink-0 items-center justify-between bg-[var(--color-bg-primary)] px-4 sm:px-6 lg:px-8">
+    <header class="z-50 flex h-14 shrink-0 items-center justify-between border-b border-[var(--color-divider)] bg-[var(--color-bg-primary)] px-4 sm:px-6 lg:px-8">
 
         {{-- Left: Brand + Test Info --}}
         <div class="flex min-w-0 items-center gap-3">

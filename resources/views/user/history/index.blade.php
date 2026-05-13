@@ -3,154 +3,155 @@
 @section('title', 'My Test History')
 
 @section('content')
-<main class="max-w-7xl mx-auto py-4">
-    <!-- Header Section -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-4">
-        <div>
-            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight dark:text-white">My Test History</h1>
-            <p class="text-slate-500 mt-1 max-w-lg dark:text-slate-400">Review all your past mock exams and track your progress across different academic modules.</p>
-        </div>
-        <a href="{{ route('dashboard') }}" class="indigo-violet-gradient text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lift active:scale-95 transition-transform">
-            <span class="material-symbols-outlined text-xl">add</span>
-            Take New Test
-        </a>
-    </div>
 
-    <!-- Quick Stats Bento Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-premium border-l-4 border-indigo-500">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Average Band Score</p>
-            <div class="flex items-baseline gap-2 mt-2">
-                <span class="text-4xl font-extrabold text-slate-900 dark:text-white">{{ $stats['averageBandScore'] !== null ? number_format($stats['averageBandScore'], 1) : 'N/A' }}</span>
-                <span class="text-indigo-600 font-bold text-sm flex items-center gap-0.5">
-                    @if($stats['trend'])
-                        <span class="material-symbols-outlined text-xs">trending_up</span>
-                        {{ $stats['trend'] }}
+{{-- ═══════════════════════════════════════════════════════════════════════════
+     HEADER
+     ═══════════════════════════════════════════════════════════════════════════ --}}
+<section class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--color-text-primary)]">My Test History</h2>
+        <p class="text-small mt-1">Review all your past mock exams and track your progress.</p>
+    </div>
+    <x-ui.button variant="primary" href="{{ route('dashboard') }}">
+        <span class="material-symbols-outlined text-sm">add</span>
+        Take New Test
+    </x-ui.button>
+</section>
+
+{{-- ═══════════════════════════════════════════════════════════════════════════
+     QUICK STATS
+     ═══════════════════════════════════════════════════════════════════════════ --}}
+<section class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <x-ui.card>
+        <div class="flex items-center gap-4">
+            <div class="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)]">
+                <span class="material-symbols-outlined text-xl text-[var(--color-primary)]">analytics</span>
+            </div>
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)]">Average Band Score</p>
+                <p class="text-2xl font-bold text-[var(--color-text-primary)]">{{ $stats['averageBandScore'] !== null ? number_format($stats['averageBandScore'], 1) : 'N/A' }}</p>
+            </div>
+        </div>
+    </x-ui.card>
+    <x-ui.card>
+        <div class="flex items-center gap-4">
+            <div class="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)]">
+                <span class="material-symbols-outlined text-xl text-[var(--color-success)]">task_alt</span>
+            </div>
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)]">Tests Completed</p>
+                <p class="text-2xl font-bold text-[var(--color-text-primary)]">{{ $stats['testsCompleted'] }}</p>
+            </div>
+        </div>
+    </x-ui.card>
+    <x-ui.card>
+        <div class="flex items-center gap-4">
+            <div class="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)]">
+                <span class="material-symbols-outlined text-xl text-[var(--color-success)]">trending_up</span>
+            </div>
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)]">Strongest Module</p>
+                <p class="text-lg font-bold text-[var(--color-text-primary)]">
+                    @if($stats['strongestModule']['name'])
+                        {{ $stats['strongestModule']['name'] }}
+                        <span class="text-xs font-medium text-[var(--color-success)]">{{ number_format($stats['strongestModule']['score'], 1) }}</span>
                     @else
-                        <span class="text-slate-400">—</span>
+                        N/A
                     @endif
-                </span>
+                </p>
             </div>
         </div>
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-premium border-l-4 border-tertiary">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tests Completed</p>
-            <div class="flex items-baseline gap-2 mt-2">
-                <span class="text-4xl font-extrabold text-slate-900 dark:text-white">{{ $stats['testsCompleted'] }}</span>
-                <span class="text-slate-400 font-medium text-sm">/ 20 Target</span>
-            </div>
-        </div>
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-premium border-l-4 border-emerald-500">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Strongest Module</p>
-            <div class="flex items-center gap-2 mt-2">
-                @if($stats['strongestModule']['name'])
-                    <span class="text-2xl font-extrabold text-slate-900 dark:text-white">{{ $stats['strongestModule']['name'] }}</span>
-                    <span class="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 text-[10px] font-bold rounded uppercase">
-                        {{ number_format($stats['strongestModule']['score'], 1) }} High
-                    </span>
-                @else
-                    <span class="text-2xl font-extrabold text-slate-400">N/A</span>
-                @endif
-            </div>
-        </div>
-    </div>
+    </x-ui.card>
+</section>
 
-    <!-- History Table Card -->
-    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-premium border border-slate-100 dark:border-slate-800 overflow-hidden">
-        <div class="px-8 py-6 border-b border-slate-50 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <h2 class="text-lg font-bold text-slate-900 dark:text-white">Recent Attempts</h2>
-            <div class="flex gap-2">
-                <button class="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 rounded-base transition-colors">Filter</button>
-                <button class="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 rounded-base transition-colors">Export CSV</button>
-            </div>
-        </div>
+{{-- ═══════════════════════════════════════════════════════════════════════════
+     HISTORY TABLE
+     ═══════════════════════════════════════════════════════════════════════════ --}}
+<section>
+    <x-ui.card :flush="true">
+        <x-slot:header>
+            <h3 class="text-base font-bold text-[var(--color-text-primary)]">Recent Attempts</h3>
+        </x-slot:header>
+
         <div class="overflow-x-auto">
             <table class="w-full text-left">
-                <thead class="bg-slate-50/50 dark:bg-slate-800/50">
-                    <tr>
-                        <th class="px-8 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Test Information</th>
-                        <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Date Taken</th>
-                        <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Band Score</th>
-                        <th class="px-8 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider text-right">Action</th>
+                <thead>
+                    <tr class="border-b border-[var(--color-divider)]">
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Test</th>
+                        <th class="hidden px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:table-cell sm:px-6">Status</th>
+                        <th class="hidden px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] md:table-cell sm:px-6">Date</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Score</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6 text-right">Action</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-50 dark:divide-slate-800">
+                <tbody>
                     @forelse($attempts as $attempt)
-                    <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors group">
-                        <td class="px-8 py-5">
-                            <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-indigo-600">
-                                    <span class="material-symbols-outlined">description</span>
+                    <tr class="border-b border-[var(--color-divider)] last:border-b-0 transition-colors hover:bg-[var(--color-bg-secondary)]">
+                        <td class="px-5 py-4 sm:px-6">
+                            <div class="flex items-center gap-3">
+                                <div class="flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-xs)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)]">
+                                    <span class="material-symbols-outlined text-base text-[var(--color-primary)]">description</span>
                                 </div>
-                                <div>
-                                    <p class="font-bold text-slate-900 dark:text-white">{{ $attempt->test->title ?? 'IELTS Mock Test' }}</p>
-                                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ $attempt->testSet->title ?? 'Full Simulation' }} • Part of Set #{{ $attempt->test_set_id }}</p>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-[var(--color-text-primary)] truncate">{{ $attempt->test->title ?? 'Mock Test' }}</p>
+                                    <p class="text-xs text-[var(--color-text-secondary)] truncate">{{ $attempt->testSet->title ?? 'Full Simulation' }}</p>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-5">
+                        <td class="hidden px-5 py-4 sm:table-cell sm:px-6">
                             @if($attempt->status === 'completed')
-                                <span class="px-3 py-1 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 text-xs font-bold rounded-full">Completed</span>
+                                <x-ui.badge variant="success">Completed</x-ui.badge>
                             @elseif($attempt->status === 'in_progress')
-                                <span class="px-3 py-1 bg-amber-50 dark:bg-amber-900/20 text-amber-600 text-xs font-bold rounded-full">In Progress</span>
+                                <x-ui.badge variant="pending">In Progress</x-ui.badge>
                             @else
-                                <span class="px-3 py-1 bg-slate-50 dark:bg-slate-800 text-slate-500 text-xs font-bold rounded-full">{{ ucfirst($attempt->status) }}</span>
+                                <x-ui.badge variant="neutral">{{ ucfirst($attempt->status) }}</x-ui.badge>
                             @endif
                         </td>
-                        <td class="px-6 py-5 text-sm text-slate-600 dark:text-slate-400 font-medium">
+                        <td class="hidden px-5 py-4 text-sm text-[var(--color-text-secondary)] md:table-cell sm:px-6">
                             {{ $attempt->created_at->format('M d, Y') }}
                         </td>
-                        <td class="px-6 py-5">
-                            @if($attempt->status === 'completed')
-                                <div class="w-10 h-10 rounded-full border-2 border-indigo-600 flex items-center justify-center text-indigo-600 font-extrabold text-sm bg-indigo-50 dark:bg-indigo-900/20">
-                                    {{ $attempt->overall_band !== null ? number_format($attempt->overall_band, 1) : 'N/A' }}
-                                </div>
+                        <td class="px-5 py-4 sm:px-6">
+                            @if($attempt->status === 'completed' && $attempt->overall_band !== null)
+                                <span class="text-sm font-bold text-[var(--color-primary)]">{{ number_format($attempt->overall_band, 1) }}</span>
                             @else
-                                <div class="w-10 h-10 rounded-full border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 font-extrabold text-sm">
-                                    —
-                                </div>
+                                <span class="text-sm text-[var(--color-text-secondary)]">—</span>
                             @endif
                         </td>
-                        <td class="px-8 py-5 text-right">
+                        <td class="px-5 py-4 sm:px-6 text-right">
                             @if($attempt->status === 'completed')
-                                <a href="{{ route('user.history.show', $attempt->id) }}" class="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition-colors">Review Details</a>
+                                <x-ui.button variant="outline" href="{{ route('user.history.show', $attempt->id) }}" class="text-xs px-3 py-1.5">Review</x-ui.button>
                             @else
-                                <a href="{{ route('user.history.show', $attempt->id) }}" class="px-4 py-2 bg-slate-900 dark:bg-white dark:text-slate-900 text-white text-xs font-bold rounded-base hover:bg-slate-800 transition-colors">Resume</a>
+                                <x-ui.button variant="primary" href="{{ route('user.history.show', $attempt->id) }}" class="text-xs px-3 py-1.5">Resume</x-ui.button>
                             @endif
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="py-24 px-8 text-center">
-                            <div class="flex flex-col items-center justify-center">
-                                <div class="w-32 h-32 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
-                                    <span class="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-600">history</span>
-                                </div>
-                                <h3 class="text-xl font-extrabold text-slate-900 dark:text-white mb-2">No tests taken yet</h3>
-                                <p class="text-slate-500 dark:text-slate-400 max-w-sm mb-8">Start your first mock exam today to track your progress and get detailed AI-powered feedback.</p>
-                                <a href="{{ route('dashboard') }}" class="indigo-violet-gradient text-white px-8 py-3 rounded-xl font-bold shadow-lift active:scale-95 transition-transform inline-block">
-                                    Start Your First Test
-                                </a>
-                            </div>
+                        <td colspan="5" class="px-5 py-10 sm:px-6">
+                            <x-ui.empty-state icon="history" title="No tests taken yet" description="Start your first mock exam to track your progress.">
+                                <x-slot:action>
+                                    <x-ui.button variant="primary" href="{{ route('dashboard') }}">Start Your First Test</x-ui.button>
+                                </x-slot:action>
+                            </x-ui.empty-state>
                         </td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-    </div>
 
-    <!-- Pagination -->
-    @if($attempts->hasPages())
-    <div class="mt-6 flex justify-between items-center px-4">
-        <p class="text-xs text-slate-500 font-medium dark:text-slate-400">
-            Showing <span class="text-slate-900 dark:text-white">{{ $attempts->firstItem() }}-{{ $attempts->lastItem() }}</span> of <span class="text-slate-900 dark:text-white">{{ $attempts->total() }}</span> attempts
-        </p>
-        <div class="flex gap-1">
-            {{-- Custom Pagination Links can be implemented here if needed, or use default --}}
-            {{ $attempts->links() }}
-        </div>
-    </div>
-    @endif
-</main>
+        {{-- Pagination --}}
+        @if($attempts->hasPages())
+            <x-slot:footer>
+                <div class="flex items-center justify-between">
+                    <p class="text-xs text-[var(--color-text-secondary)]">
+                        Showing <span class="font-semibold text-[var(--color-text-primary)]">{{ $attempts->firstItem() }}-{{ $attempts->lastItem() }}</span> of <span class="font-semibold text-[var(--color-text-primary)]">{{ $attempts->total() }}</span>
+                    </p>
+                    {{ $attempts->links() }}
+                </div>
+            </x-slot:footer>
+        @endif
+    </x-ui.card>
+</section>
+
 @endsection

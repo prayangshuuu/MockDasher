@@ -2,251 +2,210 @@
 
 @section('title', 'Test Result — Attempt #' . $attempt->id)
 
-@section('content')
-<div class="max-w-6xl mx-auto space-y-10">
-    
-    <!-- Header / Breadcrumbs -->
-    <nav class="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
-        <a href="{{ route('dashboard') }}" class="hover:text-primary transition-colors">Dashboard</a>
-        <span class="material-symbols-outlined text-[10px]">chevron_right</span>
-        <a href="{{ route('user.history.index') }}" class="hover:text-primary transition-colors">History</a>
-        <span class="material-symbols-outlined text-[10px]">chevron_right</span>
-        <span class="text-slate-900 dark:text-white">Attempt #{{ $attempt->id }}</span>
+@section('breadcrumbs')
+    <nav class="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
+        <a href="{{ route('dashboard') }}" class="hover:text-[var(--color-primary)] transition-colors">Dashboard</a>
+        <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+        <a href="{{ route('user.history.index') }}" class="hover:text-[var(--color-primary)] transition-colors">History</a>
+        <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+        <span class="font-semibold text-[var(--color-text-primary)]">Attempt #{{ $attempt->id }}</span>
     </nav>
+@endsection
 
-    <!-- Main Score Hero -->
-    <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-3xl shadow-lift border border-slate-200/50 dark:border-slate-800 p-12 md:p-16 flex flex-col md:flex-row items-center gap-12">
-        <div class="absolute top-0 right-0 -translate-y-12 translate-x-12 size-64 bg-primary/5 rounded-full blur-3xl"></div>
-        
-        <div class="relative z-10 flex-col items-center flex">
-            <div class="size-48 rounded-full bg-gradient-to-br from-primary to-violet-600 p-1 shadow-lift hover:scale-105 transition-transform">
-                <div class="w-full h-full bg-white dark:bg-slate-900 rounded-full flex flex-col items-center justify-center">
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Band Score</span>
-                    <div class="text-7xl font-black text-slate-900 dark:text-white leading-none tracking-tighter tabular-nums">
-                        {{ $attempt->overall_band !== null ? number_format($attempt->overall_band, 1) : 'N/A' }}
+@section('content')
+
+<div class="max-w-6xl mx-auto space-y-8">
+
+    {{-- ═══════════════════════════════════════════════════════════════════════
+         SCORE HERO
+         ═══════════════════════════════════════════════════════════════════════ --}}
+    <x-ui.card>
+        <div class="flex flex-col items-center gap-8 md:flex-row">
+            {{-- Score Circle --}}
+            <div class="flex flex-col items-center shrink-0">
+                <div class="flex size-36 items-center justify-center rounded-full border-4 border-[var(--color-primary)]">
+                    <div class="text-center">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-secondary)]">Band Score</p>
+                        <p class="text-5xl font-bold text-[var(--color-text-primary)] tabular-nums leading-none mt-1">
+                            {{ $attempt->overall_band !== null ? number_format($attempt->overall_band, 1) : 'N/A' }}
+                        </p>
                     </div>
                 </div>
+                <div class="mt-3">
+                    @if($attempt->status === 'completed')
+                        <x-ui.badge variant="success">Completed</x-ui.badge>
+                    @else
+                        <x-ui.badge variant="pending">{{ ucfirst($attempt->status) }}</x-ui.badge>
+                    @endif
+                </div>
             </div>
-            <div class="mt-6 inline-flex items-center gap-2 px-4 py-1.5 {{ $attempt->status === 'completed' ? 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600' : 'bg-amber-50 dark:bg-amber-900/20 text-amber-600' }} rounded-full text-[10px] font-black uppercase tracking-widest">
-                <span class="material-symbols-outlined text-sm">{{ $attempt->status === 'completed' ? 'verified' : 'pending' }}</span>
-                {{ ucfirst($attempt->status) }}
-            </div>
-        </div>
 
-        <div class="flex-1 space-y-6 text-center md:text-left">
-            <div>
-                <h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+            {{-- Test Info --}}
+            <div class="flex-1 text-center md:text-left">
+                <h2 class="text-2xl sm:text-3xl font-bold text-[var(--color-text-primary)]">
                     {{ $attempt->testSet->test->title ?? 'Full Mock Exam' }}
-                </h1>
-                <p class="text-lg text-slate-500 font-medium mt-2">
-                    IELTS {{ $attempt->testSet->test->exam_type ?? 'Academic' }} Simulation • Book {{ $attempt->testSet->test->book_number ?? '?' }}
+                </h2>
+                <p class="mt-1 text-sm text-[var(--color-text-secondary)]">
+                    {{ $attempt->testSet->test->exam_type ?? 'Academic' }} Simulation &bull; Book {{ $attempt->testSet->test->book_number ?? '?' }}
                 </p>
-            </div>
 
-            <div class="grid grid-cols-2 lg:grid-cols-3 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-                <div>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Completion Date</p>
-                    <p class="text-sm font-bold text-slate-900 dark:text-white">{{ $attempt->created_at->format('M j, Y') }}</p>
-                </div>
-                <div>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Time Spent</p>
-                    <p class="text-sm font-bold text-slate-900 dark:text-white">{{ $attempt->time_spent ?? 'N/A' }}</p>
-                </div>
-                <div class="col-span-2 lg:col-span-1">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Candidate ID</p>
-                    <p class="text-sm font-bold text-slate-900 dark:text-white">MD-{{ str_pad($attempt->user_id, 5, '0', STR_PAD_LEFT) }}</p>
+                <div class="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 border-t border-[var(--color-divider)] pt-5">
+                    <div>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-secondary)] mb-1">Date</p>
+                        <p class="text-sm font-semibold text-[var(--color-text-primary)]">{{ $attempt->created_at->format('M j, Y') }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-secondary)] mb-1">Time Spent</p>
+                        <p class="text-sm font-semibold text-[var(--color-text-primary)]">{{ $attempt->time_spent ?? 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-secondary)] mb-1">Candidate</p>
+                        <p class="text-sm font-semibold text-[var(--color-text-primary)]">MD-{{ str_pad($attempt->user_id, 5, '0', STR_PAD_LEFT) }}</p>
+                    </div>
                 </div>
             </div>
         </div>
+    </x-ui.card>
+
+    {{-- ═══════════════════════════════════════════════════════════════════════
+         MODULE BREAKDOWN GRID
+         ═══════════════════════════════════════════════════════════════════════ --}}
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+
+        {{-- Reading --}}
+        <x-ui.card>
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="flex size-10 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)]">
+                        <span class="material-symbols-outlined text-xl text-[var(--color-primary)]">auto_stories</span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-[var(--color-text-primary)]">Reading</h4>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-secondary)]">Academic Passage Analysis</p>
+                    </div>
+                </div>
+                <span class="text-2xl font-bold text-[var(--color-primary)] tabular-nums">{{ $attempt->reading_band !== null ? number_format($attempt->reading_band, 1) : 'N/A' }}</span>
+            </div>
+            <div class="h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-bg-secondary)]">
+                <div class="h-full rounded-full bg-[var(--color-primary)] transition-all duration-700" style="width: {{ ($attempt->reading_band ?? 0) * 11 }}%"></div>
+            </div>
+            <p class="mt-2 text-xs text-[var(--color-text-secondary)]">Correct: {{ $attempt->reading_score !== null ? $attempt->reading_score . '/40' : 'N/A' }}</p>
+        </x-ui.card>
+
+        {{-- Listening --}}
+        <x-ui.card>
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="flex size-10 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)]">
+                        <span class="material-symbols-outlined text-xl text-[var(--color-success)]">headphones</span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-[var(--color-text-primary)]">Listening</h4>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-secondary)]">Audio Comprehension</p>
+                    </div>
+                </div>
+                <span class="text-2xl font-bold text-[var(--color-success)] tabular-nums">{{ $attempt->listening_band !== null ? number_format($attempt->listening_band, 1) : 'N/A' }}</span>
+            </div>
+            <div class="h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-bg-secondary)]">
+                <div class="h-full rounded-full bg-[var(--color-success)] transition-all duration-700" style="width: {{ ($attempt->listening_band ?? 0) * 11 }}%"></div>
+            </div>
+            <p class="mt-2 text-xs text-[var(--color-text-secondary)]">Correct: {{ $attempt->listening_score !== null ? $attempt->listening_score . '/40' : 'N/A' }}</p>
+        </x-ui.card>
+
+        {{-- Writing --}}
+        <x-ui.card>
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="flex size-10 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,#F59E0B_10%,transparent)]">
+                        <span class="material-symbols-outlined text-xl text-[#B45309]">edit_square</span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-[var(--color-text-primary)]">Writing</h4>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-secondary)]">Task 1 & 2</p>
+                    </div>
+                </div>
+                <span class="text-2xl font-bold text-[#B45309] tabular-nums">
+                    @if($attempt->aiWritingEvaluation) {{ number_format($attempt->aiWritingEvaluation->band_score, 1) }} @else <span class="text-sm text-[var(--color-text-secondary)]">Pending</span> @endif
+                </span>
+            </div>
+            <div class="h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-bg-secondary)]">
+                <div class="h-full rounded-full bg-[#F59E0B] transition-all duration-700" style="width: {{ ($attempt->aiWritingEvaluation->band_score ?? 0) * 11 }}%"></div>
+            </div>
+            <p class="mt-2 text-xs text-[var(--color-text-secondary)]">@if($attempt->aiWritingEvaluation) AI Scored @else Evaluation pending @endif</p>
+        </x-ui.card>
+
+        {{-- Speaking --}}
+        <x-ui.card>
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="flex size-10 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-error)_10%,transparent)]">
+                        <span class="material-symbols-outlined text-xl text-[var(--color-error)]">record_voice_over</span>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-[var(--color-text-primary)]">Speaking</h4>
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-secondary)]">Oral Assessment</p>
+                    </div>
+                </div>
+                <span class="text-2xl font-bold text-[var(--color-error)] tabular-nums">
+                    @if($attempt->aiSpeakingEvaluation) {{ number_format($attempt->aiSpeakingEvaluation->band_score, 1) }} @else <span class="text-sm text-[var(--color-text-secondary)]">Pending</span> @endif
+                </span>
+            </div>
+            <div class="h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-bg-secondary)]">
+                <div class="h-full rounded-full bg-[var(--color-error)] transition-all duration-700" style="width: {{ ($attempt->aiSpeakingEvaluation->band_score ?? 0) * 11 }}%"></div>
+            </div>
+            <p class="mt-2 text-xs text-[var(--color-text-secondary)]">@if($attempt->aiSpeakingEvaluation) AI Scored @else Evaluation pending @endif</p>
+        </x-ui.card>
     </div>
 
-    <!-- Module Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        
-        <!-- Reading Module -->
-        <div class="group bg-white dark:bg-slate-900 rounded-3xl p-10 border border-slate-200/60 dark:border-slate-800 shadow-premium hover:shadow-lift transition-all">
-            <div class="flex items-center justify-between mb-8">
-                <div class="flex items-center gap-4">
-                    <div class="size-14 rounded-xl bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <span class="material-symbols-outlined text-3xl font-light">auto_stories</span>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-black text-slate-900 dark:text-white">Reading</h3>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Academic Passage Analysis</p>
-                    </div>
-                </div>
-                <div class="text-4xl font-black text-primary tabular-nums">
-                    {{ $attempt->reading_band !== null ? number_format($attempt->reading_band, 1) : 'N/A' }}
-                </div>
-            </div>
-            <div class="space-y-4">
-                <div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-primary rounded-full transition-all duration-1000" x-data="{ width: '{{ ($attempt->reading_band ?? 0) * 11 }}%' }" :style="`width: ${width}`"></div>
-                </div>
-                <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    <span>Correct: {{ $attempt->reading_score !== null ? $attempt->reading_score . '/40' : 'N/A' }}</span>
-                    <span>Band Level: {{ $attempt->reading_band !== null ? floor($attempt->reading_band) : 'N/A' }}</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Listening Module -->
-        <div class="group bg-white dark:bg-slate-900 rounded-3xl p-10 border border-slate-200/60 dark:border-slate-800 shadow-premium hover:shadow-lift transition-all">
-            <div class="flex items-center justify-between mb-8">
-                <div class="flex items-center gap-4">
-                    <div class="size-14 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <span class="material-symbols-outlined text-3xl font-light">headphones</span>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-black text-slate-900 dark:text-white">Listening</h3>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Audio Comprehension</p>
-                    </div>
-                </div>
-                <div class="text-4xl font-black text-emerald-600 tabular-nums">
-                    {{ $attempt->listening_band !== null ? number_format($attempt->listening_band, 1) : 'N/A' }}
-                </div>
-            </div>
-            <div class="space-y-4">
-                <div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <div class="h-full bg-emerald-500 rounded-full transition-all duration-1000" x-data="{ width: '{{ ($attempt->listening_band ?? 0) * 11 }}%' }" :style="`width: ${width}`"></div>
-                </div>
-                <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    <span>Correct: {{ $attempt->listening_score !== null ? $attempt->listening_score . '/40' : 'N/A' }}</span>
-                    <span>Accuracy: {{ $attempt->listening_score !== null ? number_format(($attempt->listening_score / 40) * 100, 1) . '%' : 'N/A' }}</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Writing Module -->
-        <div class="group bg-white dark:bg-slate-900 rounded-3xl p-10 border border-slate-200/60 dark:border-slate-800 shadow-premium hover:shadow-lift transition-all">
-            <div class="flex items-center justify-between mb-8">
-                <div class="flex items-center gap-4">
-                    <div class="size-14 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <span class="material-symbols-outlined text-3xl font-light">edit_square</span>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-black text-slate-900 dark:text-white">Writing</h3>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Task 1 & 2</p>
-                    </div>
-                </div>
-                <div class="text-4xl font-black text-amber-600 tabular-nums">
-                    @if($attempt->aiWritingEvaluation)
-                        {{ number_format($attempt->aiWritingEvaluation->band_score, 1) }}
-                    @else
-                        <span class="text-slate-300 text-2xl">Pending</span>
-                    @endif
-                </div>
-            </div>
-            <div class="space-y-4">
-                <div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    @if($attempt->aiWritingEvaluation)
-                        <div class="h-full bg-amber-500 rounded-full transition-all duration-1000" x-data="{ width: '{{ ($attempt->aiWritingEvaluation->band_score ?? 0) * 11 }}%' }" :style="`width: ${width}`"></div>
-                    @else
-                        <div class="h-full bg-slate-200 dark:bg-slate-700 rounded-full w-0"></div>
-                    @endif
-                </div>
-                <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    @if($attempt->aiWritingEvaluation)
-                        <span class="text-amber-600">AI Scored</span>
-                        <a href="#writing-feedback" class="underline hover:text-amber-600">View Feedback</a>
-                    @else
-                        <span>Processing with AI...</span>
-                        <span>Evaluation pending</span>
-                    @endif
-                </div>
-            </div>
-        </div>
-
-        <!-- Speaking Module -->
-        <div class="group bg-white dark:bg-slate-900 rounded-3xl p-10 border border-slate-200/60 dark:border-slate-800 shadow-premium hover:shadow-lift transition-all">
-            <div class="flex items-center justify-between mb-8">
-                <div class="flex items-center gap-4">
-                    <div class="size-14 rounded-xl bg-rose-500/10 text-rose-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <span class="material-symbols-outlined text-3xl font-light">record_voice_over</span>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-black text-slate-900 dark:text-white">Speaking</h3>
-                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Oral Interview Assessment</p>
-                    </div>
-                </div>
-                <div class="text-4xl font-black text-rose-600 tabular-nums">
-                    @if($attempt->aiSpeakingEvaluation)
-                        {{ number_format($attempt->aiSpeakingEvaluation->band_score, 1) }}
-                    @else
-                        <span class="text-slate-300 text-2xl">Pending</span>
-                    @endif
-                </div>
-            </div>
-            <div class="space-y-4">
-                <div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    @if($attempt->aiSpeakingEvaluation)
-                        <div class="h-full bg-rose-500 rounded-full transition-all duration-1000" x-data="{ width: '{{ ($attempt->aiSpeakingEvaluation->band_score ?? 0) * 11 }}%' }" :style="`width: ${width}`"></div>
-                    @else
-                        <div class="h-full bg-slate-200 dark:bg-slate-700 rounded-full w-0"></div>
-                    @endif
-                </div>
-                <div class="flex justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    @if($attempt->aiSpeakingEvaluation)
-                        <span class="text-rose-600">AI Scored</span>
-                        <a href="#speaking-feedback" class="underline hover:text-rose-600">View Feedback</a>
-                    @else
-                        <span>Processing with AI...</span>
-                        <span>Evaluation pending</span>
-                    @endif
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- AI Feedback Details -->
+    {{-- ═══════════════════════════════════════════════════════════════════════
+         AI FEEDBACK
+         ═══════════════════════════════════════════════════════════════════════ --}}
     @if($attempt->aiWritingEvaluation || $attempt->aiSpeakingEvaluation)
-    <div class="space-y-8">
-        <h2 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">AI Examiner Reports</h2>
-        
+    <div class="space-y-5">
+        <h3 class="text-lg font-bold text-[var(--color-text-primary)]">AI Examiner Reports</h3>
+
         @if($attempt->aiWritingEvaluation)
-        <div id="writing-feedback" class="bg-white dark:bg-slate-900 rounded-3xl p-10 md:p-14 border border-amber-200 dark:border-amber-900 shadow-lift transition-all">
-            <div class="flex items-center gap-4 mb-8">
-                <div class="size-12 rounded-xl bg-amber-500 text-white flex items-center justify-center shadow-lg shadow-amber-500/20">
-                    <span class="material-symbols-outlined">edit_square</span>
+        <x-ui.card>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="flex size-8 items-center justify-center rounded-[var(--radius-xs)] bg-[color-mix(in_srgb,#F59E0B_12%,transparent)]">
+                    <span class="material-symbols-outlined text-base text-[#B45309]">edit_square</span>
                 </div>
-                <h3 class="text-2xl font-black text-slate-900 dark:text-white">Writing Evaluation</h3>
-                <div class="ml-auto text-3xl font-black text-amber-500">Band {{ $attempt->aiWritingEvaluation->band_score }}</div>
+                <h4 class="text-sm font-bold text-[var(--color-text-primary)]">Writing Evaluation</h4>
+                <span class="ml-auto text-lg font-bold text-[#B45309]">Band {{ $attempt->aiWritingEvaluation->band_score }}</span>
             </div>
-            <div class="prose prose-amber dark:prose-invert max-w-none font-medium leading-relaxed whitespace-pre-wrap text-slate-600 dark:text-slate-300 bg-amber-50/50 dark:bg-amber-950/20 p-8 rounded-3xl border border-amber-100 dark:border-amber-900/50">{{ $attempt->aiWritingEvaluation->evaluation_text }}</div>
-        </div>
+            <div class="rounded-[var(--radius-base)] bg-[var(--color-bg-secondary)] p-5 text-sm leading-relaxed text-[var(--color-text-secondary)] whitespace-pre-wrap">{{ $attempt->aiWritingEvaluation->evaluation_text }}</div>
+        </x-ui.card>
         @endif
 
         @if($attempt->aiSpeakingEvaluation)
-        <div id="speaking-feedback" class="bg-white dark:bg-slate-900 rounded-3xl p-10 md:p-14 border border-rose-200 dark:border-rose-900 shadow-lift transition-all">
-            <div class="flex items-center gap-4 mb-8">
-                <div class="size-12 rounded-xl bg-rose-500 text-white flex items-center justify-center shadow-lg shadow-rose-500/20">
-                    <span class="material-symbols-outlined">record_voice_over</span>
+        <x-ui.card>
+            <div class="flex items-center gap-3 mb-4">
+                <div class="flex size-8 items-center justify-center rounded-[var(--radius-xs)] bg-[color-mix(in_srgb,var(--color-error)_12%,transparent)]">
+                    <span class="material-symbols-outlined text-base text-[var(--color-error)]">record_voice_over</span>
                 </div>
-                <h3 class="text-2xl font-black text-slate-900 dark:text-white">Speaking Evaluation</h3>
-                <div class="ml-auto text-3xl font-black text-rose-500">Band {{ $attempt->aiSpeakingEvaluation->band_score }}</div>
+                <h4 class="text-sm font-bold text-[var(--color-text-primary)]">Speaking Evaluation</h4>
+                <span class="ml-auto text-lg font-bold text-[var(--color-error)]">Band {{ $attempt->aiSpeakingEvaluation->band_score }}</span>
             </div>
-            <div class="prose prose-rose dark:prose-invert max-w-none font-medium leading-relaxed whitespace-pre-wrap text-slate-600 dark:text-slate-300 bg-rose-50/50 dark:bg-rose-950/20 p-8 rounded-3xl border border-rose-100 dark:border-rose-900/50">{{ $attempt->aiSpeakingEvaluation->evaluation_text }}</div>
-        </div>
+            <div class="rounded-[var(--radius-base)] bg-[var(--color-bg-secondary)] p-5 text-sm leading-relaxed text-[var(--color-text-secondary)] whitespace-pre-wrap">{{ $attempt->aiSpeakingEvaluation->evaluation_text }}</div>
+        </x-ui.card>
         @endif
     </div>
     @endif
 
-    <!-- Call to Action -->
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-6 p-10 bg-slate-900 dark:bg-white rounded-3xl shadow-lift">
-        <div class="text-white dark:text-slate-900 text-center sm:text-left">
-            <h3 class="text-xl font-black tracking-tight">Ready to improve?</h3>
-            <p class="text-slate-400 dark:text-slate-500 text-sm font-medium">Analyze your weak points and try another specialized module.</p>
-        </div>
-        <div class="flex gap-4">
-            <a href="{{ route('user.history.index') }}" class="px-8 py-4 bg-white dark:bg-slate-950 text-slate-900 dark:text-white rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all">
-                View All Results
-            </a>
-            <a href="{{ route('dashboard') }}" class="px-8 py-4 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lift">
-                Back to Dashboard
-            </a>
-        </div>
+    {{-- ═══════════════════════════════════════════════════════════════════════
+         ACTIONS
+         ═══════════════════════════════════════════════════════════════════════ --}}
+    <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+        <x-ui.button variant="secondary" href="{{ route('user.history.index') }}">
+            <span class="material-symbols-outlined text-sm">list</span>
+            View All Results
+        </x-ui.button>
+        <x-ui.button variant="primary" href="{{ route('dashboard') }}">
+            <span class="material-symbols-outlined text-sm">dashboard</span>
+            Back to Dashboard
+        </x-ui.button>
     </div>
 
 </div>
+
 @endsection

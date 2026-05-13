@@ -2,6 +2,7 @@
     UI Component: Card
     Usage: <x-ui.card> or <x-ui.card :flush="true">
     Slots: $header (optional), $slot (main content), $footer (optional)
+    Adheres strictly to --color-bg-primary, --color-divider, --radius-xl
     ============================================================================ --}}
 @props([
     'flush' => false,

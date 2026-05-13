@@ -1,84 +1,123 @@
 @extends('layouts.admin')
 
-@section('title', 'Manage Tests')
+@section('title', 'Exam Management')
 
 @section('breadcrumbs')
-<nav class="flex items-center gap-2 text-sm">
-    <span class="font-semibold text-slate-900 dark:text-white">Tests</span>
-</nav>
+    <nav class="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
+        <a href="{{ route('admin.dashboard') }}" class="hover:text-[var(--color-primary)] transition-colors">Dashboard</a>
+        <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+        <span class="font-semibold text-[var(--color-text-primary)]">Exams & Tests</span>
+    </nav>
 @endsection
 
 @section('content')
-<div class="max-w-7xl mx-auto">
-    <!-- Page Header & Actions -->
-    <x-admin.page-header title="Manage Tests" description="Create, organize, and monitor your mock examination library.">
-        <x-slot:actions>
-            <form action="{{ route('admin.tests.index') }}" method="GET" class="flex gap-3">
-                <select name="type" onchange="this.form.submit()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-base px-4 py-2.5 text-sm font-bold shadow-sm focus:ring-primary/20 transition-all">
-                    <option value="">All Types</option>
-                    <option value="Academic" {{ request('type') == 'Academic' ? 'selected' : '' }}>Academic</option>
-                    <option value="General" {{ request('type') == 'General' ? 'selected' : '' }}>General Training</option>
-                </select>
-                <select name="status" onchange="this.form.submit()" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-base px-4 py-2.5 text-sm font-bold shadow-sm focus:ring-primary/20 transition-all">
-                    <option value="">All Status</option>
-                    <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>Published</option>
-                    <option value="draft" {{ request('status') == 'draft' ? 'selected' : '' }}>Draft</option>
-                </select>
-            </form>
-            <x-admin.button :href="route('admin.tests.create')" icon="add">
-                Create Test
-            </x-admin.button>
-        </x-slot:actions>
-    </x-admin.page-header>
 
-    <!-- Tests List Container -->
-    <div class="space-y-4">
-        @forelse($tests as $test)
-            <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-premium flex flex-col md:flex-row md:items-center justify-between gap-6 group hover:border-primary/50 transition-all">
-                <div class="flex items-center gap-5">
-                    <div class="size-14 rounded-xl flex items-center justify-center shrink-0 {{ $test->exam_type === 'Academic' ? 'bg-indigo-50 dark:bg-indigo-900/40 text-primary' : 'bg-sky-50 dark:bg-sky-900/40 text-sky-500' }}">
-                        <span class="material-symbols-outlined text-3xl">{{ $test->exam_type === 'Academic' ? 'school' : 'public' }}</span>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-3 mb-1">
-                            <h3 class="font-black text-slate-900 dark:text-white text-xl">IELTS {{ $test->book_number }}</h3>
-                            <x-admin.badge :type="$test->status === 'published' ? 'success' : 'warning'" :label="$test->status" />
-                        </div>
-                        <div class="flex items-center gap-4 text-xs font-bold text-slate-400 uppercase tracking-widest">
-                            <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base">calendar_today</span> {{ $test->year }}</span>
-                            <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base">layers</span> {{ $test->testSets->count() }} Test Sets</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-3 w-full md:w-auto">
-                    <x-admin.button :href="route('admin.tests.show', $test->id)" variant="secondary">
-                        Manage Library
-                    </x-admin.button>
-                    <x-admin.button :href="route('admin.tests.edit', $test->id)" variant="ghost" icon="edit" size="icon" />
-                    
-                    <form action="{{ route('admin.tests.destroy', $test->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Delete this entire test volume?');">
-                        @csrf
-                        @method('DELETE')
-                        <x-admin.button variant="danger" icon="delete" size="icon" />
-                    </form>
-                </div>
-            </div>
-        @empty
-            <x-admin.empty-state 
-                title="No tests found" 
-                description="Start your collection by creating a new IELTS book volume."
-                icon="library_add"
-                :actionHref="route('admin.tests.create')"
-                actionLabel="Create First Test"
-            />
-        @endforelse
+{{-- ═══════════════════════════════════════════════════════════════════════════
+     HEADER & ACTIONS
+     ═══════════════════════════════════════════════════════════════════════════ --}}
+<section class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+        <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--color-text-primary)]">Exam Management</h2>
+        <p class="text-small mt-1 text-[var(--color-text-secondary)]">Create and manage tests for students.</p>
     </div>
+    <x-ui.button variant="primary" href="{{ route('admin.tests.create') }}">
+        <span class="material-symbols-outlined text-sm">add</span>
+        Create New Exam
+    </x-ui.button>
+</section>
 
-    @if($tests->hasPages())
-        <div class="mt-8">
-            {{ $tests->links() }}
+{{-- ═══════════════════════════════════════════════════════════════════════════
+     DATA TABLE
+     ═══════════════════════════════════════════════════════════════════════════ --}}
+<section>
+    <x-ui.card :flush="true">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-[var(--color-divider)] bg-[var(--color-bg-primary)]">
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Exam Title</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Duration</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Questions</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Status</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($tests ?? [] as $test)
+                        <tr class="border-b border-[var(--color-divider)] last:border-b-0 transition-colors hover:bg-[var(--color-bg-secondary)]">
+                            <td class="px-5 py-4 sm:px-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-xs)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)]">
+                                        <span class="material-symbols-outlined text-base text-[var(--color-primary)]">library_books</span>
+                                    </div>
+                                    <span class="text-sm font-semibold text-[var(--color-text-primary)]">
+                                        {{ $test->title ?? 'Untitled Exam' }}
+                                    </span>
+                                </div>
+                            </td>
+
+                            <td class="px-5 py-4 sm:px-6 text-sm text-[var(--color-text-secondary)]">
+                                {{ $test->duration ?? 0 }} mins
+                            </td>
+
+                            <td class="px-5 py-4 sm:px-6 text-sm text-[var(--color-text-secondary)]">
+                                {{ $test->questions_count ?? 0 }}
+                            </td>
+
+                            <td class="px-5 py-4 sm:px-6">
+                                @if(($test->status ?? 'published') === 'published')
+                                    <x-ui.badge variant="success">Published</x-ui.badge>
+                                @else
+                                    <x-ui.badge variant="neutral">Draft</x-ui.badge>
+                                @endif
+                            </td>
+
+                            <td class="px-5 py-4 sm:px-6 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="#" class="flex size-8 items-center justify-center rounded-[var(--radius-xs)] text-[var(--color-text-secondary)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] hover:text-[var(--color-primary)]" title="Edit">
+                                        <span class="material-symbols-outlined text-small">edit</span>
+                                    </a>
+                                    <form action="#" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to delete this exam?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="flex size-8 items-center justify-center rounded-[var(--radius-xs)] text-[var(--color-text-secondary)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-error)_10%,transparent)] hover:text-[var(--color-error)]" title="Delete">
+                                            <span class="material-symbols-outlined text-small">delete</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-5 py-10 text-center sm:px-6">
+                                <x-ui.empty-state
+                                    icon="library_books"
+                                    title="No exams found"
+                                    description="You haven't created any exams yet."
+                                >
+                                    <x-slot:action>
+                                        <x-ui.button variant="primary" href="{{ route('admin.tests.create') }}">Create Your First Exam</x-ui.button>
+                                    </x-slot:action>
+                                </x-ui.empty-state>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-    @endif
-</div>
+
+        {{-- Pagination (if applicable) --}}
+        @if(isset($tests) && $tests instanceof \Illuminate\Pagination\LengthAwarePaginator && $tests->hasPages())
+            <x-slot:footer>
+                <div class="flex items-center justify-between">
+                    <p class="text-xs text-[var(--color-text-secondary)]">
+                        Showing <span class="font-semibold text-[var(--color-text-primary)]">{{ $tests->firstItem() }}-{{ $tests->lastItem() }}</span> of <span class="font-semibold text-[var(--color-text-primary)]">{{ $tests->total() }}</span>
+                    </p>
+                    {{ $tests->links() }}
+                </div>
+            </x-slot:footer>
+        @endif
+    </x-ui.card>
+</section>
+
 @endsection

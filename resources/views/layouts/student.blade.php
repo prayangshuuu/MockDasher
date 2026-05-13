@@ -22,7 +22,7 @@
 
 <body
     x-data="{ sidebarOpen: false }"
-    class="bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] font-sans antialiased min-h-screen"
+    class="flex bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] font-sans antialiased min-h-screen"
 >
 
 {{-- ═══════════════════════════════════════════════════════════════════════════
@@ -42,7 +42,7 @@
 ></div>
 
 {{-- ═══════════════════════════════════════════════════════════════════════════
-     SIDEBAR
+     SIDEBAR — Minimal .glass-sidebar
      ═══════════════════════════════════════════════════════════════════════════ --}}
 <aside
     x-cloak
@@ -146,7 +146,7 @@
 <div class="flex min-w-0 flex-1 flex-col">
 
     {{-- ─── Top Header Bar ─── --}}
-    <header class="sticky top-0 z-40 flex items-center justify-between bg-[var(--color-bg-primary)] px-4 py-3 sm:px-6 lg:px-8">
+    <header class="sticky top-0 z-40 flex items-center justify-between border-b border-[var(--color-divider)] bg-[var(--color-bg-primary)] px-4 py-3 sm:px-6 lg:px-8">
         <div class="flex items-center gap-3">
             {{-- Mobile hamburger --}}
             <button
@@ -242,7 +242,7 @@
     </div>
 
     {{-- ─── Footer ─── --}}
-    <footer class="px-4 py-6 text-center text-xs text-[var(--color-text-secondary)] sm:px-6 lg:px-8">
+    <footer class="border-t border-[var(--color-divider)] px-4 py-6 text-center text-xs text-[var(--color-text-secondary)] sm:px-6 lg:px-8">
         &copy; {{ date('Y') }} {{ config('app.name', 'MockDasher') }}. All rights reserved.
     </footer>
 </div>

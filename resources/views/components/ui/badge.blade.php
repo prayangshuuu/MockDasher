@@ -2,13 +2,14 @@
     UI Component: Badge
     Usage: <x-ui.badge variant="success">Active</x-ui.badge>
     Variants: success | error | pending | primary | neutral
+    Pill shape with leading dot indicator for status variants.
     ============================================================================ --}}
 @props([
     'variant' => 'neutral',
 ])
 
 @php
-    $base = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium leading-5 whitespace-nowrap';
+    $base = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium leading-5 whitespace-nowrap';
 
     $variants = [
         'success' => 'bg-[color-mix(in_srgb,var(--color-success)_12%,transparent)] text-[var(--color-success)]',
@@ -22,7 +23,7 @@
 @endphp
 
 <span {{ $attributes->merge(['class' => $classes]) }}>
-    {{-- Optional leading dot indicator --}}
+    {{-- Leading dot indicator for status variants --}}
     @if(in_array($variant, ['success', 'error', 'pending']))
         <span @class([
             'inline-block w-1.5 h-1.5 rounded-full shrink-0',

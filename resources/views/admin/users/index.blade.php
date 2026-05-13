@@ -1,94 +1,118 @@
 @extends('layouts.admin')
 
-@section('title', 'Students Management')
+@section('title', 'Users')
 
 @section('breadcrumbs')
-<nav class="flex items-center gap-2 text-sm">
-    <span class="font-semibold text-slate-900 dark:text-white">Students</span>
-</nav>
+    <nav class="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
+        <a href="{{ route('admin.dashboard') }}" class="hover:text-[var(--color-primary)] transition-colors">Dashboard</a>
+        <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+        <span class="font-semibold text-[var(--color-text-primary)]">Users</span>
+    </nav>
 @endsection
 
 @section('content')
-<div class="max-w-7xl mx-auto space-y-10">
-    <!-- Page Header -->
-    <x-admin.page-header title="Student Management" description="Manage student accounts, monitor progress, and audit system access.">
-        <x-slot:actions>
-            <form method="GET" action="{{ route('admin.users.index') }}" class="relative group">
-                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors">search</span>
-                <input name="search" value="{{ request('search') }}" class="pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm w-64 focus:ring-2 focus:ring-primary/20 shadow-sm" placeholder="Search by name or email...">
-            </form>
-            <x-admin.button :href="route('admin.users.create')" icon="person_add">
-                Add Student
-            </x-admin.button>
-        </x-slot:actions>
-    </x-admin.page-header>
 
-    <!-- Users Table -->
-    <div class="glass-card rounded-[3rem] border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden">
+{{-- ═══════════════════════════════════════════════════════════════════════════
+     HEADER & FILTERS
+     ═══════════════════════════════════════════════════════════════════════════ --}}
+<section class="mb-8">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-6">
+        <div>
+            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--color-text-primary)]">Users</h2>
+            <p class="text-small mt-1 text-[var(--color-text-secondary)]">Manage student accounts and permissions.</p>
+        </div>
+    </div>
+
+    {{-- Search / Filter Bar --}}
+    <form action="{{ route('admin.users.index') }}" method="GET" class="flex items-center gap-3 w-full sm:w-96">
+        <div class="flex-1">
+            <x-ui.input 
+                name="search" 
+                value="{{ request('search') }}" 
+                placeholder="Search by name or email..." 
+                icon="search" 
+            />
+        </div>
+        <x-ui.button type="submit" variant="secondary" class="px-4">Filter</x-ui.button>
+    </form>
+</section>
+
+{{-- ═══════════════════════════════════════════════════════════════════════════
+     DATA TABLE
+     ═══════════════════════════════════════════════════════════════════════════ --}}
+<section>
+    <x-ui.card :flush="true">
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse min-w-[800px]">
+            <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-800">
-                        <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Student Information</th>
-                        <th class="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Role</th>
-                        <th class="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Status</th>
-                        <th class="px-6 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">Enrollment Date</th>
-                        <th class="px-10 py-6 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
+                    <tr class="border-b border-[var(--color-divider)] bg-[var(--color-bg-primary)]">
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Name</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Email</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Join Date</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Role</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Status</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6 text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-50 dark:divide-slate-800/50">
-                    @forelse($users as $user)
-                        @php
-                            $isAdmin = $user->roles->contains('name', 'Admin');
-                            $initials = strtoupper(substr($user->name, 0, 1));
-                            $colors = ['bg-indigo-50 text-indigo-600', 'bg-blue-50 text-blue-600', 'bg-purple-50 text-purple-600', 'bg-emerald-50 text-emerald-600', 'bg-orange-50 text-orange-600'];
-                            $colorClass = $colors[$user->id % count($colors)];
-                        @endphp
-                        <tr class="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                            <td class="px-10 py-6">
-                                <div class="flex items-center gap-4">
-                                    <div class="size-12 rounded-2xl flex items-center justify-center font-black text-xl {{ $colorClass }} group-hover:scale-110 transition-transform">
-                                        {{ $initials }}
+                <tbody>
+                    @forelse($users ?? [] as $user)
+                        <tr class="border-b border-[var(--color-divider)] last:border-b-0 transition-colors hover:bg-[var(--color-bg-secondary)]">
+                            <td class="px-5 py-4 sm:px-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] text-xs font-bold text-[var(--color-primary)] overflow-hidden">
+                                        @if($user->profile_photo_path)
+                                            <img class="h-full w-full object-cover" src="{{ Storage::url($user->profile_photo_path) }}" alt="{{ $user->name }}">
+                                        @else
+                                            {{ strtoupper(substr($user->name, 0, 1)) }}
+                                        @endif
                                     </div>
-                                    <div class="flex flex-col">
-                                        <span class="font-bold text-slate-900 dark:text-white">{{ $user->name }}</span>
-                                        <span class="text-xs font-medium text-slate-400">{{ $user->email }}</span>
-                                    </div>
+                                    <span class="text-sm font-semibold text-[var(--color-text-primary)]">
+                                        {{ $user->name }}
+                                    </span>
                                 </div>
                             </td>
-                            <td class="px-6 py-6">
-                                <x-admin.badge :type="$isAdmin ? 'primary' : 'info'" :label="$isAdmin ? 'Administrator' : 'Candidate'" />
+
+                            <td class="px-5 py-4 sm:px-6 text-sm text-[var(--color-text-secondary)]">
+                                {{ $user->email }}
                             </td>
-                            <td class="px-6 py-6 text-center">
-                                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/20">
-                                    <div class="size-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                                    <span class="text-[10px] font-black uppercase tracking-widest text-emerald-600">Active</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-6 text-xs font-bold text-slate-500 tracking-tight">
+
+                            <td class="px-5 py-4 sm:px-6 text-sm text-[var(--color-text-secondary)]">
                                 {{ $user->created_at->format('M d, Y') }}
                             </td>
-                            <td class="px-10 py-6 text-right">
-                                <div class="flex justify-end gap-3 transition-opacity">
-                                    <x-admin.button :href="route('admin.users.edit', $user->id)" variant="ghost" icon="edit" size="icon" class="!bg-white dark:!bg-slate-800 !text-slate-600 hover:!text-primary dark:!text-slate-300 border border-slate-100 dark:border-slate-700 shadow-sm transition-colors" />
-                                    
-                                    @if(auth()->id() !== $user->id)
-                                        <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Expel this student from the system?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <x-admin.button variant="danger" icon="person_remove" size="icon" class="!bg-white dark:!bg-slate-800 !text-red-500 hover:bg-red-50 hover:!text-red-600 dark:hover:!bg-red-500/10 border border-slate-100 dark:border-slate-700 shadow-sm transition-colors" />
-                                        </form>
-                                    @endif
+
+                            <td class="px-5 py-4 sm:px-6 text-sm text-[var(--color-text-secondary)] capitalize">
+                                {{ $user->role ?? 'student' }}
+                            </td>
+
+                            <td class="px-5 py-4 sm:px-6">
+                                @if(($user->status ?? 'active') === 'active')
+                                    <x-ui.badge variant="success">Active</x-ui.badge>
+                                @else
+                                    <x-ui.badge variant="error">Suspended</x-ui.badge>
+                                @endif
+                            </td>
+
+                            <td class="px-5 py-4 sm:px-6 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="#" class="flex size-8 items-center justify-center rounded-[var(--radius-xs)] text-[var(--color-text-secondary)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] hover:text-[var(--color-primary)]" title="Edit">
+                                        <span class="material-symbols-outlined text-small">edit</span>
+                                    </a>
+                                    <form action="#" method="POST" class="inline-block" onsubmit="return confirm('Are you sure you want to block this user?');">
+                                        @csrf
+                                        <button type="submit" class="flex size-8 items-center justify-center rounded-[var(--radius-xs)] text-[var(--color-text-secondary)] transition-colors hover:bg-[color-mix(in_srgb,var(--color-error)_10%,transparent)] hover:text-[var(--color-error)]" title="Block">
+                                            <span class="material-symbols-outlined text-small">block</span>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-10 py-24 text-center">
-                                <x-admin.empty-state 
-                                    title="No candidates found" 
-                                    description="We couldn't find any users matching your criteria."
-                                    icon="person_search"
+                            <td colspan="6" class="px-5 py-10 text-center sm:px-6">
+                                <x-ui.empty-state
+                                    icon="group_off"
+                                    title="No users found"
+                                    description="No users matched your search criteria."
                                 />
                             </td>
                         </tr>
@@ -96,38 +120,19 @@
                 </tbody>
             </table>
         </div>
-        
-        <!-- Pagination -->
-        @if($users->hasPages())
-            <div class="px-10 py-6 bg-slate-50/50 dark:bg-slate-800/30 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Page {{ $users->currentPage() }} of {{ $users->lastPage() }}</p>
-                <div class="scale-90">
+
+        {{-- Pagination (if applicable) --}}
+        @if(isset($users) && $users instanceof \Illuminate\Pagination\LengthAwarePaginator && $users->hasPages())
+            <x-slot:footer>
+                <div class="flex items-center justify-between">
+                    <p class="text-xs text-[var(--color-text-secondary)]">
+                        Showing <span class="font-semibold text-[var(--color-text-primary)]">{{ $users->firstItem() }}-{{ $users->lastItem() }}</span> of <span class="font-semibold text-[var(--color-text-primary)]">{{ $users->total() }}</span>
+                    </p>
                     {{ $users->links() }}
                 </div>
-            </div>
+            </x-slot:footer>
         @endif
-    </div>
+    </x-ui.card>
+</section>
 
-    <!-- Enrollment Insights -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <x-admin.stat-card 
-            label="Total Enrolled" 
-            :value="number_format($users->total())" 
-            icon="groups" 
-            iconColor="primary" 
-        />
-        <x-admin.stat-card 
-            label="Weekly Growth" 
-            value="+14.2%" 
-            icon="bolt" 
-            iconColor="emerald" 
-        />
-        <x-admin.stat-card 
-            label="Secure Profiles" 
-            value="100%" 
-            icon="shield_person" 
-            iconColor="blue" 
-        />
-    </div>
-</div>
 @endsection
