@@ -43,7 +43,7 @@
             {{-- Test Info --}}
             <div class="flex-1 text-center md:text-left">
                 <h2 class="text-2xl sm:text-3xl font-bold text-[var(--color-text-primary)]">
-                    {{ $attempt->testSet->test->title ?? 'Full Mock Exam' }}
+                    IELTS {{ $attempt->testSet->test->book_number ?? '' }} ({{ $attempt->testSet->test->exam_type ?? 'Mock Exam' }})
                 </h2>
                 <p class="mt-1 text-sm text-[var(--color-text-secondary)]">
                     {{ $attempt->testSet->test->exam_type ?? 'Academic' }} Simulation &bull; Book {{ $attempt->testSet->test->book_number ?? '?' }}

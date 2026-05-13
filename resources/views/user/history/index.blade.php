@@ -93,8 +93,8 @@
                                     <span class="material-symbols-outlined text-base text-[var(--color-primary)]">description</span>
                                 </div>
                                 <div class="min-w-0">
-                                    <p class="text-sm font-semibold text-[var(--color-text-primary)] truncate">{{ $attempt->test->title ?? 'Mock Test' }}</p>
-                                    <p class="text-xs text-[var(--color-text-secondary)] truncate">{{ $attempt->testSet->title ?? 'Full Simulation' }}</p>
+                                    <p class="text-sm font-semibold text-[var(--color-text-primary)] truncate">IELTS {{ $attempt->testSet->test->book_number ?? '' }} ({{ $attempt->testSet->test->exam_type ?? 'Mock Test' }})</p>
+                                    <p class="text-xs text-[var(--color-text-secondary)] truncate">Test Set {{ $attempt->testSet->set_number ?? '' }}</p>
                                 </div>
                             </div>
                         </td>

@@ -179,9 +179,9 @@
                     <x-ui.badge variant="primary">{{ $test->exam_type }}</x-ui.badge>
                 </div>
 
-                <h4 class="text-base font-bold text-[var(--color-text-primary)]">{{ $test->title }}</h4>
+                <h4 class="text-base font-bold text-[var(--color-text-primary)]">IELTS {{ $test->book_number ?? '' }}</h4>
                 <p class="text-small mt-1 line-clamp-2 text-xs">
-                    {{ $test->exam_type }} — Book {{ $test->book_number }} ({{ $test->year }})
+                    {{ $test->exam_type }} — Volume {{ $test->book_number }} ({{ $test->year }})
                 </p>
 
                 <div class="mt-4 flex items-center gap-4 text-[var(--color-text-secondary)]">
@@ -253,7 +253,7 @@
                                         <span class="material-symbols-outlined text-base text-[var(--color-primary)]">task</span>
                                     </div>
                                     <span class="text-sm font-semibold text-[var(--color-text-primary)]">
-                                        {{ $attempt->testSet->test->title ?? 'Practice Test' }}
+                                        IELTS {{ $attempt->testSet->test->book_number ?? '' }} ({{ $attempt->testSet->test->exam_type ?? 'Test' }})
                                     </span>
                                 </div>
                             </td>
