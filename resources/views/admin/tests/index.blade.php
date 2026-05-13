@@ -35,9 +35,9 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="border-b border-[var(--color-divider)] bg-[var(--color-bg-primary)]">
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Exam Title</th>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Duration</th>
-                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Questions</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Exam Name</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Year</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Test Sets</th>
                         <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Status</th>
                         <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6 text-right">Actions</th>
                     </tr>
@@ -51,17 +51,17 @@
                                         <span class="material-symbols-outlined text-base text-[var(--color-primary)]">library_books</span>
                                     </div>
                                     <span class="text-sm font-semibold text-[var(--color-text-primary)]">
-                                        {{ $test->title ?? 'Untitled Exam' }}
+                                        IELTS {{ $test->book_number ?? '' }} ({{ $test->exam_type ?? 'Test' }})
                                     </span>
                                 </div>
                             </td>
 
                             <td class="px-5 py-4 sm:px-6 text-sm text-[var(--color-text-secondary)]">
-                                {{ $test->duration ?? 0 }} mins
+                                {{ $test->year ?? 'N/A' }}
                             </td>
 
                             <td class="px-5 py-4 sm:px-6 text-sm text-[var(--color-text-secondary)]">
-                                {{ $test->questions_count ?? 0 }}
+                                {{ $test->testSets ? $test->testSets->count() : 0 }} Sets
                             </td>
 
                             <td class="px-5 py-4 sm:px-6">

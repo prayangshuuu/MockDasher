@@ -125,7 +125,7 @@
                             </td>
 
                             <td class="px-5 py-4 sm:px-6 text-sm text-[var(--color-text-primary)] font-medium">
-                                {{ $attempt->testSet->test->title ?? 'Practice Test' }}
+                                IELTS {{ $attempt->testSet->test->book_number ?? '' }} {{ $attempt->testSet->test->exam_type ?? 'Test' }}
                             </td>
 
                             <td class="hidden px-5 py-4 text-sm text-[var(--color-text-secondary)] sm:table-cell sm:px-6">
@@ -141,7 +141,7 @@
                             </td>
 
                             <td class="px-5 py-4 sm:px-6 text-right">
-                                <x-ui.button variant="outline" href="#" class="text-xs px-3 py-1.5">
+                                <x-ui.button variant="outline" href="{{ route('admin.results.show', $attempt) }}" class="text-xs px-3 py-1.5">
                                     <span class="material-symbols-outlined text-sm">visibility</span>
                                     View Result
                                 </x-ui.button>

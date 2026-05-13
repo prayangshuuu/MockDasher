@@ -36,32 +36,45 @@
         {{-- Right: Form Card --}}
         <div class="lg:col-span-2">
             <x-ui.card>
-                <form action="#" method="POST">
+                <form action="{{ route('admin.tests.store') }}" method="POST">
                     @csrf
                     
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                         
-                        {{-- Exam Title --}}
-                        <div class="md:col-span-2">
+                        {{-- Book Number --}}
+                        <div>
                             <x-ui.input 
-                                name="title" 
-                                label="Exam Title" 
-                                type="text" 
-                                placeholder="e.g., IELTS Academic Mock Test 1" 
+                                name="book_number" 
+                                label="IELTS Book Number" 
+                                type="number" 
+                                placeholder="e.g., 20" 
+                                min="1"
                                 required 
                             />
                         </div>
 
-                        {{-- Duration --}}
+                        {{-- Year --}}
                         <div>
                             <x-ui.input 
-                                name="duration" 
-                                label="Duration in Minutes" 
+                                name="year" 
+                                label="Publication Year" 
                                 type="number" 
-                                placeholder="e.g., 60" 
-                                min="1" 
+                                placeholder="e.g., 2025" 
+                                min="1990"
                                 required 
                             />
+                        </div>
+
+                        {{-- Exam Type Select --}}
+                        <div>
+                            <label class="block mb-1.5 text-sm font-medium text-[var(--color-text-primary)]">Exam Type</label>
+                            <div class="relative">
+                                <select name="exam_type" class="block w-full appearance-none bg-[var(--color-bg-primary)] border border-[var(--color-divider)] rounded-[var(--radius-base)] px-4 py-2.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-ui cursor-pointer">
+                                    <option value="Academic">Academic</option>
+                                    <option value="General Training">General Training</option>
+                                </select>
+                                <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[18px] text-[var(--color-text-secondary)] pointer-events-none">expand_more</span>
+                            </div>
                         </div>
 
                         {{-- Status Select/Toggle --}}

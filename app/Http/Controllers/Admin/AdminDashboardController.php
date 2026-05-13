@@ -7,6 +7,7 @@ use App\Models\Test;
 use App\Models\TestAttempt;
 use App\Models\TestSet;
 use App\Models\User;
+use App\Models\Question;
 
 class AdminDashboardController extends Controller
 {
@@ -15,16 +16,13 @@ class AdminDashboardController extends Controller
         $totalAttempts = TestAttempt::count();
         $completedAttempts = TestAttempt::where(fn ($q) => $q->where('status', 'completed'))->count();
 
-        $stats = [
-            'total_tests' => Test::count(),
-            'total_test_sets' => TestSet::count(),
-            'users' => User::count(),
-            'attempts' => $totalAttempts,
-            'completion_rate' => $totalAttempts > 0 ? ($completedAttempts / $totalAttempts) * 100 : 0,
-        ];
+        $totalUsers = User::count();
+        $activeExams = Test::where('status', 'published')->count();
+        $totalQuestions = Question::count();
+        $passRate = $totalAttempts > 0 ? round(($completedAttempts / $totalAttempts) * 100, 1) : 0;
 
-        $tests = Test::orderBy('created_at', 'desc')->take(5)->get();
+        $recentAttempts = TestAttempt::with(['user', 'testSet.test'])->orderBy('created_at', 'desc')->take(5)->get();
 
-        return view('admin.dashboard', compact('tests', 'stats'));
+        return view('admin.dashboard', compact('totalUsers', 'activeExams', 'totalQuestions', 'passRate', 'recentAttempts'));
     }
 }
