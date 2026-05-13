@@ -3,255 +3,314 @@
 @section('title', 'Dashboard')
 
 @section('content')
-<!-- Welcome Section -->
-<div class="mb-10">
-    <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">{{ __('messages.welcome', ['name' => explode(' ', $user->name)[0]]) }}</h2>
-    <p class="text-slate-500 mt-2 font-medium">
-        @if($daysToExam !== null)
-            @if($daysToExam > 0)
-                You are {{ $daysToExam }} days away from your IELTS exam. Focus on your writing module today.
-            @elseif($daysToExam === 0)
-                Today is your IELTS exam day! Good luck!
-            @else
-                Your IELTS exam was {{ abs($daysToExam) }} days ago.
-            @endif
+
+{{-- ═══════════════════════════════════════════════════════════════════════════
+     WELCOME HEADER
+     ═══════════════════════════════════════════════════════════════════════════ --}}
+<section class="mb-8">
+    <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--color-text-primary)]">
+        {{ __('messages.welcome', ['name' => explode(' ', $user->name)[0]]) }}
+    </h2>
+    <p class="text-small mt-1">
+        @if($daysToExam !== null && $daysToExam > 0)
+            You have <span class="font-semibold text-[var(--color-primary)]">{{ $daysToExam }} days</span> until your exam. Keep practising.
+        @elseif($daysToExam === 0)
+            Today is your exam day — you've got this!
+        @elseif($daysToExam !== null && $daysToExam < 0)
+            Your exam was {{ abs($daysToExam) }} days ago. Review your results below.
         @else
-            Welcome to MockDasher. Set your exam date in settings to track your progress.
+            Track your preparation progress and start a new mock test anytime.
         @endif
     </p>
-</div>
+</section>
 
-<!-- Stats Grid -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-    <div class="bg-white p-6 rounded-2xl shadow-premium border border-slate-100 flex items-center justify-between group hover:border-primary/30 transition-all">
-        <div>
-            <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">{{ __('messages.target_score') }}</p>
-            <p class="text-3xl font-black mt-1 text-slate-900">{{ number_format($targetScore, 1) }} <span class="text-xs font-medium text-slate-400">/ 9.0</span></p>
-        </div>
-        <div class="relative size-14 group-hover:scale-110 transition-transform">
-            <svg class="size-full -rotate-90" viewbox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
-                <circle class="stroke-slate-100" cx="18" cy="18" fill="none" r="16" stroke-width="3"></circle>
-                <circle class="stroke-primary" cx="18" cy="18" fill="none" r="16" stroke-dasharray="100" stroke-dashoffset="{{ 100 - (min(9, $targetScore) / 9 * 100) }}" stroke-linecap="round" stroke-width="3"></circle>
-            </svg>
-            <div class="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-primary">{{ round((min(9, $targetScore) / 9) * 100) }}%</div>
-        </div>
-    </div>
-    
-    <div class="bg-white p-6 rounded-2xl shadow-premium border border-slate-100 group hover:border-emerald-500/30 transition-all">
-        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">{{ __('messages.tests_taken') }}</p>
-        <div class="flex items-end justify-between mt-1">
-            <p class="text-3xl font-black text-slate-900">{{ $testsTakenCount }}</p>
-            <span class="bg-emerald-50 text-emerald-600 text-[10px] px-2 py-0.5 rounded-full font-bold mb-1 shadow-sm">+{{ $user->testAttempts()->where('created_at', '>=', now()->startOfWeek())->count() }} this week</span>
-        </div>
-        <div class="w-full bg-slate-100 h-1.5 rounded-full mt-4 overflow-hidden">
-            <div class="bg-emerald-500 h-1.5 rounded-full transition-all duration-1000" x-data="{ width: '{{ min(100, ($testsTakenCount / 20) * 100) }}%' }" :style="`width: ${width}`"></div>
-        </div>
-    </div>
-    
-    <div class="bg-white p-6 rounded-2xl shadow-premium border border-slate-100 group hover:border-indigo-500/30 transition-all">
-        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">{{ __('messages.avg_band_score') }}</p>
-        <div class="flex items-end justify-between mt-1">
-            <p class="text-3xl font-black text-slate-900">{{ $avgBandScore !== null ? number_format($avgBandScore, 1) : 'N/A' }}</p>
-            @if($avgBandScore !== null)
-                <span class="bg-indigo-50 text-indigo-600 text-[10px] px-2 py-0.5 rounded-full font-bold mb-1 shadow-sm">Band {{ number_format($avgBandScore, 1) }}</span>
-            @endif
-        </div>
-        <div class="flex gap-1 mt-4">
-            @for($i = 0; $i < 5; $i++)
-                <div class="flex-1 h-2 {{ $avgBandScore !== null && $i < floor($avgBandScore - 2) ? 'bg-indigo-500' : 'bg-slate-100' }} rounded-full"></div>
-            @endfor
-        </div>
-    </div>
-    
-    <div class="bg-white p-6 rounded-2xl shadow-premium border border-slate-100 border-l-4 border-l-orange-500 group hover:border-orange-500/30 transition-all">
-        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest">{{ __('messages.days_to_exam') }}</p>
-        <p class="text-3xl font-black mt-1 text-slate-900">
-            {{ $daysToExam ?? 'N/A' }} 
-            @if($user->exam_date)
-                <span class="text-xs font-black text-slate-400 uppercase">{{ $user->exam_date->format('M d') }}</span>
-            @endif
-        </p>
-        <div class="flex items-center gap-2 mt-4 text-orange-600">
-            <div class="size-5 bg-orange-50 rounded-base flex items-center justify-center">
-                <span class="material-symbols-outlined text-[14px]">schedule</span>
-            </div>
-            <span class="text-[10px] font-black uppercase tracking-widest">Intensity Required</span>
-        </div>
-    </div>
-</div>
+{{-- ═══════════════════════════════════════════════════════════════════════════
+     STATS GRID
+     ═══════════════════════════════════════════════════════════════════════════ --}}
+<section class="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
-<!-- Performance Insights Section -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
-    <!-- Score Chart -->
-    <div class="lg:col-span-2 bg-white p-8 rounded-3xl shadow-premium border border-slate-100 relative overflow-hidden">
-        <div class="flex items-center justify-between mb-8">
+    {{-- Target Score --}}
+    <x-ui.card>
+        <div class="flex items-start justify-between">
             <div>
-                <h3 class="text-lg font-bold text-slate-900">{{ __('messages.score_improvement') }}</h3>
-                <p class="text-sm text-slate-400">Your progress over the last mock tests</p>
+                <p class="text-small text-xs font-semibold uppercase tracking-wider">{{ __('messages.target_score') }}</p>
+                <p class="mt-2 text-3xl font-bold text-[var(--color-text-primary)]">
+                    {{ number_format($targetScore, 1) }}
+                    <span class="text-xs font-medium text-[var(--color-text-secondary)]">/ 9.0</span>
+                </p>
             </div>
-            <div class="flex gap-2">
-                <button class="px-3 py-1.5 text-xs font-bold rounded-lg border border-slate-200 hover:bg-slate-50">Monthly</button>
-                <button class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-900 text-white shadow-lg">Weekly</button>
+            <div class="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)]">
+                <span class="material-symbols-outlined text-xl text-[var(--color-primary)]">target</span>
             </div>
         </div>
-        
-        <!-- Score Chart Visualization -->
-        @if(count($chartData) > 0)
-            <div class="h-64 flex items-end justify-between gap-4 px-2">
-                @foreach($chartData as $data)
-                    <div class="flex-1 bg-primary/{{ 10 * ($loop->index + 1) }} rounded-t-lg relative group transition-all duration-500" x-data="{ height: '{{ $data['height'] }}' }" :style="`height: ${height}`">
-                        @if($loop->last)
-                            <div class="absolute inset-0 indigo-gradient rounded-t-lg shadow-xl shadow-primary/20"></div>
-                        @endif
-                        <div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">{{ $data['score'] }}</div>
-                    </div>
-                @endforeach
+    </x-ui.card>
+
+    {{-- Tests Taken --}}
+    <x-ui.card>
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-small text-xs font-semibold uppercase tracking-wider">{{ __('messages.tests_taken') }}</p>
+                <p class="mt-2 text-3xl font-bold text-[var(--color-text-primary)]">{{ $testsTakenCount }}</p>
             </div>
-            <div class="flex justify-between mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+            <div class="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-success)_10%,transparent)]">
+                <span class="material-symbols-outlined text-xl text-[var(--color-success)]">task_alt</span>
+            </div>
+        </div>
+    </x-ui.card>
+
+    {{-- Average Band --}}
+    <x-ui.card>
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-small text-xs font-semibold uppercase tracking-wider">{{ __('messages.avg_band_score') }}</p>
+                <p class="mt-2 text-3xl font-bold text-[var(--color-text-primary)]">
+                    {{ $avgBandScore !== null ? number_format($avgBandScore, 1) : '—' }}
+                </p>
+            </div>
+            <div class="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)]">
+                <span class="material-symbols-outlined text-xl text-[var(--color-primary)]">analytics</span>
+            </div>
+        </div>
+    </x-ui.card>
+
+    {{-- Days to Exam --}}
+    <x-ui.card>
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-small text-xs font-semibold uppercase tracking-wider">{{ __('messages.days_to_exam') }}</p>
+                <p class="mt-2 text-3xl font-bold text-[var(--color-text-primary)]">
+                    {{ $daysToExam ?? '—' }}
+                    @if($user->exam_date)
+                        <span class="text-xs font-medium text-[var(--color-text-secondary)]">{{ $user->exam_date->format('M d') }}</span>
+                    @endif
+                </p>
+            </div>
+            <div class="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-base)] bg-[color-mix(in_srgb,#F59E0B_10%,transparent)]">
+                <span class="material-symbols-outlined text-xl text-[#B45309]">schedule</span>
+            </div>
+        </div>
+    </x-ui.card>
+</section>
+
+{{-- ═══════════════════════════════════════════════════════════════════════════
+     MODULE BREAKDOWN + SCORE CHART (2-column)
+     ═══════════════════════════════════════════════════════════════════════════ --}}
+<section class="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
+
+    {{-- Score Progression (2/3 width) --}}
+    <x-ui.card class="lg:col-span-2">
+        <x-slot:header>
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-base font-bold text-[var(--color-text-primary)]">{{ __('messages.score_improvement') }}</h3>
+                    <p class="text-small text-xs mt-0.5">Your band scores across recent tests</p>
+                </div>
+            </div>
+        </x-slot:header>
+
+        @if(count($chartData) > 0)
+            <div class="flex h-52 items-end gap-3">
                 @foreach($chartData as $data)
-                    <span>{{ $data['label'] }}</span>
+                    <div class="group relative flex flex-1 flex-col items-center">
+                        {{-- Tooltip --}}
+                        <div class="absolute -top-7 rounded-[var(--radius-xs)] bg-[var(--color-text-primary)] px-2 py-1 text-[10px] font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100">
+                            {{ $data['score'] }}
+                        </div>
+                        {{-- Bar --}}
+                        <div
+                            class="w-full rounded-t-[var(--radius-sm)] transition-all duration-700
+                                   {{ $loop->last ? 'bg-[var(--color-primary)]' : 'bg-[color-mix(in_srgb,var(--color-primary)_' . (20 + ($loop->index * 12)) . '%,transparent)]' }}"
+                            style="height: {{ max($data['height'], 8) }}%"
+                        ></div>
+                        {{-- Label --}}
+                        <span class="mt-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">{{ $data['label'] }}</span>
+                    </div>
                 @endforeach
             </div>
         @else
-            <div class="h-64 flex items-center justify-center">
-                <div class="text-center">
-                    <span class="material-symbols-outlined text-4xl text-slate-300 mb-2">bar_chart</span>
-                    <p class="text-sm text-slate-400 font-medium">Complete a test to see your score progression</p>
-                </div>
+            <div class="flex h-52 flex-col items-center justify-center text-center">
+                <span class="material-symbols-outlined mb-2 text-4xl text-[var(--color-divider)]">bar_chart</span>
+                <p class="text-small text-sm">Complete a test to see your score progression</p>
             </div>
         @endif
-    </div>
-    
-    <!-- Radar/Module Breakdown -->
-    <div class="bg-white p-8 rounded-3xl shadow-premium border border-slate-100 group">
-        <h3 class="text-lg font-black text-slate-900 mb-6 uppercase tracking-tight">{{ __('messages.module_breakdown') }}</h3>
-        <div class="space-y-6">
+    </x-ui.card>
+
+    {{-- Module Breakdown (1/3 width) --}}
+    <x-ui.card>
+        <x-slot:header>
+            <h3 class="text-base font-bold text-[var(--color-text-primary)]">{{ __('messages.module_breakdown') }}</h3>
+        </x-slot:header>
+
+        <div class="space-y-5">
             @foreach($moduleBreakdown as $module)
                 <div>
-                    <div class="flex justify-between text-[10px] font-black uppercase tracking-widest mb-2">
-                        <span class="text-slate-500">{{ $module['name'] }}</span>
+                    <div class="mb-1.5 flex items-center justify-between">
+                        <span class="text-sm font-medium text-[var(--color-text-primary)]">{{ $module['name'] }}</span>
                         @if($module['score'] !== null)
-                            <span class="{{ $module['type'] === 'primary' ? 'text-primary' : 'text-slate-400' }}">{{ number_format($module['score'], 1) }}</span>
+                            <span class="text-sm font-semibold text-[var(--color-primary)]">{{ number_format($module['score'], 1) }}</span>
                         @else
-                            <span class="text-slate-300">N/A</span>
+                            <span class="text-sm text-[var(--color-text-secondary)]">N/A</span>
                         @endif
                     </div>
-                    <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                        @if($module['score'] !== null)
-                            <div class="{{ $module['type'] === 'primary' ? 'bg-primary' : 'bg-slate-400' }} h-full rounded-full transition-all duration-1000" x-data="{ width: '{{ $module['percentage'] }}%' }" :style="`width: ${width}`"></div>
-                        @else
-                            <div class="bg-slate-200 h-full rounded-full w-0"></div>
-                        @endif
+                    <div class="h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-bg-secondary)]">
+                        <div
+                            class="h-full rounded-full transition-all duration-700 {{ $module['score'] !== null ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-divider)]' }}"
+                            style="width: {{ $module['percentage'] }}%"
+                        ></div>
                     </div>
                 </div>
             @endforeach
         </div>
-        <a href="{{ route('user.history.index') }}" class="block w-full mt-8 py-3 rounded-xl border-2 border-slate-50 text-slate-400 text-xs font-black uppercase tracking-widest hover:bg-slate-50 hover:text-primary transition-all text-center">
-            Detailed Analysis
+
+        <div class="mt-6">
+            <x-ui.button variant="outline" href="{{ route('user.history.index') }}" class="w-full text-xs">
+                View Detailed Analysis
+            </x-ui.button>
+        </div>
+    </x-ui.card>
+</section>
+
+{{-- ═══════════════════════════════════════════════════════════════════════════
+     RECOMMENDED MOCK TESTS
+     ═══════════════════════════════════════════════════════════════════════════ --}}
+<section class="mb-10">
+    <div class="mb-5 flex items-center justify-between">
+        <h3 class="text-lg font-bold text-[var(--color-text-primary)]">{{ __('messages.recommended_mock_tests') }}</h3>
+        <a href="{{ route('user.history.index') }}" class="text-sm font-semibold text-[var(--color-primary)] transition-opacity hover:opacity-80">
+            View All
         </a>
     </div>
-</div>
 
-<!-- Available Mock Tests Grid -->
-<div class="mb-10">
-    <div class="flex items-center justify-between mb-6">
-        <h3 class="text-2xl font-bold text-slate-900">{{ __('messages.recommended_mock_tests') }}</h3>
-        <a class="text-primary font-bold text-sm hover:underline" href="{{ route('user.history.index') }}">View All</a>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         @forelse($recommendedTests as $test)
-            <div class="bg-white p-6 rounded-2xl shadow-premium border border-slate-100 hover-lift flex flex-col group">
-                <div class="flex items-center justify-between mb-4">
-                    <span class="bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">{{ $test->exam_type }}</span>
-                    <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-1 rounded-md uppercase">{{ __('messages.new') ?? 'New' }}</span>
+            <x-ui.card class="flex flex-col hover-lift">
+                <div class="mb-3 flex items-center gap-2">
+                    <x-ui.badge variant="primary">{{ $test->exam_type }}</x-ui.badge>
                 </div>
-                <h4 class="text-lg font-bold text-slate-900 mb-2">{{ $test->title }}</h4>
-                <p class="text-sm text-slate-500 mb-6 line-clamp-2">{{ $test->exam_type }} — Book {{ $test->book_number }} ({{ $test->year }}). All four IELTS modules available.</p>
-                <div class="mt-auto space-y-4">
-                    <div class="flex items-center gap-3 text-slate-400">
-                        <div class="flex items-center gap-1">
-                            <span class="material-symbols-outlined text-sm">timer</span>
-                            <span class="text-[11px] font-bold uppercase">{{ $test->duration ?? '2h 45m' }}</span>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <span class="material-symbols-outlined text-sm">menu_book</span>
-                            <span class="text-[11px] font-bold uppercase">{{ $test->modules_count ?? 4 }} Modules</span>
-                        </div>
+
+                <h4 class="text-base font-bold text-[var(--color-text-primary)]">{{ $test->title }}</h4>
+                <p class="text-small mt-1 line-clamp-2 text-xs">
+                    {{ $test->exam_type }} — Book {{ $test->book_number }} ({{ $test->year }})
+                </p>
+
+                <div class="mt-4 flex items-center gap-4 text-[var(--color-text-secondary)]">
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">timer</span>
+                        <span class="text-xs font-medium">{{ $test->duration ?? '2h 45m' }}</span>
                     </div>
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-sm">menu_book</span>
+                        <span class="text-xs font-medium">{{ $test->modules_count ?? 4 }} Modules</span>
+                    </div>
+                </div>
+
+                <div class="mt-auto pt-5">
                     <form action="{{ route('user.tests.start', $test->id) }}" method="POST">
                         @csrf
-                        <button type="submit" class="w-full py-3 indigo-gradient text-white rounded-xl text-sm font-bold shadow-lg shadow-primary/20 group-hover:scale-[1.02] transition-transform">
-                            {{ __('messages.start_preparation') ?? 'Start Preparation' }}
-                        </button>
+                        <x-ui.button type="submit" variant="primary" class="w-full">
+                            Start Preparation
+                        </x-ui.button>
                     </form>
                 </div>
-            </div>
+            </x-ui.card>
         @empty
-            <div class="col-span-1 md:col-span-3 bg-white p-8 rounded-2xl shadow-soft border border-slate-100 flex flex-col items-center justify-center text-center">
-                <span class="material-symbols-outlined text-4xl text-slate-300 mb-3">auto_stories</span>
-                <p class="text-slate-500 font-medium">No tests currently available. Check back later.</p>
+            <div class="col-span-full">
+                <x-ui.card>
+                    <div class="flex flex-col items-center justify-center py-6 text-center">
+                        <span class="material-symbols-outlined mb-2 text-4xl text-[var(--color-divider)]">auto_stories</span>
+                        <p class="text-small text-sm">No tests currently available. Check back later.</p>
+                    </div>
+                </x-ui.card>
             </div>
         @endforelse
     </div>
-</div>
+</section>
 
-<!-- Recent Activity/History -->
-<div class="bg-white rounded-3xl shadow-premium border border-slate-100 overflow-hidden">
-    <div class="p-6 border-b border-slate-100 flex items-center justify-between">
-        <h3 class="text-lg font-bold text-slate-900">{{ __('messages.recent_test_history') }}</h3>
-        <button class="text-slate-400 hover:text-slate-600"><span class="material-symbols-outlined">more_horiz</span></button>
-    </div>
-    <div class="overflow-x-auto">
-        <table class="w-full text-left">
-            <thead>
-                <tr class="bg-slate-50/50">
-                    <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Test Title</th>
-                    <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Date Taken</th>
-                    <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Modules</th>
-                    <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                    <th class="px-6 py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Action</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-                @forelse($recentAttempts as $attempt)
-                    <tr class="hover:bg-slate-50/50 transition-colors group">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="size-8 rounded-lg bg-indigo-50 flex items-center justify-center text-primary">
-                                    <span class="material-symbols-outlined text-base">task</span>
+{{-- ═══════════════════════════════════════════════════════════════════════════
+     RECENT TEST HISTORY TABLE
+     ═══════════════════════════════════════════════════════════════════════════ --}}
+<section>
+    <x-ui.card :flush="true">
+        <x-slot:header>
+            <div class="flex items-center justify-between">
+                <h3 class="text-base font-bold text-[var(--color-text-primary)]">{{ __('messages.recent_test_history') }}</h3>
+                <a href="{{ route('user.history.index') }}" class="text-sm font-semibold text-[var(--color-primary)] transition-opacity hover:opacity-80">
+                    See All
+                </a>
+            </div>
+        </x-slot:header>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="border-b border-[var(--color-divider)]">
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Test</th>
+                        <th class="hidden px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:table-cell sm:px-6">Date</th>
+                        <th class="hidden px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] md:table-cell sm:px-6">Modules</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6">Status</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] sm:px-6"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($recentAttempts as $attempt)
+                        <tr class="border-b border-[var(--color-divider)] last:border-b-0 transition-colors hover:bg-[var(--color-bg-secondary)]">
+                            {{-- Test Title --}}
+                            <td class="px-5 py-4 sm:px-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-xs)] bg-[color-mix(in_srgb,var(--color-primary)_10%,transparent)]">
+                                        <span class="material-symbols-outlined text-base text-[var(--color-primary)]">task</span>
+                                    </div>
+                                    <span class="text-sm font-semibold text-[var(--color-text-primary)]">
+                                        {{ $attempt->testSet->test->title ?? 'Practice Test' }}
+                                    </span>
                                 </div>
-                                <span class="text-sm font-bold text-slate-700">{{ $attempt->testSet->test->title ?? 'Practice Test' }}</span>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-sm text-slate-500">{{ $attempt->created_at->format('M d, Y') }}</td>
-                        <td class="px-6 py-4">
-                            <div class="flex gap-1">
-                                <span class="size-5 rounded bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-600" title="Listening">L</span>
-                                <span class="size-5 rounded bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-600" title="Reading">R</span>
-                                <span class="size-5 rounded bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-600" title="Writing">W</span>
-                                <span class="size-5 rounded bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-600" title="Speaking">S</span>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4">
-                            @if($attempt->status == 'completed')
-                                <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-bold">Completed</span>
-                            @else
-                                <span class="px-2.5 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-bold">In Progress</span>
-                            @endif
-                        </td>
-                        <td class="px-6 py-4">
-                            <a href="{{ route('user.history.show', $attempt->id) }}" class="text-sm font-bold text-primary group-hover:underline">Review Details</a>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="px-6 py-8 text-center text-slate-500 font-medium">
-                            No test history found. Start your first mock test today!
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-</div>
+                            </td>
+
+                            {{-- Date --}}
+                            <td class="hidden px-5 py-4 text-sm text-[var(--color-text-secondary)] sm:table-cell sm:px-6">
+                                {{ $attempt->created_at->format('M d, Y') }}
+                            </td>
+
+                            {{-- Module Pills --}}
+                            <td class="hidden px-5 py-4 md:table-cell sm:px-6">
+                                <div class="flex gap-1">
+                                    @foreach(['L','R','W','S'] as $mod)
+                                        <span class="flex size-6 items-center justify-center rounded-[var(--radius-xs)] bg-[var(--color-bg-secondary)] text-[10px] font-bold text-[var(--color-text-secondary)]">{{ $mod }}</span>
+                                    @endforeach
+                                </div>
+                            </td>
+
+                            {{-- Status Badge --}}
+                            <td class="px-5 py-4 sm:px-6">
+                                @if($attempt->status === 'completed')
+                                    <x-ui.badge variant="success">Completed</x-ui.badge>
+                                @else
+                                    <x-ui.badge variant="pending">In Progress</x-ui.badge>
+                                @endif
+                            </td>
+
+                            {{-- Action --}}
+                            <td class="px-5 py-4 sm:px-6">
+                                <a href="{{ route('user.history.show', $attempt->id) }}"
+                                   class="text-sm font-semibold text-[var(--color-primary)] transition-opacity hover:opacity-80">
+                                    Review
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-5 py-10 text-center sm:px-6">
+                                <div class="flex flex-col items-center">
+                                    <span class="material-symbols-outlined mb-2 text-3xl text-[var(--color-divider)]">history</span>
+                                    <p class="text-small text-sm">No test history yet. Start your first mock test above!</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </x-ui.card>
+</section>
+
 @endsection
