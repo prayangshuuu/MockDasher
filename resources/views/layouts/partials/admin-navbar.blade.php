@@ -11,7 +11,7 @@
     <div class="flex items-center gap-4">
         <div class="relative hidden sm:block">
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-            <input type="text" placeholder="Search resources..." class="pl-10 pr-4 py-1.5 bg-slate-100 dark:bg-slate-800 border-none rounded-base text-sm w-64 focus:ring-2 focus:ring-primary/20">
+            <input type="text" placeholder="Search resources..." class="pl-11 pr-4 py-1.5 bg-slate-100 dark:bg-slate-800 border-none rounded-base text-sm w-64 focus:ring-2 focus:ring-primary/20">
         </div>
         
         <button class="p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors relative">

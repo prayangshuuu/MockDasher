@@ -18,7 +18,7 @@
         <x-slot:actions>
             <form method="GET" action="{{ route('admin.results.index') }}" class="relative group">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors">search</span>
-                <input name="search" value="{{ request('search') }}" class="pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm w-64 focus:ring-2 focus:ring-primary/20 shadow-sm" placeholder="Search user or test...">
+                <input name="search" value="{{ request('search') }}" class="pl-11 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm w-64 focus:ring-2 focus:ring-primary/20 shadow-sm" placeholder="Search user or test...">
             </form>
             <x-admin.button variant="outline" icon="filter_list" size="md" />
         </x-slot:actions>

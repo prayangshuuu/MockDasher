@@ -23,7 +23,7 @@
 
     $inputClasses = "block w-full bg-[var(--color-bg-primary)] border border-[var(--color-divider)] rounded-[var(--radius-base)] text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:ring-1 transition-ui disabled:opacity-50 disabled:cursor-not-allowed {$ring}";
 
-    $padding = $icon ? 'pl-10 pr-4 py-2.5' : 'px-4 py-2.5';
+    $padding = $icon ? 'pl-11 pr-4 py-2.5' : 'px-4 py-2.5';
 @endphp
 
 <div class="w-full">
