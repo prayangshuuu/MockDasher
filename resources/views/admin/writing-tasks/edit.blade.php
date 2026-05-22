@@ -56,14 +56,26 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="space-y-3">
-                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Task 1 Description</label>
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Task Description</label>
                     <textarea name="task_description" rows="5" class="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm">{{ $writing_task->task_description }}</textarea>
                 </div>
                 <div class="space-y-3">
-                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Task 2 Prompt</label>
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Task Prompt</label>
                     <textarea name="task_prompt" rows="5" class="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm">{{ $writing_task->task_prompt }}</textarea>
                 </div>
             </div>
+
+            @if($writing_task->task_number == 1)
+            <div class="space-y-3">
+                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
+                    Task 1 Data Context <span class="text-primary">(AI Evaluation Context)</span>
+                </label>
+                <p class="text-[10px] font-semibold text-slate-400 ml-1">
+                    The image is still shown to students as usual. This text is sent to Gemini for AI scoring — describe the data the image shows in detail. Example: "A bar chart showing the percentage of households with internet access in five countries between 2000 and 2020."
+                </p>
+                <textarea name="precontext" rows="4" class="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm" placeholder="Describe the visual data here...">{{ $writing_task->precontext }}</textarea>
+            </div>
+            @endif
 
             <div class="p-8 rounded-[2rem] bg-slate-50 dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div class="flex-1">

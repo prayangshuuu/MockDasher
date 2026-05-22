@@ -9,6 +9,7 @@ class SpeakingAnswer extends Model
     protected $fillable = [
         'user_id', 'test_attempt_id', 'speaking_question_id',
         'audio_path', 'transcript_text', 'duration_seconds',
+        'evaluation_json', 'band_score', 'submitted_at',
     ];
 
     public function user()

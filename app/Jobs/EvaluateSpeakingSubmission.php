@@ -14,57 +14,63 @@ class EvaluateSpeakingSubmission implements ShouldQueue
     use Queueable;
 
     protected int $testAttemptId;
-    protected string $transcript;
 
-    /**
-     * Create a new job instance.
-     */
-    public function __construct(int $testAttemptId, string $transcript)
+    public function __construct(int $testAttemptId)
     {
         $this->testAttemptId = $testAttemptId;
-        $this->transcript = $transcript;
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(GeminiEvaluationService $service): void
     {
-        $attempt = TestAttempt::with(['testSet.speakingQuestions'])->find($this->testAttemptId);
+        $attempt = TestAttempt::with([
+            'testSet.speakingQuestions',
+            'speakingAnswers',
+        ])->find($this->testAttemptId);
 
         if (!$attempt) {
             Log::error("EvaluateSpeakingSubmission: TestAttempt {$this->testAttemptId} not found.");
             return;
         }
 
-        $questionsRaw = $attempt->testSet->speakingQuestions()->orderBy('part')->get();
-        if ($questionsRaw->isEmpty()) {
+        $questions = $attempt->testSet->speakingQuestions()
+            ->orderBy('part')
+            ->orderBy('id')
+            ->get();
+
+        if ($questions->isEmpty()) {
             return;
         }
 
-        $questions = [];
-        foreach ($questionsRaw as $q) {
-            $questions[] = "Part {$q->part}: {$q->question_text}";
+        // Map answers by question id for O(1) lookup
+        $answersByQuestion = $attempt->speakingAnswers
+            ->keyBy('speaking_question_id');
+
+        $qaItems = [];
+        foreach ($questions as $q) {
+            $answer = $answersByQuestion->get($q->id);
+            $qaItems[] = [
+                'part'     => $q->part,
+                'question' => $q->question_text,
+                'answer'   => $answer ? trim($answer->transcript_text ?? '') : '',
+            ];
         }
 
-        $transcriptToUse = empty(trim($this->transcript)) ? "No transcript provided by user." : strip_tags($this->transcript);
-
         try {
-            $result = $service->evaluateSpeaking($questions, $transcriptToUse);
+            $result = $service->evaluateSpeaking($qaItems);
 
             AiSpeakingEvaluation::updateOrCreate(
                 [
-                    'user_id' => $attempt->user_id,
+                    'user_id'         => $attempt->user_id,
                     'test_attempt_id' => $attempt->id,
                 ],
                 [
-                    'full_transcript' => $transcriptToUse,
-                    'evaluation_text' => $result['evaluation_text'],
-                    'band_score' => $result['band_score'],
+                    'full_transcript'  => json_encode(array_column($qaItems, 'answer', 'question'), JSON_UNESCAPED_UNICODE),
+                    'evaluation_text'  => $result['evaluation_text'],
+                    'band_score'       => $result['band_score'],
                 ]
             );
         } catch (\Exception $e) {
-            Log::error("Failed to process Speaking AI Evaluation: " . $e->getMessage());
+            Log::error('EvaluateSpeakingSubmission failed: ' . $e->getMessage());
         }
     }
 }

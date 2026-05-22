@@ -32,14 +32,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
 
     // User Test Routes
+    Route::get('/tests', [TestController::class, 'index'])->name('user.tests.index');
     Route::match(['get', 'post'], '/tests/{test}/start', [TestController::class, 'start'])->name('user.tests.start');
 
     Route::get('/tests/attempts/{attempt}/writing', [WritingTestController::class, 'show'])->name('user.writing.show');
     Route::post('/tests/attempts/{attempt}/writing/autosave', [WritingTestController::class, 'autosave'])->name('user.writing.autosave');
+    Route::post('/tests/attempts/{attempt}/writing/tasks/{task}/submit', [WritingTestController::class, 'submitTask'])->name('user.writing.submitTask');
     Route::post('/tests/attempts/{attempt}/writing/submit', [WritingTestController::class, 'submit'])->name('user.writing.submit');
 
     Route::get('/tests/attempts/{attempt}/speaking', [SpeakingTestController::class, 'show'])->name('user.speaking.show');
     Route::post('/tests/attempts/{attempt}/speaking/upload-audio', [SpeakingTestController::class, 'uploadAudio'])->name('user.speaking.uploadAudio');
+    Route::post('/tests/attempts/{attempt}/speaking/questions/{question}/submit', [SpeakingTestController::class, 'submitQuestion'])->name('user.speaking.submitQuestion');
     Route::post('/tests/attempts/{attempt}/speaking/submit', [SpeakingTestController::class, 'submit'])->name('user.speaking.submit');
 
     Route::get('/tests/attempts/{attempt}/listening', [ListeningTestController::class, 'show'])->name('user.listening.show');

@@ -11,6 +11,12 @@ use Illuminate\Http\Request;
 
 class TestController extends Controller
 {
+    public function index()
+    {
+        $tests = Test::withCount('testSets')->get();
+        return view('user.tests.index', compact('tests'));
+    }
+
     public function start(Request $request, Test $test)
     {
         // View modules placeholder if it's GET/no module selected

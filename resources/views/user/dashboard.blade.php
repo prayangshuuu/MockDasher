@@ -167,7 +167,7 @@
 <section class="mb-10">
     <div class="mb-5 flex items-center justify-between">
         <h3 class="text-lg font-bold text-[var(--color-text-primary)]">Recommended Mock Tests</h3>
-        <a href="{{ route('user.history.index') }}" class="text-sm font-semibold text-[var(--color-primary)] transition-opacity hover:opacity-80">
+        <a href="{{ route('user.tests.index') }}" class="text-sm font-semibold text-[var(--color-primary)] transition-opacity hover:opacity-80">
             View All
         </a>
     </div>

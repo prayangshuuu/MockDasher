@@ -15,20 +15,17 @@ class EvaluateWritingSubmission implements ShouldQueue
 
     protected int $testAttemptId;
 
-    /**
-     * Create a new job instance.
-     */
     public function __construct(int $testAttemptId)
     {
         $this->testAttemptId = $testAttemptId;
     }
 
-    /**
-     * Execute the job.
-     */
     public function handle(GeminiEvaluationService $service): void
     {
-        $attempt = TestAttempt::with(['writingAnswers.writingTask', 'testSet.writingTasks'])->find($this->testAttemptId);
+        $attempt = TestAttempt::with([
+            'writingAnswers',
+            'testSet.writingTasks',
+        ])->find($this->testAttemptId);
 
         if (!$attempt) {
             Log::error("EvaluateWritingSubmission: TestAttempt {$this->testAttemptId} not found.");
@@ -40,39 +37,46 @@ class EvaluateWritingSubmission implements ShouldQueue
             return;
         }
 
-        $task1 = $tasks->where('task_number', 1)->first();
-        $task2 = $tasks->where('task_number', 2)->first();
+        $task1 = $tasks->firstWhere('task_number', 1);
+        $task2 = $tasks->firstWhere('task_number', 2);
 
-        // Get answers
         $answers = $attempt->writingAnswers->keyBy('writing_task_id');
-        
-        $task1Answer = $task1 && $answers->has($task1->id) ? $answers->get($task1->id)->answer_text : null;
-        $task2Answer = $task2 && $answers->has($task2->id) ? $answers->get($task2->id)->answer_text : null;
 
-        $task1Prompt = $task1 ? $task1->task_prompt : 'No Task 1 assigned.';
-        $task2Prompt = $task2 ? $task2->task_prompt : 'No Task 2 assigned.';
+        $task1Answer = ($task1 && $answers->has($task1->id))
+            ? strip_tags($answers->get($task1->id)->answer_text)
+            : null;
 
-        // Ensure we strip tags as TinyMCE or similar might save HTML.
-        $task1AnswerPlain = $task1Answer ? strip_tags($task1Answer) : 'No answer provided.';
-        $task2AnswerPlain = $task2Answer ? strip_tags($task2Answer) : 'No answer provided.';
+        $task2Answer = ($task2 && $answers->has($task2->id))
+            ? strip_tags($answers->get($task2->id)->answer_text)
+            : null;
+
+        $task1Prompt     = $task1 ? ($task1->task_prompt ?? $task1->task_description ?? 'No Task 1 assigned.') : 'No Task 1 assigned.';
+        $task1Precontext = $task1 ? $task1->precontext : null;
+        $task2Prompt     = $task2 ? ($task2->task_prompt ?? $task2->task_description ?? 'No Task 2 assigned.') : 'No Task 2 assigned.';
 
         try {
-            $result = $service->evaluateWriting($task1Prompt, $task2Prompt, $task1AnswerPlain, $task2AnswerPlain);
+            $result = $service->evaluateWriting(
+                $task1Prompt,
+                $task1Precontext,
+                $task2Prompt,
+                $task1Answer,
+                $task2Answer
+            );
 
             AiWritingEvaluation::updateOrCreate(
                 [
-                    'user_id' => $attempt->user_id,
+                    'user_id'         => $attempt->user_id,
                     'test_attempt_id' => $attempt->id,
                 ],
                 [
-                    'task_1_answer' => $task1AnswerPlain,
-                    'task_2_answer' => $task2AnswerPlain,
+                    'task_1_answer'   => $task1Answer,
+                    'task_2_answer'   => $task2Answer,
                     'evaluation_text' => $result['evaluation_text'],
-                    'band_score' => $result['band_score'],
+                    'band_score'      => $result['band_score'],
                 ]
             );
         } catch (\Exception $e) {
-            Log::error("Failed to process Writing AI Evaluation: " . $e->getMessage());
+            Log::error('EvaluateWritingSubmission failed: ' . $e->getMessage());
         }
     }
 }

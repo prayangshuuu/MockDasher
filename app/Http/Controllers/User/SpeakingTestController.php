@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\EvaluateSpeakingSubmission;
+use App\Models\AiSpeakingEvaluation;
 use App\Models\SpeakingAnswer;
+use App\Models\SpeakingQuestion;
 use App\Models\TestAttempt;
+use App\Services\GeminiEvaluationService;
 use Illuminate\Http\Request;
 
 class SpeakingTestController extends Controller
@@ -29,15 +31,13 @@ class SpeakingTestController extends Controller
         $speakingQuestions = $attempt->testSet->speakingQuestions()->orderBy('part')->orderBy('id')->get();
         $parts = $speakingQuestions->groupBy('part');
 
-        // Load existing answers for resume
-        $existingAnswers = $attempt->speakingAnswers()->pluck('transcript_text', 'speaking_question_id')->toArray();
+        $existingAnswers = $attempt->speakingAnswers()
+            ->get()
+            ->keyBy('speaking_question_id');
 
         return view('user.speaking-test.show', compact('attempt', 'parts', 'speakingQuestions', 'existingAnswers'));
     }
 
-    /**
-     * Upload audio for a single question (AJAX).
-     */
     public function uploadAudio(Request $request, TestAttempt $attempt)
     {
         if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->status === 'completed') {
@@ -46,27 +46,77 @@ class SpeakingTestController extends Controller
 
         $request->validate([
             'question_id' => 'required|exists:speaking_questions,id',
-            'audio' => 'required|file|max:10240',
-            'transcript' => 'nullable|string',
-            'duration' => 'nullable|integer',
+            'audio'       => 'required|file|max:10240',
+            'transcript'  => 'nullable|string',
+            'duration'    => 'nullable|integer',
         ]);
+
+        // Don't overwrite a submitted answer
+        $existing = SpeakingAnswer::where([
+            'user_id'              => auth()->id(),
+            'test_attempt_id'      => $attempt->id,
+            'speaking_question_id' => $request->question_id,
+        ])->whereNotNull('submitted_at')->first();
+
+        if ($existing) {
+            return response()->json(['error' => 'Already submitted'], 409);
+        }
 
         $path = $request->file('audio')->store('speaking_recordings/' . $attempt->id, 'public');
 
         SpeakingAnswer::updateOrCreate(
-            [
-                'user_id' => auth()->id(),
-                'test_attempt_id' => $attempt->id,
-                'speaking_question_id' => $request->question_id,
-            ],
-            [
-                'audio_path' => $path,
-                'transcript_text' => $request->transcript ?? '',
-                'duration_seconds' => $request->duration ?? 0,
-            ]
+            ['user_id' => auth()->id(), 'test_attempt_id' => $attempt->id, 'speaking_question_id' => $request->question_id],
+            ['audio_path' => $path, 'transcript_text' => $request->transcript ?? '', 'duration_seconds' => $request->duration ?? 0]
         );
 
         return response()->json(['success' => true, 'path' => $path]);
+    }
+
+    public function submitQuestion(Request $request, TestAttempt $attempt, SpeakingQuestion $question)
+    {
+        if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->status === 'completed') {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $existing = SpeakingAnswer::where([
+            'user_id'              => auth()->id(),
+            'test_attempt_id'      => $attempt->id,
+            'speaking_question_id' => $question->id,
+        ])->whereNotNull('submitted_at')->first();
+
+        if ($existing) {
+            return response()->json(['error' => 'Already submitted'], 409);
+        }
+
+        $answer = SpeakingAnswer::where([
+            'user_id'              => auth()->id(),
+            'test_attempt_id'      => $attempt->id,
+            'speaking_question_id' => $question->id,
+        ])->first();
+
+        $transcript = $answer ? trim($answer->transcript_text ?? '') : '';
+
+        $service = app(GeminiEvaluationService::class);
+        $result = $service->evaluateSpeakingQuestion(
+            $question->part,
+            $question->question_text,
+            $transcript
+        );
+
+        SpeakingAnswer::updateOrCreate(
+            ['user_id' => auth()->id(), 'test_attempt_id' => $attempt->id, 'speaking_question_id' => $question->id],
+            [
+                'evaluation_json' => $result['evaluation_text'],
+                'band_score'      => $result['band_score'],
+                'submitted_at'    => now(),
+            ]
+        );
+
+        return response()->json([
+            'success'    => true,
+            'band_score' => $result['band_score'],
+            'evaluation' => $result['evaluation_text'] ? json_decode($result['evaluation_text'], true) : null,
+        ]);
     }
 
     public function submit(Request $request, TestAttempt $attempt)
@@ -75,20 +125,28 @@ class SpeakingTestController extends Controller
             abort(403);
         }
 
-        $attempt->update([
-            'status' => 'completed',
-            'completed_at' => now(),
-        ]);
+        $attempt->update(['status' => 'completed', 'completed_at' => now()]);
+        $this->saveOverallBand($attempt);
 
-        // Build full transcript from all answers
-        $answers = $attempt->speakingAnswers()->with('question')->orderBy('speaking_question_id')->get();
-        $transcript = '';
-        foreach ($answers as $ans) {
-            $transcript .= "Part {$ans->question->part} — Q: {$ans->question->question_text}\nA: {$ans->transcript_text}\n\n";
+        return redirect()->route('dashboard')->with('success', 'Speaking test completed.');
+    }
+
+    protected function saveOverallBand(TestAttempt $attempt): void
+    {
+        $scores = $attempt->speakingAnswers()
+            ->whereNotNull('band_score')
+            ->pluck('band_score')
+            ->toArray();
+
+        if (empty($scores)) {
+            return;
         }
 
-        EvaluateSpeakingSubmission::dispatch($attempt->id, $transcript);
+        $overall = round((array_sum($scores) / count($scores)) * 2) / 2;
 
-        return redirect()->route('dashboard')->with('success', 'Speaking test submitted! AI evaluation will be available shortly.');
+        AiSpeakingEvaluation::updateOrCreate(
+            ['user_id' => $attempt->user_id, 'test_attempt_id' => $attempt->id],
+            ['band_score' => $overall]
+        );
     }
 }

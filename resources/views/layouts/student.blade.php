@@ -68,8 +68,8 @@
         @php
             $navItems = [
                 ['label' => 'Dashboard',    'icon' => 'dashboard',    'route' => 'dashboard',            'match' => 'dashboard'],
-                ['label' => 'My Exams',     'icon' => 'quiz',         'route' => 'user.history.index',   'match' => 'user.history.*'],
-                ['label' => 'Results',      'icon' => 'analytics',    'route' => 'user.history.index',   'match' => 'user.results.*'],
+                ['label' => 'Mock Tests',   'icon' => 'quiz',         'route' => 'user.tests.index',   'match' => 'user.tests.*'],
+                ['label' => 'Test History', 'icon' => 'history',      'route' => 'user.history.index',   'match' => 'user.history.*'],
             ];
         @endphp
 
