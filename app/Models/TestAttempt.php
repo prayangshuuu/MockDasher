@@ -119,6 +119,20 @@ class TestAttempt extends Model
         return ($la && $la->status === 'completed') ? $la->band_score : null;
     }
 
+    public function getWritingBandAttribute(): ?float
+    {
+        $wa = $this->aiWritingEvaluation;
+
+        return $wa ? $wa->band_score : null;
+    }
+
+    public function getSpeakingBandAttribute(): ?float
+    {
+        $sa = $this->aiSpeakingEvaluation;
+
+        return $sa ? $sa->band_score : null;
+    }
+
     public function getReadingScoreAttribute(): ?int
     {
         $ra = $this->readingAttempt;

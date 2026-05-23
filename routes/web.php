@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AiContentController;
 use App\Http\Controllers\Admin\ListeningSectionController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\ReadingPassageController;
@@ -66,6 +67,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Admin Routes
     Route::middleware([RoleMiddleware::class.':Admin'])->prefix('admin')->name('admin.')->group(function () {
+        // ── AI Content Generator (AJAX) ──────────────────────────────────────
+        Route::post('/ai/generate-content', [AiContentController::class, 'generate'])->name('ai.generate');
+
         Route::resource('tests', App\Http\Controllers\Admin\TestController::class);
 
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');

@@ -95,6 +95,92 @@
     </div>
     @endif
 
+    {{-- AI Content Generator Panel --}}
+    @if($tasks->count() < 2)
+    <div class="mt-8 rounded-2xl border border-violet-200 dark:border-violet-800/50 overflow-hidden shadow-soft"
+         style="background: linear-gradient(135deg, rgba(109,40,217,0.04) 0%, rgba(139,92,246,0.04) 100%);">
+        {{-- Header --}}
+        <button type="button"
+                onclick="toggleAiPanel('writing-ai-panel')"
+                class="w-full flex items-center justify-between p-5 text-left group hover:opacity-90 transition-opacity">
+            <div class="flex items-center gap-3">
+                <div class="size-10 rounded-xl bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center border border-violet-200 dark:border-violet-800 shadow-sm">
+                    <span class="material-symbols-outlined text-violet-600 dark:text-violet-400 text-xl">auto_awesome</span>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                        AI Content Generator
+                        <span class="px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400 text-[10px] font-black uppercase tracking-widest border border-violet-200 dark:border-violet-800">Gemini</span>
+                    </h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">Auto-generate exam-standard content — then review and save</p>
+                </div>
+            </div>
+            <span class="material-symbols-outlined text-slate-400 transition-transform duration-200" id="writing-ai-panel-chevron">expand_more</span>
+        </button>
+
+        {{-- Collapsible Body --}}
+        <div id="writing-ai-panel" class="hidden border-t border-violet-200 dark:border-violet-800/50 p-5 space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {{-- Module Type --}}
+                <div class="space-y-2">
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Module Type</label>
+                    <div class="relative">
+                        <select id="ai-writing-module"
+                                class="w-full px-4 py-3 rounded-xl border border-violet-200 dark:border-violet-700 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all shadow-sm appearance-none cursor-pointer">
+                            <option value="Writing Task 1">Writing Task 1 — Graph / Chart / Diagram</option>
+                            <option value="Writing Task 2">Writing Task 2 — Academic Essay</option>
+                        </select>
+                        <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-lg">expand_more</span>
+                    </div>
+                </div>
+                {{-- Topic --}}
+                <div class="space-y-2">
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Topic / Theme</label>
+                    <input id="ai-writing-topic"
+                           type="text"
+                           placeholder="e.g. Climate Change, Technology, Education..."
+                           class="w-full px-4 py-3 rounded-xl border border-violet-200 dark:border-violet-700 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-all shadow-sm placeholder:text-slate-400">
+                </div>
+            </div>
+
+            {{-- Generate Button --}}
+            <div class="flex items-center gap-4">
+                <button type="button"
+                        id="ai-writing-generate-btn"
+                        onclick="aiGenerateWriting()"
+                        class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 active:scale-95 text-white text-sm font-bold shadow-sm transition-all duration-200">
+                    <span class="material-symbols-outlined text-base" id="ai-writing-btn-icon">auto_awesome</span>
+                    <span id="ai-writing-btn-label">Generate Content</span>
+                </button>
+                <p class="text-xs text-slate-400 dark:text-slate-500 font-medium">Fields below will be auto-filled. Review before saving.</p>
+            </div>
+
+            {{-- Status / Error --}}
+            <div id="ai-writing-status" class="hidden"></div>
+
+            {{-- Preview Card --}}
+            <div id="ai-writing-preview" class="hidden p-4 rounded-xl bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 space-y-3">
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="material-symbols-outlined text-violet-500 text-base">check_circle</span>
+                    <p class="text-xs font-black text-violet-700 dark:text-violet-400 uppercase tracking-widest">Content Generated — Scroll down to review & save</p>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Instructions</p>
+                    <p id="ai-writing-preview-instructions" class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed"></p>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Prompt / Questions</p>
+                    <p id="ai-writing-preview-prompt" class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line"></p>
+                </div>
+                <div id="ai-writing-preview-precontext-wrap">
+                    <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Data Context (for AI grading)</p>
+                    <p id="ai-writing-preview-precontext" class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-line"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- Add New Task Form --}}
     @if($tasks->count() < 2)
     <div class="bg-surface-light dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden mt-8">
@@ -116,7 +202,7 @@
                 <div class="space-y-3">
                     <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Task Number</label>
                     <div class="relative">
-                        <select name="task_number" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm appearance-none cursor-pointer">
+                        <select name="task_number" id="form-task-number" onchange="togglePrecontextField(this.value)" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm appearance-none cursor-pointer">
                             @for($i = 1; $i <= 2; $i++)
                                 @if(!$tasks->contains('task_number', $i))
                                     <option value="{{ $i }}" {{ old('task_number') == $i ? 'selected' : '' }}>Task {{ $i }}</option>
@@ -128,16 +214,16 @@
                 </div>
                 <div class="space-y-3">
                     <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Title</label>
-                    <input type="text" name="task_title" value="{{ old('task_title') }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm" required placeholder="e.g. Writing Task 1">
+                    <input type="text" name="task_title" id="form-task-title" value="{{ old('task_title') }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm" required placeholder="e.g. Writing Task 1">
                 </div>
                 <div class="space-y-3">
                     <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Min Word Count</label>
-                    <input type="number" name="minimum_word_count" value="{{ old('minimum_word_count', 150) }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm" required>
+                    <input type="number" name="minimum_word_count" id="form-minimum-word-count" value="{{ old('minimum_word_count', 150) }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm" required>
                 </div>
             </div>
             <div class="space-y-3">
                 <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Description</label>
-                <input type="text" name="task_description" value="{{ old('task_description') }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm" placeholder="e.g. You should spend about 20 minutes on this task.">
+                <input type="text" name="task_description" id="form-task-description" value="{{ old('task_description') }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm" placeholder="e.g. You should spend about 20 minutes on this task.">
             </div>
             <div class="space-y-3 bg-slate-50 dark:bg-slate-900/30 p-5 rounded-xl border border-slate-200 dark:border-slate-700" id="precontext-field">
                 <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
@@ -146,16 +232,16 @@
                 <p class="text-[10px] font-medium text-slate-500 dark:text-slate-400 mb-2">
                     For Task 1 only. The image you upload is shown to students as usual. This text is what gets sent to Gemini for AI scoring — describe the data the image shows in detail. Example: "A bar chart showing the percentage of households with internet access in five countries between 2000 and 2020."
                 </p>
-                <textarea name="precontext" rows="3" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary transition-all shadow-sm" placeholder="Describe the visual data here...">{{ old('precontext') }}</textarea>
+                <textarea name="precontext" id="form-precontext" rows="3" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary transition-all shadow-sm" placeholder="Describe the visual data here...">{{ old('precontext') }}</textarea>
             </div>
             <div class="space-y-3">
                 <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Prompt</label>
-                <textarea name="task_prompt" rows="5" class="w-full px-4 py-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm" required>{{ old('task_prompt') }}</textarea>
+                <textarea name="task_prompt" id="form-task-prompt" rows="5" class="w-full px-4 py-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm" required>{{ old('task_prompt') }}</textarea>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-3">
                     <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Instruction Text</label>
-                    <input type="text" name="instruction_text" value="{{ old('instruction_text') }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm" placeholder="e.g. Write at least 150 words.">
+                    <input type="text" name="instruction_text" id="form-instruction-text" value="{{ old('instruction_text') }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm" placeholder="e.g. Write at least 150 words.">
                 </div>
                 <div class="space-y-3">
                     <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Task Image (optional)</label>
@@ -178,3 +264,177 @@
     @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    function toggleAiPanel(panelId) {
+        const panel = document.getElementById(panelId);
+        const chevron = document.getElementById(panelId + '-chevron');
+        if (panel.classList.contains('hidden')) {
+            panel.classList.remove('hidden');
+            if (chevron) chevron.classList.add('rotate-180');
+        } else {
+            panel.classList.add('hidden');
+            if (chevron) chevron.classList.remove('rotate-180');
+        }
+    }
+
+    function togglePrecontextField(taskNumber) {
+        const precontextField = document.getElementById('precontext-field');
+        if (precontextField) {
+            if (taskNumber == '1') {
+                precontextField.classList.remove('hidden');
+            } else {
+                precontextField.classList.add('hidden');
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const taskNumSelect = document.getElementById('form-task-number');
+        if (taskNumSelect) {
+            togglePrecontextField(taskNumSelect.value);
+        }
+    });
+
+    function aiGenerateWriting() {
+        const moduleSelect = document.getElementById('ai-writing-module');
+        const topicInput = document.getElementById('ai-writing-topic');
+        const statusDiv = document.getElementById('ai-writing-status');
+        const previewCard = document.getElementById('ai-writing-preview');
+        const generateBtn = document.getElementById('ai-writing-generate-btn');
+        const btnIcon = document.getElementById('ai-writing-btn-icon');
+        const btnLabel = document.getElementById('ai-writing-btn-label');
+
+        const moduleType = moduleSelect.value;
+        const topic = topicInput.value.trim();
+
+        if (!topic) {
+            statusDiv.className = "p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm font-semibold flex items-center gap-2";
+            statusDiv.innerHTML = '<span class="material-symbols-outlined text-lg">error</span> Please enter a topic or theme first.';
+            statusDiv.classList.remove('hidden');
+            return;
+        }
+
+        // Clear previous status & preview
+        statusDiv.classList.add('hidden');
+        statusDiv.innerHTML = '';
+        previewCard.classList.add('hidden');
+
+        // Loading State
+        generateBtn.disabled = true;
+        generateBtn.classList.add('opacity-75', 'cursor-not-allowed');
+        btnLabel.textContent = 'Generating content...';
+        if (btnIcon) {
+            btnIcon.textContent = 'sync';
+            btnIcon.classList.add('animate-spin');
+        }
+
+        fetch('{{ route("admin.ai.generate") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                module_type: moduleType,
+                topic: topic
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw err; });
+            }
+            return response.json();
+        })
+        .then(payload => {
+            if (payload.success && payload.data) {
+                const data = payload.data;
+
+                // Populate Form Fields
+                const formTaskNum = document.getElementById('form-task-number');
+                const formTaskTitle = document.getElementById('form-task-title');
+                const formMinWords = document.getElementById('form-minimum-word-count');
+                const formDesc = document.getElementById('form-task-description');
+                const formPrecontext = document.getElementById('form-precontext');
+                const formPrompt = document.getElementById('form-task-prompt');
+                const formInstruction = document.getElementById('form-instruction-text');
+
+                // Standard IELTS logic mapping
+                const isTask1 = moduleType === 'Writing Task 1';
+                
+                // Set Task Number matching select option if possible
+                if (formTaskNum) {
+                    const targetVal = isTask1 ? '1' : '2';
+                    const option = Array.from(formTaskNum.options).find(opt => opt.value === targetVal);
+                    if (option) {
+                        formTaskNum.value = targetVal;
+                    }
+                    togglePrecontextField(formTaskNum.value);
+                }
+
+                if (formTaskTitle) {
+                    formTaskTitle.value = isTask1 ? 'Writing Task 1' : 'Writing Task 2';
+                }
+                if (formMinWords) {
+                    formMinWords.value = isTask1 ? 150 : 250;
+                }
+                if (formInstruction) {
+                    formInstruction.value = isTask1 ? 'Write at least 150 words.' : 'Write at least 250 words.';
+                }
+                if (formDesc) {
+                    formDesc.value = data.db_precontext_instructions || '';
+                }
+                if (formPrompt) {
+                    formPrompt.value = data.db_generated_questions_or_prompt || '';
+                }
+                if (formPrecontext) {
+                    formPrecontext.value = isTask1 ? (data.db_image_description_data || '') : '';
+                }
+
+                // Populate Preview Card
+                const previewInst = document.getElementById('ai-writing-preview-instructions');
+                const previewPrompt = document.getElementById('ai-writing-preview-prompt');
+                const previewPrecontextWrap = document.getElementById('ai-writing-preview-precontext-wrap');
+                const previewPrecontext = document.getElementById('ai-writing-preview-precontext');
+
+                if (previewInst) previewInst.textContent = data.db_precontext_instructions || '';
+                if (previewPrompt) previewPrompt.textContent = data.db_generated_questions_or_prompt || '';
+                
+                if (isTask1 && data.db_image_description_data) {
+                    if (previewPrecontext) previewPrecontext.textContent = data.db_image_description_data;
+                    if (previewPrecontextWrap) previewPrecontextWrap.classList.remove('hidden');
+                } else {
+                    if (previewPrecontextWrap) previewPrecontextWrap.classList.add('hidden');
+                }
+
+                previewCard.classList.remove('hidden');
+                
+                // Success Status
+                statusDiv.className = "p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 text-sm font-semibold flex items-center gap-2";
+                statusDiv.innerHTML = '<span class="material-symbols-outlined text-lg">check_circle</span> IELTS content generated successfully! Form fields have been filled below.';
+                statusDiv.classList.remove('hidden');
+            } else {
+                throw { error: 'Unknown error occurred.' };
+            }
+        })
+        .catch(err => {
+            const errorMsg = err.error || err.message || 'An error occurred during generation. Please try again.';
+            statusDiv.className = "p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm font-semibold flex items-center gap-2";
+            statusDiv.innerHTML = `<span class="material-symbols-outlined text-lg">error</span> ${errorMsg}`;
+            statusDiv.classList.remove('hidden');
+        })
+        .finally(() => {
+            // Reset Loading State
+            generateBtn.disabled = false;
+            generateBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+            btnLabel.textContent = 'Generate Content';
+            if (btnIcon) {
+                btnIcon.textContent = 'auto_awesome';
+                btnIcon.classList.remove('animate-spin');
+            }
+        });
+    }
+</script>
+@endpush

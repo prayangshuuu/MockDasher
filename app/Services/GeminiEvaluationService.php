@@ -14,7 +14,7 @@ class GeminiEvaluationService
     public function __construct()
     {
         $this->apiKey = config('services.gemini.key', env('GEMINI_API_KEY'));
-        $this->model  = 'gemini-1.5-flash';
+        $this->model  = 'gemini-2.5-flash';
         $this->endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent";
     }
 

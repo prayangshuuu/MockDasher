@@ -35,7 +35,7 @@ class ResultController extends Controller
 
     public function show(TestAttempt $result)
     {
-        $result->load(['user', 'test', 'writingAnswers']);
+        $result->load(['user', 'test', 'writingAnswers', 'aiWritingEvaluation', 'aiSpeakingEvaluation']);
 
         return view('admin.results.show', compact('result'));
     }

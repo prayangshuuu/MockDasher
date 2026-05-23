@@ -78,6 +78,13 @@
                         Detailed Writing Responses
                     </h4>
 
+                    @php
+                        $evaluation = null;
+                        if ($result->aiWritingEvaluation && $result->aiWritingEvaluation->evaluation_text) {
+                            $evaluation = json_decode($result->aiWritingEvaluation->evaluation_text, true);
+                        }
+                    @endphp
+
                     <div class="space-y-6">
                         @foreach($result->writingAnswers as $index => $answer)
                             <div class="bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
@@ -87,7 +94,7 @@
                                             {{ $index + 1 }}
                                         </div>
                                         <span class="text-sm font-bold text-slate-700 dark:text-slate-200">
-                                            {{ optional($answer->writingTask)->title ?? 'Writing Task' }}
+                                            {{ optional($answer->writingTask)->task_title ?? 'Writing Task' }}
                                         </span>
                                     </div>
                                     <span class="inline-flex items-center gap-1.5 rounded-full bg-white dark:bg-surface-dark px-2.5 py-1 text-xs font-medium text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">{{ str_word_count($answer->answer_text ?? '') }} Words</span>
@@ -95,10 +102,117 @@
                                 <div class="p-6 text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-h-80 overflow-y-auto whitespace-pre-wrap font-medium">
                                     {{ $answer->answer_text ?? 'No response submitted.' }}
                                 </div>
-                                @if($index === 0)
-                                    <div class="px-6 py-3 bg-primary/5 border-t border-primary/10 flex items-center justify-between">
-                                        <span class="text-xs font-bold text-primary">AI Feedback: Analysis Pending</span>
-                                        <button class="text-xs font-bold text-primary hover:underline">Auditor Notes</button>
+
+                                @php
+                                    $taskNumber = optional($answer->writingTask)->task_number ?? ($index + 1);
+                                    $taskFeedback = $evaluation ? ($evaluation["task_{$taskNumber}"] ?? null) : null;
+                                @endphp
+
+                                @if($taskFeedback && isset($taskFeedback['overall_band_score']) && $taskFeedback['overall_band_score'] > 0)
+                                    <div class="border-t border-slate-200 dark:border-slate-800 p-6 bg-slate-50/30 dark:bg-slate-900/10 space-y-6">
+                                        {{-- Header with Score --}}
+                                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                            <div>
+                                                <h5 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                                    <span class="material-symbols-outlined text-violet-600 dark:text-violet-400 text-lg">auto_awesome</span>
+                                                    AI Examiner Report
+                                                </h5>
+                                                <p class="text-xs text-slate-500 mt-0.5">Evaluated strictly according to official IELTS band descriptors.</p>
+                                            </div>
+                                            <div class="px-4 py-2 rounded-xl bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800 font-extrabold text-sm flex items-center gap-1.5 shadow-sm shrink-0">
+                                                <span>Band Score</span>
+                                                <span class="text-base text-violet-800 dark:text-violet-200">{{ number_format($taskFeedback['overall_band_score'] ?? 0, 1) }}</span>
+                                            </div>
+                                        </div>
+
+                                        {{-- Criteria Grid --}}
+                                        @if(isset($taskFeedback['criteria_scores']))
+                                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                @foreach($taskFeedback['criteria_scores'] as $criterion => $score)
+                                                    <div class="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+                                                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider truncate" title="{{ ucwords(str_replace('_', ' ', $criterion)) }}">
+                                                            {{ ucwords(str_replace('_', ' ', $criterion)) }}
+                                                        </p>
+                                                        <p class="text-base font-extrabold text-slate-900 dark:text-white mt-1">{{ number_format($score, 1) }}</p>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @endif
+
+                                        {{-- Detailed Feedback --}}
+                                        @if(isset($taskFeedback['detailed_feedback']))
+                                            <div class="space-y-2">
+                                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Detailed Analysis</p>
+                                                <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium whitespace-pre-line bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-inner">
+                                                    {{ $taskFeedback['detailed_feedback'] }}
+                                                </p>
+                                            </div>
+                                        @endif
+
+                                        {{-- Suggestions for Improvement --}}
+                                        @if(isset($taskFeedback['suggestions_for_improvement']))
+                                            <div class="space-y-2">
+                                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Suggestions for Improvement</p>
+                                                <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium whitespace-pre-line bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-inner">
+                                                    {{ $taskFeedback['suggestions_for_improvement'] }}
+                                                </p>
+                                            </div>
+                                        @endif
+
+                                        {{-- Corrections (Grammar/Vocabulary) --}}
+                                        @if((isset($taskFeedback['grammar_corrections']) && count($taskFeedback['grammar_corrections']) > 0) || (isset($taskFeedback['vocabulary_corrections']) && count($taskFeedback['vocabulary_corrections']) > 0))
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                {{-- Grammar --}}
+                                                @if(isset($taskFeedback['grammar_corrections']) && count($taskFeedback['grammar_corrections']) > 0)
+                                                    <div class="space-y-3">
+                                                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Grammar Corrections</p>
+                                                        <div class="space-y-2.5">
+                                                            @foreach($taskFeedback['grammar_corrections'] as $correction)
+                                                                <div class="p-3 rounded-xl bg-red-50/50 dark:bg-red-950/10 border border-red-100 dark:border-red-900/30 text-xs font-medium space-y-1 shadow-sm">
+                                                                    <div class="flex items-start gap-2">
+                                                                        <span class="text-red-500 font-bold shrink-0">Incorrect:</span>
+                                                                        <span class="text-slate-600 dark:text-slate-400 italic">"{{ $correction['incorrect'] }}"</span>
+                                                                    </div>
+                                                                    <div class="flex items-start gap-2 border-t border-red-100/50 dark:border-red-900/20 pt-1 mt-1">
+                                                                        <span class="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">Suggested:</span>
+                                                                        <span class="text-slate-800 dark:text-slate-200 font-bold">"{{ $correction['suggested'] }}"</span>
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                @endif
+
+                                                {{-- Vocabulary --}}
+                                                @if(isset($taskFeedback['vocabulary_corrections']) && count($taskFeedback['vocabulary_corrections']) > 0)
+                                                    <div class="space-y-3">
+                                                        <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Vocabulary Corrections</p>
+                                                        <div class="space-y-2.5">
+                                                            @foreach($taskFeedback['vocabulary_corrections'] as $correction)
+                                                                <div class="p-3 rounded-xl bg-amber-50/50 dark:bg-amber-950/10 border border-amber-100 dark:border-amber-900/30 text-xs font-medium space-y-1 shadow-sm">
+                                                                    <div class="flex items-start gap-2">
+                                                                        <span class="text-amber-600 dark:text-amber-500 font-bold shrink-0">Incorrect:</span>
+                                                                        <span class="text-slate-600 dark:text-slate-400 italic">"{{ $correction['incorrect'] }}"</span>
+                                                                    </div>
+                                                                    <div class="flex items-start gap-2 border-t border-amber-100/50 dark:border-amber-900/20 pt-1 mt-1">
+                                                                        <span class="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">Suggested:</span>
+                                                                        <span class="text-slate-800 dark:text-slate-200 font-bold">"{{ $correction['suggested'] }}"</span>
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    </div>
+                                @else
+                                    <div class="px-6 py-4 bg-violet-50/40 dark:bg-violet-950/5 border-t border-violet-100 dark:border-violet-900/30 flex items-center justify-between">
+                                        <span class="text-xs font-bold text-violet-600 dark:text-violet-400 flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-sm animate-pulse">pending</span>
+                                            AI Feedback: Analysis Pending
+                                        </span>
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Expected shortly</span>
                                     </div>
                                 @endif
                             </div>
