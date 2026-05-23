@@ -14,207 +14,228 @@ class GeminiEvaluationService
     public function __construct()
     {
         $this->apiKey = config('services.gemini.key', env('GEMINI_API_KEY'));
-        $this->model = 'gemini-1.5-flash';
+        $this->model  = 'gemini-1.5-flash';
         $this->endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent";
     }
 
+    // ─────────────────────────────────────────────────────────────
+    //  SHARED SYSTEM INSTRUCTION
+    // ─────────────────────────────────────────────────────────────
+
+    /**
+     * The canonical IELTS Examiner system prompt used for every evaluation.
+     * MODULE_TYPE / PRECONTEXT / IMAGE_DESCRIPTION / STUDENT_ANSWER are
+     * injected by each caller into the *user* turn, not into this instruction.
+     */
+    private function getSystemInstruction(): string
+    {
+        return <<<'TEXT'
+You are an expert, highly rigorous IELTS Examiner AI. Your sole function is to evaluate student responses for IELTS Speaking (Parts 1, 2, 3) and IELTS Writing (Tasks 1 and 2). You evaluate strictly according to official IELTS band descriptors.
+
+Evaluation Rules:
+- Read the provided MODULE_TYPE, PRECONTEXT (the questions or data/graph descriptions), IMAGE_DESCRIPTION (if Writing Task 1), and STUDENT_ANSWER.
+- Analyse the response and assign a Band Score (0–9, in 0.5 increments) for the overall module, as well as the 4 specific criteria for that module type.
+- Provide constructive, specific feedback and actionable improvements.
+
+CRITICAL OUTPUT RULE: You must output ONLY valid, strictly formatted JSON. Do not include markdown code blocks (like ```json). Do not include any conversational preamble, greetings, or postscripts. The first character of your response must be { and the last must be }.
+
+If MODULE_TYPE contains "Speaking", return exactly this JSON shape:
+{
+  "evaluation_type": "Speaking",
+  "overall_band_score": <0.0–9.0 in 0.5 increments>,
+  "criteria_scores": {
+    "fluency_and_coherence": <0.0–9.0>,
+    "lexical_resource": <0.0–9.0>,
+    "grammatical_range_and_accuracy": <0.0–9.0>,
+    "pronunciation": <0.0–9.0>
+  },
+  "detailed_feedback": "<specific analysis of strengths and weaknesses>",
+  "vocabulary_corrections": [
+    {"incorrect": "<word/phrase used>", "suggested": "<better word/phrase>"}
+  ],
+  "grammar_corrections": [
+    {"incorrect": "<sentence used>", "suggested": "<corrected sentence>"}
+  ],
+  "suggestions_for_improvement": "<actionable advice to increase their band score>"
+}
+
+If MODULE_TYPE contains "Writing", return exactly this JSON shape:
+{
+  "evaluation_type": "Writing",
+  "overall_band_score": <0.0–9.0 in 0.5 increments>,
+  "criteria_scores": {
+    "task_achievement_or_response": <0.0–9.0>,
+    "coherence_and_cohesion": <0.0–9.0>,
+    "lexical_resource": <0.0–9.0>,
+    "grammatical_range_and_accuracy": <0.0–9.0>
+  },
+  "detailed_feedback": "<detailed paragraph analysing task fulfilment, paragraph structure, vocabulary, and grammar>",
+  "vocabulary_corrections": [
+    {"incorrect": "<word/phrase used>", "suggested": "<better word/phrase>"}
+  ],
+  "grammar_corrections": [
+    {"incorrect": "<sentence used>", "suggested": "<corrected sentence>"}
+  ],
+  "suggestions_for_improvement": "<actionable advice on structure, vocabulary, or argument development>"
+}
+TEXT;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    //  PER-TASK WRITING EVALUATION  (used by WritingTestController)
+    // ─────────────────────────────────────────────────────────────
+
     /**
      * Evaluate a single IELTS Writing task instantly (synchronous).
+     *
+     * @param  int          $taskNumber   1 or 2
+     * @param  string       $prompt       The question / task instruction
+     * @param  string|null  $precontext   Admin-supplied data description (Task 1 graph/chart text)
+     * @param  string       $answer       Candidate's answer text
      */
     public function evaluateWritingTask(int $taskNumber, string $prompt, ?string $precontext, string $answer): array
     {
-        if ($taskNumber === 1) {
-            $firstCriterion = '"task_achievement"';
-            $firstLabel = 'Task Achievement (key features covered)';
-            $taskNote = 'Writing Task 1 — describe visual/tabular data';
-            $dataBlock = $precontext ? "Visual Data Description:\n{$precontext}\n\n" : '';
-        } else {
-            $firstCriterion = '"task_response"';
-            $firstLabel = 'Task Response (addresses all parts of the task)';
-            $taskNote = 'Writing Task 2 — academic essay';
-            $dataBlock = '';
-        }
+        $moduleType       = "Writing Task {$taskNumber}";
+        $imageDescription = $precontext ? $precontext : 'N/A';
 
-        $systemInstruction = <<<TEXT
-You are an expert IELTS examiner. Evaluate this IELTS Academic {$taskNote} response using official band descriptors.
-
-Criteria:
-- {$firstLabel}
-- Coherence and Cohesion: organization, paragraphing, cohesive devices
-- Lexical Resource: range and accuracy of vocabulary
-- Grammatical Range and Accuracy: sentence variety and correctness
-
-Return ONLY valid JSON — no markdown, no code fences:
-{
-  "band_score": <0.0-9.0, average of all four criteria>,
-  {$firstCriterion}: {"score": <0.0-9.0>, "feedback": "<2-4 sentences of specific feedback>"},
-  "coherence_cohesion": {"score": <0.0-9.0>, "feedback": "<2-4 sentences>"},
-  "lexical_resource": {"score": <0.0-9.0>, "feedback": "<2-4 sentences>"},
-  "grammatical_range_accuracy": {"score": <0.0-9.0>, "feedback": "<2-4 sentences>"},
-  "grammatical_errors": ["<quote the exact error> — <correction>"],
-  "overall_review": "<3-5 sentence overall summary>",
-  "improved_version": "<full rewritten improved version of the candidate answer>"
-}
+        $userPrompt = <<<TEXT
+MODULE_TYPE: {$moduleType}
+PRECONTEXT / QUESTION: {$prompt}
+IMAGE_DESCRIPTION (If Writing Task 1): {$imageDescription}
+STUDENT_ANSWER: {$answer}
 TEXT;
 
-        $userPrompt = "Task {$taskNumber} Question:\n{$prompt}\n\n{$dataBlock}Candidate Answer:\n"
-            . ($answer ?: 'No answer provided.');
-
-        return $this->callGeminiApi($systemInstruction, $userPrompt);
+        return $this->callGeminiApi($this->getSystemInstruction(), $userPrompt);
     }
+
+    // ─────────────────────────────────────────────────────────────
+    //  PER-QUESTION SPEAKING EVALUATION  (used by SpeakingTestController)
+    // ─────────────────────────────────────────────────────────────
 
     /**
      * Evaluate a single IELTS Speaking question instantly (synchronous).
+     *
+     * @param  int     $part      1, 2, or 3
+     * @param  string  $question  The examiner question
+     * @param  string  $answer    Candidate's spoken answer (transcript text)
      */
     public function evaluateSpeakingQuestion(int $part, string $question, string $answer): array
     {
-        $systemInstruction = <<<TEXT
-You are an expert IELTS examiner. Evaluate this single IELTS Speaking Part {$part} answer using official band descriptors.
+        $moduleType = "Speaking Part {$part}";
 
-Criteria:
-- Fluency and Coherence: speaks at length, logical flow, minimal repetition
-- Lexical Resource: vocabulary range, accuracy, collocation
-- Grammatical Range and Accuracy: sentence structure variety and correctness
-- Pronunciation: estimated from written transcript (note this limitation)
-
-Return ONLY valid JSON — no markdown, no code fences:
-{
-  "band_score": <0.0-9.0, average of all four criteria>,
-  "fluency_coherence": {"score": <0.0-9.0>, "feedback": "<2-3 sentences>"},
-  "lexical_resource": {"score": <0.0-9.0>, "feedback": "<2-3 sentences>"},
-  "grammatical_range_accuracy": {"score": <0.0-9.0>, "feedback": "<2-3 sentences>"},
-  "pronunciation": {"score": <0.0-9.0>, "feedback": "<estimated from text>"},
-  "overall_feedback": "<2-3 sentence summary for this specific answer>"
-}
+        $userPrompt = <<<TEXT
+MODULE_TYPE: {$moduleType}
+PRECONTEXT / QUESTION: {$question}
+IMAGE_DESCRIPTION (If Writing Task 1): N/A
+STUDENT_ANSWER: {$answer}
 TEXT;
 
-        $userPrompt = "Part {$part} Question: {$question}\n\nCandidate Answer: "
-            . ($answer ?: 'No answer recorded.');
-
-        return $this->callGeminiApi($systemInstruction, $userPrompt);
+        return $this->callGeminiApi($this->getSystemInstruction(), $userPrompt);
     }
 
+    // ─────────────────────────────────────────────────────────────
+    //  BATCH WRITING  (legacy — evaluates both tasks in one call)
+    // ─────────────────────────────────────────────────────────────
+
     /**
-     * Evaluate IELTS Writing.
+     * Evaluate both IELTS Writing tasks in a single API call.
      *
-     * @param  string       $task1Prompt    The Task 1 question/prompt text
-     * @param  string|null  $task1Precontext Admin-provided description of the data (replaces image)
-     * @param  string       $task2Prompt    The Task 2 essay prompt
-     * @param  string|null  $task1Answer
-     * @param  string|null  $task2Answer
+     * Returns a combined structure:
+     * {
+     *   "overall_band_score": <avg>,
+     *   "task_1": { <Writing schema> },
+     *   "task_2": { <Writing schema> }
+     * }
      */
     public function evaluateWriting(
-        string $task1Prompt,
+        string  $task1Prompt,
         ?string $task1Precontext,
-        string $task2Prompt,
+        string  $task2Prompt,
         ?string $task1Answer,
         ?string $task2Answer
     ): array {
-        $systemInstruction = <<<TEXT
-You are an expert IELTS examiner. Evaluate the IELTS Academic Writing answers below based on official IELTS band descriptors.
+        $systemInstruction = $this->getSystemInstruction() . <<<'TEXT'
 
-IELTS Writing criteria:
-- Task Achievement / Task Response: how well the candidate addresses the task requirements
-- Coherence and Cohesion: organization, paragraphing, use of cohesive devices
-- Lexical Resource: range and accuracy of vocabulary
-- Grammatical Range and Accuracy: variety and correctness of sentence structures
-- Grammatical Errors: specific errors found in the text
-
-Return ONLY valid JSON. No extra text, no markdown code fences.
-
-JSON schema:
+ADDITIONAL INSTRUCTION FOR BATCH MODE:
+You are evaluating BOTH Task 1 AND Task 2 in a single response.
+Return a JSON object with this exact shape (wrapping each task's evaluation under its own key):
 {
-  "overall_band_score": <average of task1 and task2 band scores, rounded to nearest 0.5>,
-  "task_1": {
-    "band_score": <0-9>,
-    "task_achievement": {"score": <0-9>, "feedback": "<detailed>"},
-    "coherence_cohesion": {"score": <0-9>, "feedback": "<detailed>"},
-    "lexical_resource": {"score": <0-9>, "feedback": "<detailed>"},
-    "grammatical_range_accuracy": {"score": <0-9>, "feedback": "<detailed>"},
-    "grammatical_errors": ["<error 1>", "<error 2>"],
-    "overall_review": "<summary of performance>",
-    "improved_version": "<rewritten improved version of the answer>"
-  },
-  "task_2": {
-    "band_score": <0-9>,
-    "task_response": {"score": <0-9>, "feedback": "<detailed>"},
-    "coherence_cohesion": {"score": <0-9>, "feedback": "<detailed>"},
-    "lexical_resource": {"score": <0-9>, "feedback": "<detailed>"},
-    "grammatical_range_accuracy": {"score": <0-9>, "feedback": "<detailed>"},
-    "grammatical_errors": ["<error 1>", "<error 2>"],
-    "overall_review": "<summary of performance>",
-    "improved_version": "<rewritten improved version of the answer>"
-  }
+  "overall_band_score": <average of task_1 and task_2 overall_band_scores, rounded to nearest 0.5>,
+  "task_1": { <full Writing evaluation JSON for Task 1> },
+  "task_2": { <full Writing evaluation JSON for Task 2> }
 }
+Each task object must conform to the Writing JSON schema above.
 TEXT;
 
-        $task1Context = $task1Precontext
-            ? "Data Description (Task 1 context provided by examiner):\n{$task1Precontext}\n\n"
-            : '';
+        $task1ImageDesc = $task1Precontext ?? 'N/A';
 
-        $userPrompt = "TASK 1\n"
-            . "Question: {$task1Prompt}\n"
-            . $task1Context
-            . "Candidate Answer:\n" . ($task1Answer ?? 'No answer provided.')
-            . "\n\n---\n\n"
-            . "TASK 2\n"
-            . "Question: {$task2Prompt}\n"
-            . "Candidate Answer:\n" . ($task2Answer ?? 'No answer provided.');
+        $userPrompt = <<<TEXT
+--- TASK 1 ---
+MODULE_TYPE: Writing Task 1
+PRECONTEXT / QUESTION: {$task1Prompt}
+IMAGE_DESCRIPTION (If Writing Task 1): {$task1ImageDesc}
+STUDENT_ANSWER: {$task1Answer}
+
+--- TASK 2 ---
+MODULE_TYPE: Writing Task 2
+PRECONTEXT / QUESTION: {$task2Prompt}
+IMAGE_DESCRIPTION (If Writing Task 1): N/A
+STUDENT_ANSWER: {$task2Answer}
+TEXT;
 
         return $this->callGeminiApi($systemInstruction, $userPrompt);
     }
 
+    // ─────────────────────────────────────────────────────────────
+    //  BATCH SPEAKING  (legacy — evaluates all Q&A in one call)
+    // ─────────────────────────────────────────────────────────────
+
     /**
-     * Evaluate IELTS Speaking.
+     * Evaluate all IELTS Speaking answers in a single API call.
      *
      * @param  array  $qaItems  Each item: ['part' => int, 'question' => string, 'answer' => string]
      */
     public function evaluateSpeaking(array $qaItems): array
     {
-        $systemInstruction = <<<TEXT
-You are an expert IELTS examiner. Evaluate the IELTS Speaking answers below based on official IELTS band descriptors.
+        $systemInstruction = $this->getSystemInstruction() . <<<'TEXT'
 
-IELTS Speaking criteria:
-- Fluency and Coherence: ability to speak at length with logical flow
-- Lexical Resource: range and accuracy of vocabulary
-- Grammatical Range and Accuracy: variety and correctness of sentence structures
-- Pronunciation: clarity and ease of understanding (estimated from written transcript)
-
-Note: Pronunciation is estimated from the written transcript and is for practice reference only.
-
-Return ONLY valid JSON. No extra text, no markdown code fences.
-
-JSON schema:
+ADDITIONAL INSTRUCTION FOR BATCH MODE:
+You are evaluating ALL Speaking answers (Parts 1, 2, and 3) together in a single response.
+Return a JSON object with this exact shape:
 {
-  "band_score": <overall 0-9, average of all criteria>,
-  "fluency_coherence": {"score": <0-9>, "feedback": "<detailed>"},
-  "lexical_resource": {"score": <0-9>, "feedback": "<detailed>"},
-  "grammatical_range_accuracy": {"score": <0-9>, "feedback": "<detailed>"},
-  "pronunciation": {"score": <0-9>, "feedback": "<estimated from text>"},
-  "questions": [
-    {
-      "part": <part number>,
-      "question": "<question text>",
-      "answer": "<candidate answer>",
-      "feedback": "<specific feedback on this answer>"
-    }
-  ],
-  "overall_review": "<summary of overall performance and key improvement areas>"
+  "overall_band_score": <overall average across all criteria, rounded to nearest 0.5>,
+  "criteria_scores": {
+    "fluency_and_coherence": <0.0–9.0>,
+    "lexical_resource": <0.0–9.0>,
+    "grammatical_range_and_accuracy": <0.0–9.0>,
+    "pronunciation": <0.0–9.0>
+  },
+  "detailed_feedback": "<holistic feedback across all parts>",
+  "vocabulary_corrections": [{"incorrect": "...", "suggested": "..."}],
+  "grammar_corrections": [{"incorrect": "...", "suggested": "..."}],
+  "suggestions_for_improvement": "<actionable advice>",
+  "per_question_feedback": [
+    {"part": <part number>, "question": "<question text>", "feedback": "<specific feedback>"}
+  ]
 }
 TEXT;
 
         $lines = [];
         foreach ($qaItems as $i => $item) {
-            $n = $i + 1;
-            $lines[] = "Q{$n} (Part {$item['part']}): {$item['question']}";
-            $lines[] = "A{$n}: " . (trim($item['answer']) ?: 'No answer recorded.');
-            $lines[] = '';
+            $n        = $i + 1;
+            $lines[]  = "Q{$n} (Part {$item['part']}): {$item['question']}";
+            $lines[]  = "A{$n}: " . (trim($item['answer']) ?: 'No answer recorded.');
+            $lines[]  = '';
         }
 
-        $userPrompt = "IELTS Speaking — Candidate Answers:\n\n" . implode("\n", $lines);
+        $userPrompt = "MODULE_TYPE: Speaking\nSTUDENT_ANSWER (all parts):\n\n" . implode("\n", $lines);
 
         return $this->callGeminiApi($systemInstruction, $userPrompt);
     }
+
+    // ─────────────────────────────────────────────────────────────
+    //  GEMINI API CALL
+    // ─────────────────────────────────────────────────────────────
 
     protected function callGeminiApi(string $systemInstruction, string $userPrompt): array
     {
@@ -229,33 +250,36 @@ TEXT;
                     ['parts' => [['text' => $userPrompt]]],
                 ],
                 'generationConfig' => [
-                    'temperature' => 0.2,
+                    'temperature'      => 0.2,
                     'responseMimeType' => 'application/json',
                 ],
             ]);
 
             if ($response->successful()) {
-                $result = $response->json();
+                $result  = $response->json();
                 $rawText = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
                 $rawText = trim($rawText);
 
-                // Strip markdown fences if present
+                // Strip markdown fences if present (defensive)
                 $rawText = preg_replace('/^```(?:json)?\s*/i', '', $rawText);
                 $rawText = preg_replace('/\s*```$/', '', $rawText);
 
                 $parsed = json_decode($rawText, true);
 
-                if (json_last_error() !== JSON_ERROR_NONE || !is_array($parsed)) {
+                if (json_last_error() !== JSON_ERROR_NONE || ! is_array($parsed)) {
                     Log::warning('Gemini returned non-JSON: ' . substr($rawText, 0, 500));
                     return $this->fallbackResponse();
                 }
 
-                $bandScore = $parsed['band_score'] ?? $parsed['overall_band_score'] ?? null;
+                // New schema uses `overall_band_score`; old schema used `band_score`
+                $bandScore = $parsed['overall_band_score']
+                    ?? $parsed['band_score']
+                    ?? null;
 
                 return [
-                    'success' => true,
+                    'success'         => true,
                     'evaluation_text' => $rawText,
-                    'band_score' => $bandScore ? (float) $bandScore : null,
+                    'band_score'      => $bandScore !== null ? (float) $bandScore : null,
                 ];
             }
 
@@ -271,9 +295,9 @@ TEXT;
     protected function fallbackResponse(): array
     {
         return [
-            'success' => false,
+            'success'         => false,
             'evaluation_text' => null,
-            'band_score' => null,
+            'band_score'      => null,
         ];
     }
 }

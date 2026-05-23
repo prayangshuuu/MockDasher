@@ -450,27 +450,100 @@
         const content = document.getElementById('eval-content-q-'+qid);
         if (!panel || !content) return;
 
+        const isNewSchema = eval_.criteria_scores !== undefined;
+
         const scoreColor = (s) => s >= 7 ? 'text-emerald-500' : (s >= 5.5 ? 'text-amber-500' : 'text-rose-500');
         const bandColor  = bandScore >= 7 ? 'bg-emerald-500' : (bandScore >= 5.5 ? 'bg-amber-500' : 'bg-rose-500');
 
-        const criteria = [
-            { key: 'fluency_coherence',          label: 'Fluency & Coherence' },
-            { key: 'lexical_resource',            label: 'Lexical Resource' },
-            { key: 'grammatical_range_accuracy',  label: 'Grammatical Range & Accuracy' },
-            { key: 'pronunciation',               label: 'Pronunciation (estimated)' },
-        ];
+        // ── Criteria grid ──────────────────────────────────────────────────────
+        let criteriaHtml = '';
+        if (isNewSchema) {
+            const cs = eval_.criteria_scores || {};
+            const newCriteria = [
+                { label: 'Fluency & Coherence',          score: cs.fluency_and_coherence },
+                { label: 'Lexical Resource',              score: cs.lexical_resource },
+                { label: 'Grammatical Range & Accuracy',  score: cs.grammatical_range_and_accuracy },
+                { label: 'Pronunciation (estimated)',     score: cs.pronunciation },
+            ];
+            criteriaHtml = newCriteria.map(c => {
+                const s = c.score ?? '—';
+                return `<div class="p-4 rounded-[var(--radius-lg)] bg-[var(--color-bg-primary)] border border-[var(--color-divider)]">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-[10px] font-black uppercase tracking-widest text-[var(--color-text-secondary)]">${c.label}</span>
+                        <span class="text-lg font-black ${scoreColor(s)}">${s}</span>
+                    </div>
+                </div>`;
+            }).join('');
+        } else {
+            // Legacy v1 schema
+            const oldCriteria = [
+                { key: 'fluency_coherence',          label: 'Fluency & Coherence' },
+                { key: 'lexical_resource',            label: 'Lexical Resource' },
+                { key: 'grammatical_range_accuracy',  label: 'Grammatical Range & Accuracy' },
+                { key: 'pronunciation',               label: 'Pronunciation (estimated)' },
+            ];
+            criteriaHtml = oldCriteria.map(c => {
+                const d = eval_[c.key] || {};
+                const s = d.score ?? '—';
+                return `<div class="p-4 rounded-[var(--radius-lg)] bg-[var(--color-bg-primary)] border border-[var(--color-divider)]">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-[10px] font-black uppercase tracking-widest text-[var(--color-text-secondary)]">${c.label}</span>
+                        <span class="text-lg font-black ${scoreColor(s)}">${s}</span>
+                    </div>
+                    <p class="text-xs text-[var(--color-text-secondary)] leading-relaxed">${d.feedback || ''}</p>
+                </div>`;
+            }).join('');
+        }
 
-        const criteriaHtml = criteria.map(c => {
-            const d = eval_[c.key] || {};
-            const s = d.score ?? '—';
-            return `<div class="p-4 rounded-[var(--radius-lg)] bg-[var(--color-bg-primary)] border border-[var(--color-divider)]">
-                <div class="flex items-center justify-between mb-1.5">
-                    <span class="text-[10px] font-black uppercase tracking-widest text-[var(--color-text-secondary)]">${c.label}</span>
-                    <span class="text-lg font-black ${scoreColor(s)}">${s}</span>
-                </div>
-                <p class="text-xs text-[var(--color-text-secondary)] leading-relaxed">${d.feedback || ''}</p>
-            </div>`;
-        }).join('');
+        // ── Extra sections ────────────────────────────────────────────────────
+        let extraHtml = '';
+        if (isNewSchema) {
+            if (eval_.detailed_feedback) {
+                extraHtml += `<div class="mb-3 p-4 rounded-[var(--radius-lg)] bg-[color-mix(in_srgb,var(--color-primary)_5%,transparent)] border border-[color-mix(in_srgb,var(--color-primary)_15%,transparent)]">
+                    <p class="text-[10px] font-black text-[var(--color-primary)] uppercase tracking-widest mb-2">Detailed Feedback</p>
+                    <p class="text-sm text-[var(--color-text-primary)] leading-relaxed">${eval_.detailed_feedback}</p>
+                </div>`;
+            }
+            if (eval_.vocabulary_corrections?.length) {
+                const items = eval_.vocabulary_corrections.map(v =>
+                    `<div class="flex items-start gap-3 text-xs">
+                        <span class="shrink-0 px-2 py-0.5 rounded bg-rose-100 text-rose-700 font-mono line-through">${v.incorrect || ''}</span>
+                        <span class="shrink-0 text-[var(--color-text-secondary)]">→</span>
+                        <span class="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-mono font-semibold">${v.suggested || ''}</span>
+                    </div>`
+                ).join('');
+                extraHtml += `<div class="mb-3 p-4 rounded-[var(--radius-lg)] bg-[color-mix(in_srgb,#8B5CF6_5%,transparent)] border border-[color-mix(in_srgb,#8B5CF6_20%,transparent)]">
+                    <p class="text-[10px] font-black text-violet-500 uppercase tracking-widest mb-3">Vocabulary Improvements</p>
+                    <div class="space-y-2">${items}</div>
+                </div>`;
+            }
+            if (eval_.grammar_corrections?.length) {
+                const items = eval_.grammar_corrections.map(g =>
+                    `<div class="space-y-1 text-xs">
+                        <div class="flex items-start gap-2"><span class="shrink-0 text-[10px] font-bold uppercase text-rose-400 mt-0.5 w-12">Wrong:</span><span class="text-rose-700 italic">${g.incorrect || ''}</span></div>
+                        <div class="flex items-start gap-2"><span class="shrink-0 text-[10px] font-bold uppercase text-emerald-500 mt-0.5 w-12">Better:</span><span class="text-emerald-700 font-semibold">${g.suggested || ''}</span></div>
+                    </div>`
+                ).join('');
+                extraHtml += `<div class="mb-3 p-4 rounded-[var(--radius-lg)] bg-[color-mix(in_srgb,#EF4444_5%,transparent)] border border-[color-mix(in_srgb,#EF4444_20%,transparent)]">
+                    <p class="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-3">Grammar Corrections</p>
+                    <div class="space-y-3">${items}</div>
+                </div>`;
+            }
+            if (eval_.suggestions_for_improvement) {
+                extraHtml += `<div class="p-4 rounded-[var(--radius-lg)] bg-[color-mix(in_srgb,#10B981_5%,transparent)] border border-[color-mix(in_srgb,#10B981_20%,transparent)]">
+                    <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-2">Suggestions for Improvement</p>
+                    <p class="text-xs text-[var(--color-text-primary)] leading-relaxed">${eval_.suggestions_for_improvement}</p>
+                </div>`;
+            }
+        } else {
+            // Legacy v1
+            if (eval_.overall_feedback) {
+                extraHtml = `<div class="p-4 rounded-[var(--radius-lg)] bg-[color-mix(in_srgb,var(--color-primary)_5%,transparent)] border border-[color-mix(in_srgb,var(--color-primary)_15%,transparent)]">
+                    <p class="text-[10px] font-black text-[var(--color-primary)] uppercase tracking-widest mb-2">Feedback</p>
+                    <p class="text-sm text-[var(--color-text-primary)] leading-relaxed">${eval_.overall_feedback}</p>
+                </div>`;
+            }
+        }
 
         content.innerHTML = `
             <div class="flex items-center justify-between mb-6">
@@ -486,7 +559,7 @@
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-3 mb-4">${criteriaHtml}</div>
-            ${eval_.overall_feedback ? `<div class="p-4 rounded-[var(--radius-lg)] bg-[color-mix(in_srgb,var(--color-primary)_5%,transparent)] border border-[color-mix(in_srgb,var(--color-primary)_15%,transparent)]"><p class="text-[10px] font-black text-[var(--color-primary)] uppercase tracking-widest mb-2">Feedback</p><p class="text-sm text-[var(--color-text-primary)] leading-relaxed">${eval_.overall_feedback}</p></div>` : ''}
+            ${extraHtml}
         `;
 
         panel.style.display = 'block';
