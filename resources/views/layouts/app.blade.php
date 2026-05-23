@@ -122,7 +122,7 @@
                 @csrf
                 <button type="submit"
                     class="bg-white hover:bg-slate-50 dark:bg-surface-dark dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 px-6 py-2.5 rounded-full text-sm font-bold shadow-soft hover:shadow-premium transition-all duration-300 flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[18px]">logout</span>
+                    <img src="/storage/asset/icons/logout.svg" class="w-4 h-4 opacity-70" alt="Logout" />
                     Logout
                 </button>
             </form>
@@ -130,8 +130,7 @@
 
         <!-- Mobile Nav Toggle -->
         <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 text-slate-900 dark:text-white">
-            <span class="material-symbols-outlined text-3xl"
-                x-text="mobileMenuOpen ? 'close' : 'menu'">menu</span>
+            <img :src="mobileMenuOpen ? '/storage/asset/icons/close-circle.svg' : '/storage/asset/icons/menu.svg'" class="w-8 h-8 opacity-70" alt="Menu" />
         </button>
     </nav>
 
@@ -162,7 +161,8 @@
                 @csrf
                 <button type="submit"
                     class="w-full bg-white hover:bg-slate-50 dark:bg-surface-dark dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 py-4 rounded-xl font-bold shadow-soft flex items-center justify-center gap-2">
-                    <span class="material-symbols-outlined text-[20px]">logout</span> Logout
+                    <img src="/storage/asset/icons/logout.svg" class="w-5 h-5 opacity-70" alt="Logout" />
+                    Logout
                 </button>
             </form>
         </div>

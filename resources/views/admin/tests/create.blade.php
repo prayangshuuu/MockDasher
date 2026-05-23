@@ -3,110 +3,93 @@
 @section('title', 'Create New Exam')
 
 @section('breadcrumbs')
-    <nav class="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
-        <a href="{{ route('admin.dashboard') }}" class="hover:text-[var(--color-primary)] transition-colors">Dashboard</a>
-        <span class="material-symbols-outlined text-[12px]">chevron_right</span>
-        <a href="{{ route('admin.tests.index') }}" class="hover:text-[var(--color-primary)] transition-colors">Exams & Tests</a>
-        <span class="material-symbols-outlined text-[12px]">chevron_right</span>
-        <span class="font-semibold text-[var(--color-text-primary)]">Create Exam</span>
+    <nav class="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+        <a href="{{ route('admin.dashboard') }}" class="hover:text-primary transition-colors">Dashboard</a>
+        <img src="/storage/asset/icons/expand-more.svg" class="w-4 h-4 transform -rotate-90" alt=">" />
+        <a href="{{ route('admin.tests.index') }}" class="hover:text-primary transition-colors">Exams & Tests</a>
+        <img src="/storage/asset/icons/expand-more.svg" class="w-4 h-4 transform -rotate-90" alt=">" />
+        <span class="font-semibold text-slate-900 dark:text-white">Create Exam</span>
     </nav>
 @endsection
 
 @section('content')
 
-<div class="max-w-5xl mx-auto mb-10">
-    <div class="flex items-center mb-8">
-        <a href="{{ route('admin.tests.index') }}" class="flex items-center gap-1.5 text-sm font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-colors">
-            <span class="material-symbols-outlined text-lg">arrow_back</span>
+<div class="max-w-5xl mx-auto mb-10 space-y-8">
+    <div class="flex items-center">
+        <a href="{{ route('admin.tests.index') }}" class="flex items-center gap-2 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-primary transition-colors">
+            <img src="/storage/asset/icons/expand-more.svg" class="w-4 h-4 transform rotate-90 opacity-70" alt="<" />
             Back to Exams
         </a>
     </div>
 
-    {{-- ═══════════════════════════════════════════════════════════════════════
-         CREATE EXAM FORM - 2 COLUMN GRID
-         ═══════════════════════════════════════════════════════════════════════ --}}
-    <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        
-        {{-- Left: Details --}}
-        <div>
-            <h3 class="text-lg font-bold text-[var(--color-text-primary)]">Exam Details</h3>
-            <p class="mt-1 text-sm text-[var(--color-text-secondary)]">Provide the basic information for this test. Students will see these details before starting.</p>
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-3 items-start">
+
+        <div class="lg:col-span-1">
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">Exam Details</h3>
+            <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Provide the basic information for this test. Students will see these details before starting.</p>
         </div>
 
-        {{-- Right: Form Card --}}
         <div class="lg:col-span-2">
-            <x-ui.card>
-                <form action="{{ route('admin.tests.store') }}" method="POST">
+            <div class="bg-surface-light dark:bg-surface-dark p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-soft">
+                <form action="{{ route('admin.tests.store') }}" method="POST" class="space-y-8">
                     @csrf
-                    
+
                     <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        
-                        {{-- Book Number --}}
-                        <div>
-                            <x-ui.input 
-                                name="book_number" 
-                                label="IELTS Book Number" 
-                                type="number" 
-                                placeholder="e.g., 20" 
-                                min="1"
-                                required 
-                            />
+
+                        <div class="space-y-3">
+                            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">IELTS Book Number</label>
+                            <input type="number" name="book_number" placeholder="e.g., 20" min="1"
+                                   class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm" required>
                         </div>
 
-                        {{-- Year --}}
-                        <div>
-                            <x-ui.input 
-                                name="year" 
-                                label="Publication Year" 
-                                type="number" 
-                                placeholder="e.g., 2025" 
-                                min="1990"
-                                required 
-                            />
+                        <div class="space-y-3">
+                            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Publication Year</label>
+                            <input type="number" name="year" placeholder="e.g., 2025" min="1990"
+                                   class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm" required>
                         </div>
 
-                        {{-- Exam Type Select --}}
-                        <div>
-                            <label class="block mb-1.5 text-sm font-medium text-[var(--color-text-primary)]">Exam Type</label>
+                        <div class="space-y-3">
+                            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Exam Type</label>
                             <div class="relative">
-                                <select name="exam_type" class="block w-full appearance-none bg-[var(--color-bg-primary)] border border-[var(--color-divider)] rounded-[var(--radius-base)] px-4 py-2.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-ui cursor-pointer">
+                                <select name="exam_type" class="block w-full appearance-none bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm cursor-pointer">
                                     <option value="Academic">Academic</option>
                                     <option value="General Training">General Training</option>
                                 </select>
-                                <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[18px] text-[var(--color-text-secondary)] pointer-events-none">expand_more</span>
+                                <img src="/storage/asset/icons/expand-more.svg" class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-50 pointer-events-none" alt="v" />
                             </div>
                         </div>
 
-                        {{-- Status Select/Toggle --}}
-                        <div>
-                            <label class="block mb-1.5 text-sm font-medium text-[var(--color-text-primary)]">Status</label>
+                        <div class="space-y-3">
+                            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Status</label>
                             <div class="relative">
-                                <select name="status" class="block w-full appearance-none bg-[var(--color-bg-primary)] border border-[var(--color-divider)] rounded-[var(--radius-base)] px-4 py-2.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] transition-ui cursor-pointer">
+                                <select name="status" class="block w-full appearance-none bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm cursor-pointer">
                                     <option value="draft">Draft (Hidden)</option>
                                     <option value="published">Published (Visible)</option>
                                 </select>
-                                <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[18px] text-[var(--color-text-secondary)] pointer-events-none">expand_more</span>
+                                <img src="/storage/asset/icons/expand-more.svg" class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-50 pointer-events-none" alt="v" />
                             </div>
                         </div>
 
                     </div>
 
-                    {{-- Info Note --}}
-                    <div class="mt-6 flex items-start gap-3 rounded-[var(--radius-base)] bg-[color-mix(in_srgb,var(--color-primary)_5%,transparent)] border border-[color-mix(in_srgb,var(--color-primary)_10%,transparent)] p-4">
-                        <span class="material-symbols-outlined text-[var(--color-primary)] text-lg">info</span>
+                    <div class="flex items-start gap-4 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 p-5">
+                        <img src="/storage/asset/icons/info.svg" class="w-6 h-6 mt-0.5" alt="Info" />
                         <div>
-                            <p class="text-sm font-bold text-[var(--color-primary)]">Automatic Test Sets</p>
-                            <p class="text-xs text-[var(--color-text-secondary)] mt-0.5">Creating this exam will automatically generate 4 empty Test Sets (Set 1–4) for you to configure with module content.</p>
+                            <p class="text-sm font-bold text-slate-900 dark:text-white">Automatic Test Sets</p>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Creating this exam will automatically generate 4 empty Test Sets (Set 1–4) for you to configure with module content.</p>
                         </div>
                     </div>
 
-                    {{-- Form Footer --}}
-                    <div class="mt-8 pt-6 border-t border-[var(--color-divider)] flex items-center justify-end gap-3">
-                        <x-ui.button type="button" variant="secondary" href="{{ route('admin.tests.index') }}">Cancel</x-ui.button>
-                        <x-ui.button type="submit" variant="primary">Save Exam</x-ui.button>
+                    <div class="pt-8 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-4">
+                        <a href="{{ route('admin.tests.index') }}" class="px-6 py-2.5 text-sm font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl border border-slate-200 dark:border-slate-700 transition-colors shadow-sm">
+                            Cancel
+                        </a>
+                        <button type="submit" class="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-8 py-2.5 rounded-xl text-sm font-bold shadow-soft hover:shadow-premium transition-all duration-300">
+                            Save Exam
+                        </button>
                     </div>
                 </form>
-            </x-ui.card>
+            </div>
         </div>
     </div>
 </div>
