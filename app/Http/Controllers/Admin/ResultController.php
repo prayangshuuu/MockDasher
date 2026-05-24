@@ -30,9 +30,9 @@ class ResultController extends Controller
         $totalCompleted = TestAttempt::whereNotNull('completed_at')->count();
 
         // Global accuracy: percentage of attempts that were completed
-        $totalAttempts  = TestAttempt::count();
+        $totalAttempts = TestAttempt::count();
         $globalAccuracy = $totalAttempts > 0
-            ? round(($totalCompleted / $totalAttempts) * 100) . '%'
+            ? round(($totalCompleted / $totalAttempts) * 100).'%'
             : 'N/A';
 
         // Average time spent on completed attempts (start → complete)
@@ -42,9 +42,9 @@ class ResultController extends Controller
             ->value('avg_seconds');
 
         if ($avgSeconds !== null) {
-            $avgMinutes  = (int) round($avgSeconds / 60);
-            $hours       = intdiv($avgMinutes, 60);
-            $mins        = $avgMinutes % 60;
+            $avgMinutes = (int) round($avgSeconds / 60);
+            $hours = intdiv($avgMinutes, 60);
+            $mins = $avgMinutes % 60;
             $avgTimeSpent = $hours > 0 ? "{$hours}h {$mins}m" : "{$mins}m";
         } else {
             $avgTimeSpent = 'N/A';

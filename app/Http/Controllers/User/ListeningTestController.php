@@ -11,8 +11,10 @@ class ListeningTestController extends Controller
 {
     /** Time limits in seconds (+ grace for network latency) */
     private const LISTENING_LIMIT_SECONDS = 1800; // 30 minutes
-    private const TRANSFER_LIMIT_SECONDS  = 600;  // 10 minutes
-    private const GRACE_SECONDS           = 60;
+
+    private const TRANSFER_LIMIT_SECONDS = 600;  // 10 minutes
+
+    private const GRACE_SECONDS = 60;
 
     public function show(ListeningAttempt $attempt)
     {
@@ -28,7 +30,7 @@ class ListeningTestController extends Controller
             $attempt->refresh();
         }
 
-        $transferRemainingSeconds  = null;
+        $transferRemainingSeconds = null;
         $listeningRemainingSeconds = null;
 
         if ($attempt->status === 'transfer' && $attempt->transfer_started_at) {
@@ -45,8 +47,8 @@ class ListeningTestController extends Controller
             }
         }
 
-        $test     = $attempt->testSet->test;
-        $testSet  = $attempt->testSet;
+        $test = $attempt->testSet->test;
+        $testSet = $attempt->testSet;
         $sections = $testSet->listeningSections()
             ->with(['questions.options'])
             ->orderBy('section_number')
@@ -57,8 +59,8 @@ class ListeningTestController extends Controller
                 ->with('error', 'No listening sections configured for this test.');
         }
 
-        $answers        = $attempt->answers;
-        $savedAnswers   = $answers->pluck('answer_text', 'question_id')->toArray();
+        $answers = $attempt->answers;
+        $savedAnswers = $answers->pluck('answer_text', 'question_id')->toArray();
         $flaggedAnswers = $answers->filter(fn ($a) => $a->is_flagged)->pluck('is_flagged', 'question_id')->toArray();
 
         return view('user.listening-test.show', compact(
@@ -80,9 +82,9 @@ class ListeningTestController extends Controller
         }
 
         $request->validate([
-            'answers'   => 'array|max:50',
+            'answers' => 'array|max:50',
             'answers.*' => 'nullable|string|max:1000',
-            'flagged'   => 'array|max:50',
+            'flagged' => 'array|max:50',
             'flagged.*' => 'nullable|boolean',
         ]);
 
@@ -108,10 +110,12 @@ class ListeningTestController extends Controller
 
             if ($nextSection > 4) {
                 $attempt->update(['status' => 'transfer', 'transfer_started_at' => now()]);
+
                 return response()->json(['status' => 'transfer', 'transfer_seconds' => self::TRANSFER_LIMIT_SECONDS]);
             }
 
             $attempt->update(['current_section' => $nextSection]);
+
             return response()->json(['status' => 'next', 'next_section' => $nextSection]);
         }
 
@@ -124,9 +128,9 @@ class ListeningTestController extends Controller
         abort_if($attempt->status === 'completed', 403);
 
         $request->validate([
-            'answers'   => 'array|max:50',
+            'answers' => 'array|max:50',
             'answers.*' => 'nullable|string|max:1000',
-            'flagged'   => 'array|max:50',
+            'flagged' => 'array|max:50',
             'flagged.*' => 'nullable|boolean',
         ]);
 
@@ -197,13 +201,13 @@ class ListeningTestController extends Controller
             }
             ListeningAnswer::updateOrCreate(
                 [
-                    'user_id'         => auth()->id(),
+                    'user_id' => auth()->id(),
                     'test_attempt_id' => $attempt->id,
-                    'question_id'     => (int) $questionId,
+                    'question_id' => (int) $questionId,
                 ],
                 [
                     'answer_text' => $answerText,
-                    'is_flagged'  => ! empty($flagged[$questionId]),
+                    'is_flagged' => ! empty($flagged[$questionId]),
                 ]
             );
         }
@@ -214,9 +218,9 @@ class ListeningTestController extends Controller
             }
             ListeningAnswer::updateOrCreate(
                 [
-                    'user_id'         => auth()->id(),
+                    'user_id' => auth()->id(),
                     'test_attempt_id' => $attempt->id,
-                    'question_id'     => (int) $questionId,
+                    'question_id' => (int) $questionId,
                 ],
                 ['is_flagged' => (bool) $isFlagged]
             );

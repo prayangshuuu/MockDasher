@@ -13,6 +13,8 @@ class AiSpeakingEvaluation extends Model
         'evaluation_json',   // Full aggregated Gemini JSON for all speaking parts
         'evaluation_text',   // Legacy text field
         'band_score',        // Overall averaged band score
+        'evaluation_status',
+        'failure_reason',
     ];
 
     protected function casts(): array

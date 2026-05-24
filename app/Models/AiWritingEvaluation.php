@@ -17,6 +17,8 @@ class AiWritingEvaluation extends Model
         'task_2_band_score',         // Band score for Task 2
         'evaluation_text',           // Legacy combined evaluation text
         'band_score',                // Overall averaged band score
+        'evaluation_status',
+        'failure_reason',
     ];
 
     protected function casts(): array
@@ -24,7 +26,7 @@ class AiWritingEvaluation extends Model
         return [
             'task_1_band_score' => 'float',
             'task_2_band_score' => 'float',
-            'band_score'        => 'float',
+            'band_score' => 'float',
         ];
     }
 

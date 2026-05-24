@@ -3,17 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Question;
 use App\Models\Test;
 use App\Models\TestAttempt;
-use App\Models\TestSet;
 use App\Models\User;
-use App\Models\Question;
 
 class AdminDashboardController extends Controller
 {
     public function index()
     {
-        $totalAttempts     = TestAttempt::count();
+        $totalAttempts = TestAttempt::count();
         $completedAttempts = TestAttempt::where('status', 'completed')->count();
 
         $totalUsers = User::count();

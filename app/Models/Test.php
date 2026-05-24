@@ -8,7 +8,7 @@ class Test extends Model
 {
     protected $fillable = ['book_number', 'year', 'exam_type', 'status'];
 
-    public function testSets()
+    public function test_sets()
     {
         return $this->hasMany(TestSet::class);
     }

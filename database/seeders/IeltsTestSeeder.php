@@ -2,11 +2,15 @@
 
 namespace Database\Seeders;
 
+use App\Models\ListeningSection;
 use App\Models\Question;
+use App\Models\QuestionOption;
 use App\Models\ReadingPassage;
 use App\Models\ReadingQuestionGroup;
+use App\Models\SpeakingQuestion;
 use App\Models\Test;
 use App\Models\TestSet;
+use App\Models\WritingTask;
 use Illuminate\Database\Seeder;
 
 class IeltsTestSeeder extends Seeder
@@ -150,23 +154,23 @@ class IeltsTestSeeder extends Seeder
         ]);
 
         // ── Writing Tasks ──
-        \App\Models\WritingTask::updateOrCreate(
+        WritingTask::updateOrCreate(
             ['test_set_id' => $testSet->id, 'task_number' => 1],
             [
                 'task_title' => 'Writing Task 1',
                 'task_description' => 'You should spend about 20 minutes on this task.',
-                'task_prompt' => 'The first table below shows changes in the total population of New York City from 1800 to 2000. The second and third tables show changes in the population of the five districts of the city (Manhattan, Brooklyn, Bronx, Queens, Staten Island) over the same period.' . "\n\n" . 'Summarise the information by selecting and reporting the main features, and make comparisons where relevant.',
+                'task_prompt' => 'The first table below shows changes in the total population of New York City from 1800 to 2000. The second and third tables show changes in the population of the five districts of the city (Manhattan, Brooklyn, Bronx, Queens, Staten Island) over the same period.'."\n\n".'Summarise the information by selecting and reporting the main features, and make comparisons where relevant.',
                 'instruction_text' => 'Write at least 150 words.',
                 'minimum_word_count' => 150,
             ]
         );
 
-        \App\Models\WritingTask::updateOrCreate(
+        WritingTask::updateOrCreate(
             ['test_set_id' => $testSet->id, 'task_number' => 2],
             [
                 'task_title' => 'Writing Task 2',
                 'task_description' => 'You should spend about 40 minutes on this task.',
-                'task_prompt' => 'Write about the following topic:' . "\n\n" . 'Access to clean water is a basic human right. Therefore every home should have a water supply that is provided free of charge.' . "\n\n" . 'Do you agree or disagree?' . "\n\n" . 'Give reasons for your answer and include any relevant examples from your own knowledge or experience.',
+                'task_prompt' => 'Write about the following topic:'."\n\n".'Access to clean water is a basic human right. Therefore every home should have a water supply that is provided free of charge.'."\n\n".'Do you agree or disagree?'."\n\n".'Give reasons for your answer and include any relevant examples from your own knowledge or experience.',
                 'instruction_text' => 'Write at least 250 words.',
                 'minimum_word_count' => 250,
             ]
@@ -191,26 +195,26 @@ class IeltsTestSeeder extends Seeder
         ];
 
         foreach ($speakingData as $sq) {
-            \App\Models\SpeakingQuestion::updateOrCreate(
+            SpeakingQuestion::updateOrCreate(
                 ['test_set_id' => $testSet->id, 'part' => $sq['part'], 'question_text' => $sq['question_text']],
                 ['time_limit' => $sq['time_limit'], 'preparation_instructions' => $sq['preparation_instructions']]
             );
         }
 
         // ── Listening Sections & Questions ──
-        $sec1 = \App\Models\ListeningSection::updateOrCreate(
+        $sec1 = ListeningSection::updateOrCreate(
             ['test_set_id' => $testSet->id, 'section_number' => 1],
             ['instruction_text' => 'Complete the table below. Write ONE WORD AND/OR A NUMBER for each answer.', 'passage_text' => null]
         );
-        $sec2 = \App\Models\ListeningSection::updateOrCreate(
+        $sec2 = ListeningSection::updateOrCreate(
             ['test_set_id' => $testSet->id, 'section_number' => 2],
             ['instruction_text' => 'Choose the correct letter, A, B or C.', 'passage_text' => null]
         );
-        $sec3 = \App\Models\ListeningSection::updateOrCreate(
+        $sec3 = ListeningSection::updateOrCreate(
             ['test_set_id' => $testSet->id, 'section_number' => 3],
             ['instruction_text' => 'Choose TWO letters, A-E.', 'passage_text' => null]
         );
-        $sec4 = \App\Models\ListeningSection::updateOrCreate(
+        $sec4 = ListeningSection::updateOrCreate(
             ['test_set_id' => $testSet->id, 'section_number' => 4],
             ['instruction_text' => 'Complete the notes below. Write ONE WORD ONLY for each answer.', 'passage_text' => null]
         );
@@ -230,7 +234,7 @@ class IeltsTestSeeder extends Seeder
         ];
         foreach ($s1Questions as $sq) {
             Question::updateOrCreate(
-                ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec1->id, 'question_text' => $sq[0]],
+                ['questionable_type' => ListeningSection::class, 'questionable_id' => $sec1->id, 'question_text' => $sq[0]],
                 ['question_type' => 'short_answer', 'correct_answer' => $sq[1]]
             );
         }
@@ -270,11 +274,11 @@ class IeltsTestSeeder extends Seeder
         ];
         foreach ($s2McqData as $mcq) {
             $q = Question::updateOrCreate(
-                ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec2->id, 'question_text' => $mcq[0]],
+                ['questionable_type' => ListeningSection::class, 'questionable_id' => $sec2->id, 'question_text' => $mcq[0]],
                 ['question_type' => 'multiple_choice', 'correct_answer' => $mcq[1]]
             );
             foreach ($mcq[2] as $letter => $text) {
-                \App\Models\QuestionOption::updateOrCreate(
+                QuestionOption::updateOrCreate(
                     ['question_id' => $q->id, 'option_text' => $text],
                     ['is_correct' => ($letter === $mcq[1])]
                 );
@@ -302,11 +306,11 @@ class IeltsTestSeeder extends Seeder
         ];
         foreach ($s2ChooseTwo as $ct) {
             $q = Question::updateOrCreate(
-                ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec2->id, 'question_text' => $ct[0]],
+                ['questionable_type' => ListeningSection::class, 'questionable_id' => $sec2->id, 'question_text' => $ct[0]],
                 ['question_type' => 'multiple_choice', 'correct_answer' => $ct[1]]
             );
             foreach ($ct[2] as $letter => $text) {
-                \App\Models\QuestionOption::updateOrCreate(
+                QuestionOption::updateOrCreate(
                     ['question_id' => $q->id, 'option_text' => $text],
                     ['is_correct' => ($letter === $ct[1])]
                 );
@@ -342,11 +346,11 @@ class IeltsTestSeeder extends Seeder
         ];
         foreach ($s3ChooseTwo as $ct) {
             $q = Question::updateOrCreate(
-                ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec3->id, 'question_text' => $ct[0]],
+                ['questionable_type' => ListeningSection::class, 'questionable_id' => $sec3->id, 'question_text' => $ct[0]],
                 ['question_type' => 'multiple_choice', 'correct_answer' => $ct[1]]
             );
             foreach ($ct[2] as $letter => $text) {
-                \App\Models\QuestionOption::updateOrCreate(
+                QuestionOption::updateOrCreate(
                     ['question_id' => $q->id, 'option_text' => $text],
                     ['is_correct' => ($letter === $ct[1])]
                 );
@@ -378,11 +382,11 @@ class IeltsTestSeeder extends Seeder
         ];
         foreach ($s3McqData as $mcq) {
             $q = Question::updateOrCreate(
-                ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec3->id, 'question_text' => $mcq[0]],
+                ['questionable_type' => ListeningSection::class, 'questionable_id' => $sec3->id, 'question_text' => $mcq[0]],
                 ['question_type' => 'multiple_choice', 'correct_answer' => $mcq[1]]
             );
             foreach ($mcq[2] as $letter => $text) {
-                \App\Models\QuestionOption::updateOrCreate(
+                QuestionOption::updateOrCreate(
                     ['question_id' => $q->id, 'option_text' => $text],
                     ['is_correct' => ($letter === $mcq[1])]
                 );
@@ -404,7 +408,7 @@ class IeltsTestSeeder extends Seeder
         ];
         foreach ($s4Questions as $sq) {
             Question::updateOrCreate(
-                ['questionable_type' => \App\Models\ListeningSection::class, 'questionable_id' => $sec4->id, 'question_text' => $sq[0]],
+                ['questionable_type' => ListeningSection::class, 'questionable_id' => $sec4->id, 'question_text' => $sq[0]],
                 ['question_type' => 'short_answer', 'correct_answer' => $sq[1]]
             );
         }
@@ -423,7 +427,7 @@ class IeltsTestSeeder extends Seeder
     private function seedQuestions(ReadingQuestionGroup $group, string $type, array $items): void
     {
         // Remove old questions for this group first
-        $group->questions()->each(fn(Question $q) => tap($q, fn(Question $q) => $q->options()->delete())->delete());
+        $group->questions()->each(fn (Question $q) => tap($q, fn (Question $q) => $q->options()->delete())->delete());
 
         foreach ($items as [$text, $answer]) {
             $group->questions()->create([
@@ -436,7 +440,7 @@ class IeltsTestSeeder extends Seeder
 
     private function seedMCQLetters(ReadingQuestionGroup $group, array $items): void
     {
-        $group->questions()->each(fn(Question $q) => tap($q, fn(Question $q) => $q->options()->delete())->delete());
+        $group->questions()->each(fn (Question $q) => tap($q, fn (Question $q) => $q->options()->delete())->delete());
 
         foreach ($items as [$text, $answer]) {
             $group->questions()->create([
@@ -449,7 +453,7 @@ class IeltsTestSeeder extends Seeder
 
     private function seedMCQWithOptions(ReadingQuestionGroup $group, array $items): void
     {
-        $group->questions()->each(fn(Question $q) => tap($q, fn(Question $q) => $q->options()->delete())->delete());
+        $group->questions()->each(fn (Question $q) => tap($q, fn (Question $q) => $q->options()->delete())->delete());
 
         foreach ($items as [$text, $options, $correctLetter]) {
             $q = $group->questions()->create([
@@ -511,6 +515,7 @@ class IeltsTestSeeder extends Seeder
 
 <p><strong>G.</strong> All of this raises questions of social acceptance, acknowledges Russell. "If we\'re putting elm back into the landscape, a small element of it is not native - are we bothered about that?" For her, the environmental case for reintroducing elm is strong. "They will host wildlife, which is a good thing." Others are more wary. "On the face of it, it seems like a good idea," says Elliot. The problem, he suggests, is that, "You\'re replacing a native species with a horticultural analogue. You\'re effectively cloning." There\'s also the risk of introducing new diseases. Rather than plant new elms, the Woodland Trust emphasises providing space to those elms that have survived independently. "Sometimes the best thing you can do is just give nature time to recover... over time, you might get resistance," says Elliot.</p>';
     }
+
     private function passage3Content(): string
     {
         return '<p><strong>The impact of stress and social media on mental health</strong></p>

@@ -24,9 +24,9 @@ class UpdateTestRequest extends FormRequest
     {
         return [
             'book_number' => 'required|integer|min:1',
-            'year'        => 'required|integer|min:1900|max:2100',
-            'exam_type'   => 'required|string|max:255',
-            'status'      => 'required|in:draft,published',
+            'year' => 'required|integer|min:1900|max:2100',
+            'exam_type' => 'required|string|max:255',
+            'status' => 'required|in:draft,published',
         ];
     }
 }

@@ -10,7 +10,8 @@ use Illuminate\Http\Request;
 class ReadingTestController extends Controller
 {
     private const READING_LIMIT_SECONDS = 3600; // 60 minutes
-    private const GRACE_SECONDS         = 60;
+
+    private const GRACE_SECONDS = 60;
 
     public function show(ReadingAttempt $attempt)
     {
@@ -26,15 +27,15 @@ class ReadingTestController extends Controller
             $attempt->refresh();
         }
 
-        $elapsed          = (int) now()->diffInSeconds($attempt->started_at);
+        $elapsed = (int) now()->diffInSeconds($attempt->started_at);
         $remainingSeconds = (int) max(0, self::READING_LIMIT_SECONDS - $elapsed);
 
         if ($remainingSeconds <= 0) {
             return $this->forceSubmit($attempt);
         }
 
-        $testSet  = $attempt->testSet;
-        $test     = $testSet->test;
+        $testSet = $attempt->testSet;
+        $test = $testSet->test;
         $passages = $testSet->readingPassages()
             ->with(['questionGroups' => fn ($q) => $q->with(['questions.options'])])
             ->orderBy('passage_number')
@@ -45,8 +46,8 @@ class ReadingTestController extends Controller
                 ->with('error', 'No reading passages found for this test.');
         }
 
-        $answers        = $attempt->answers;
-        $savedAnswers   = $answers->pluck('answer_text', 'question_id')->toArray();
+        $answers = $attempt->answers;
+        $savedAnswers = $answers->pluck('answer_text', 'question_id')->toArray();
         $flaggedAnswers = $answers->filter(fn ($a) => $a->is_flagged)->pluck('is_flagged', 'question_id')->toArray();
 
         return view('user.reading-test.show', compact(
@@ -67,9 +68,9 @@ class ReadingTestController extends Controller
         }
 
         $request->validate([
-            'answers'   => 'array|max:50',
+            'answers' => 'array|max:50',
             'answers.*' => 'nullable|string|max:1000',
-            'flagged'   => 'array|max:50',
+            'flagged' => 'array|max:50',
             'flagged.*' => 'nullable|boolean',
         ]);
 
@@ -89,9 +90,9 @@ class ReadingTestController extends Controller
         abort_if($attempt->status === 'completed', 403);
 
         $request->validate([
-            'answers'   => 'array|max:50',
+            'answers' => 'array|max:50',
             'answers.*' => 'nullable|string|max:1000',
-            'flagged'   => 'array|max:50',
+            'flagged' => 'array|max:50',
             'flagged.*' => 'nullable|boolean',
         ]);
 
@@ -116,14 +117,14 @@ class ReadingTestController extends Controller
             return redirect()->route('user.reading.show', $attempt->id);
         }
 
-        $testSet  = $attempt->testSet;
-        $test     = $testSet->test;
+        $testSet = $attempt->testSet;
+        $test = $testSet->test;
         $passages = $testSet->readingPassages()
             ->with(['questionGroups' => fn ($q) => $q->with(['questions.options'])])
             ->orderBy('passage_number')
             ->get();
 
-        $answers        = $attempt->answers()->with('question')->get()->keyBy('question_id');
+        $answers = $attempt->answers()->with('question')->get()->keyBy('question_id');
         $totalQuestions = $passages
             ->flatMap(fn ($p) => $p->questionGroups->flatMap(fn ($g) => $g->questions))
             ->count();
@@ -176,13 +177,13 @@ class ReadingTestController extends Controller
             }
             ReadingAnswer::updateOrCreate(
                 [
-                    'user_id'         => auth()->id(),
+                    'user_id' => auth()->id(),
                     'test_attempt_id' => $attempt->id,
-                    'question_id'     => (int) $questionId,
+                    'question_id' => (int) $questionId,
                 ],
                 [
                     'answer_text' => $answerText,
-                    'is_flagged'  => ! empty($flagged[$questionId]),
+                    'is_flagged' => ! empty($flagged[$questionId]),
                 ]
             );
         }
@@ -193,9 +194,9 @@ class ReadingTestController extends Controller
             }
             ReadingAnswer::updateOrCreate(
                 [
-                    'user_id'         => auth()->id(),
+                    'user_id' => auth()->id(),
                     'test_attempt_id' => $attempt->id,
-                    'question_id'     => (int) $questionId,
+                    'question_id' => (int) $questionId,
                 ],
                 ['is_flagged' => (bool) $isFlagged]
             );

@@ -69,34 +69,34 @@ class DashboardStatsService
 
         if ($readingAvg) {
             $moduleBreakdown[] = [
-                'name'       => 'Reading',
-                'score'      => round($readingAvg * 2) / 2,
+                'name' => 'Reading',
+                'score' => round($readingAvg * 2) / 2,
                 'percentage' => round(($readingAvg / 9) * 100),
-                'type'       => 'primary',
+                'type' => 'primary',
             ];
         }
 
         if ($listeningAvg) {
             $moduleBreakdown[] = [
-                'name'       => 'Listening',
-                'score'      => round($listeningAvg * 2) / 2,
+                'name' => 'Listening',
+                'score' => round($listeningAvg * 2) / 2,
                 'percentage' => round(($listeningAvg / 9) * 100),
-                'type'       => 'primary',
+                'type' => 'primary',
             ];
         }
 
         $moduleBreakdown[] = [
-            'name'       => 'Writing',
-            'score'      => $writingAvg !== null ? round($writingAvg * 2) / 2 : null,
+            'name' => 'Writing',
+            'score' => $writingAvg !== null ? round($writingAvg * 2) / 2 : null,
             'percentage' => $writingAvg !== null ? round(($writingAvg / 9) * 100) : 0,
-            'type'       => $writingAvg !== null ? 'primary' : 'muted',
+            'type' => $writingAvg !== null ? 'primary' : 'muted',
         ];
 
         $moduleBreakdown[] = [
-            'name'       => 'Speaking',
-            'score'      => $speakingAvg !== null ? round($speakingAvg * 2) / 2 : null,
+            'name' => 'Speaking',
+            'score' => $speakingAvg !== null ? round($speakingAvg * 2) / 2 : null,
             'percentage' => $speakingAvg !== null ? round(($speakingAvg / 9) * 100) : 0,
-            'type'       => $speakingAvg !== null ? 'primary' : 'muted',
+            'type' => $speakingAvg !== null ? 'primary' : 'muted',
         ];
 
         return $moduleBreakdown;

@@ -36,7 +36,7 @@ return [
     ],
 
     'gemini' => [
-        'key'   => env('GEMINI_API_KEY'),
+        'key' => env('GEMINI_API_KEY'),
         'model' => env('GEMINI_MODEL', 'gemini-2.5-flash'),
     ],
 
@@ -44,8 +44,8 @@ return [
         'speaking_part1_context' => env('IELTS_SPEAKING_PART1_CONTEXT', 'IELTS Speaking Part 1: The examiner asks about familiar topics.'),
         'speaking_part2_context' => env('IELTS_SPEAKING_PART2_CONTEXT', 'IELTS Speaking Part 2: The candidate speaks for 1-2 minutes on a topic.'),
         'speaking_part3_context' => env('IELTS_SPEAKING_PART3_CONTEXT', 'IELTS Speaking Part 3: The examiner and candidate discuss abstract topics.'),
-        'writing_task1_context'  => env('IELTS_WRITING_TASK1_CONTEXT', 'IELTS Writing Task 1: Summarise the graph/chart in at least 150 words.'),
-        'writing_task2_context'  => env('IELTS_WRITING_TASK2_CONTEXT', 'IELTS Writing Task 2: Write an essay of at least 250 words.'),
+        'writing_task1_context' => env('IELTS_WRITING_TASK1_CONTEXT', 'IELTS Writing Task 1: Summarise the graph/chart in at least 150 words.'),
+        'writing_task2_context' => env('IELTS_WRITING_TASK2_CONTEXT', 'IELTS Writing Task 2: Write an essay of at least 250 words.'),
     ],
 
 ];

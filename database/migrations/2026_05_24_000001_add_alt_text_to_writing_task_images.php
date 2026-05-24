@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::table('writing_task_images', function (Blueprint $table) {
             $table->longText('alt_text')->nullable()->after('image_path')
-                  ->comment('Admin description of the chart/graph sent to Gemini for AI evaluation');
+                ->comment('Admin description of the chart/graph sent to Gemini for AI evaluation');
         });
     }
 

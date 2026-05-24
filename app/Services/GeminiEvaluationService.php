@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -18,7 +19,9 @@ use Illuminate\Support\Facades\Log;
 class GeminiEvaluationService
 {
     protected string $apiKey;
+
     protected string $endpoint;
+
     protected string $model;
 
     /**
@@ -27,20 +30,19 @@ class GeminiEvaluationService
     public function __construct(?string $apiKey = null)
     {
         // Prefer per-user key; fall back to global config key
-        $this->apiKey   = $apiKey ?? config('services.gemini.key', '');
-        $this->model    = config('services.gemini.model', 'gemini-2.5-flash');
+        $this->apiKey = $apiKey ?? config('services.gemini.key', '');
+        $this->model = config('services.gemini.model', 'gemini-2.5-flash');
         $this->endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent";
     }
 
     /**
      * Create a service instance using a specific user's API key.
      * Falls back to the global env key if the user has no key set.
-     *
-     * @param  \App\Models\User|null  $user
      */
-    public static function forUser(?\App\Models\User $user = null): static
+    public static function forUser(?User $user = null): static
     {
         $key = $user?->getRawOriginal('gemini_api_key') ?? null;
+
         return new static($key ?: null);
     }
 
@@ -55,47 +57,47 @@ class GeminiEvaluationService
     private function getSystemInstruction(): string
     {
         return 'You are an expert, highly rigorous IELTS Examiner AI. '
-            . 'Your sole function is to evaluate student responses for IELTS Speaking (Parts 1, 2, 3) and IELTS Writing (Tasks 1 and 2). '
-            . 'You evaluate strictly according to official IELTS band descriptors. '
-            . "\n\nEvaluation Rules:\n"
-            . "1. Read the MODULE_TYPE, PART_CONTEXT, QUESTION, IMAGE_DESCRIPTION (if any), and STUDENT_ANSWER.\n"
-            . "2. Assign a Band Score (0–9, in 0.5 increments) for overall and all 4 criteria.\n"
-            . "3. Provide constructive, specific feedback and actionable improvements.\n"
-            . "4. CRITICAL: Output ONLY valid JSON. No markdown fences, no preamble. First char must be { and last must be }.\n"
-            . "\n--- OUTPUT SCHEMA ---\n"
-            . "If MODULE_TYPE contains \"Speaking\":\n"
-            . "{\n"
-            . "  \"evaluation_type\": \"Speaking\",\n"
-            . "  \"module_type\": \"Speaking Part N\",\n"
-            . "  \"overall_band_score\": 0.0,\n"
-            . "  \"criteria_scores\": {\n"
-            . "    \"fluency_and_coherence\": 0.0,\n"
-            . "    \"lexical_resource\": 0.0,\n"
-            . "    \"grammatical_range_and_accuracy\": 0.0,\n"
-            . "    \"pronunciation\": 0.0\n"
-            . "  },\n"
-            . "  \"detailed_feedback\": \"Specific analysis of strengths and weaknesses.\",\n"
-            . "  \"vocabulary_corrections\": [{\"incorrect\": \"...\", \"suggested\": \"...\"}],\n"
-            . "  \"grammar_corrections\": [{\"incorrect\": \"...\", \"suggested\": \"...\"}],\n"
-            . "  \"suggestions_for_improvement\": \"Actionable advice.\"\n"
-            . "}\n"
-            . "\nIf MODULE_TYPE contains \"Writing\":\n"
-            . "{\n"
-            . "  \"evaluation_type\": \"Writing\",\n"
-            . "  \"module_type\": \"Writing Task N\",\n"
-            . "  \"overall_band_score\": 0.0,\n"
-            . "  \"criteria_scores\": {\n"
-            . "    \"task_achievement_or_response\": 0.0,\n"
-            . "    \"coherence_and_cohesion\": 0.0,\n"
-            . "    \"lexical_resource\": 0.0,\n"
-            . "    \"grammatical_range_and_accuracy\": 0.0\n"
-            . "  },\n"
-            . "  \"detailed_feedback\": \"Detailed analysis of task fulfillment, structure, vocabulary, grammar.\",\n"
-            . "  \"vocabulary_corrections\": [{\"incorrect\": \"...\", \"suggested\": \"...\"}],\n"
-            . "  \"grammar_corrections\": [{\"incorrect\": \"...\", \"suggested\": \"...\"}],\n"
-            . "  \"suggestions_for_improvement\": \"Actionable advice.\"\n"
-            . "}\n"
-            . "\nProceed with the evaluation and output the JSON now.";
+            .'Your sole function is to evaluate student responses for IELTS Speaking (Parts 1, 2, 3) and IELTS Writing (Tasks 1 and 2). '
+            .'You evaluate strictly according to official IELTS band descriptors. '
+            ."\n\nEvaluation Rules:\n"
+            ."1. Read the MODULE_TYPE, PART_CONTEXT, QUESTION, IMAGE_DESCRIPTION (if any), and STUDENT_ANSWER.\n"
+            ."2. Assign a Band Score (0–9, in 0.5 increments) for overall and all 4 criteria.\n"
+            ."3. Provide constructive, specific feedback and actionable improvements.\n"
+            ."4. CRITICAL: Output ONLY valid JSON. No markdown fences, no preamble. First char must be { and last must be }.\n"
+            ."\n--- OUTPUT SCHEMA ---\n"
+            ."If MODULE_TYPE contains \"Speaking\":\n"
+            ."{\n"
+            ."  \"evaluation_type\": \"Speaking\",\n"
+            ."  \"module_type\": \"Speaking Part N\",\n"
+            ."  \"overall_band_score\": 0.0,\n"
+            ."  \"criteria_scores\": {\n"
+            ."    \"fluency_and_coherence\": 0.0,\n"
+            ."    \"lexical_resource\": 0.0,\n"
+            ."    \"grammatical_range_and_accuracy\": 0.0,\n"
+            ."    \"pronunciation\": 0.0\n"
+            ."  },\n"
+            ."  \"detailed_feedback\": \"Specific analysis of strengths and weaknesses.\",\n"
+            ."  \"vocabulary_corrections\": [{\"incorrect\": \"...\", \"suggested\": \"...\"}],\n"
+            ."  \"grammar_corrections\": [{\"incorrect\": \"...\", \"suggested\": \"...\"}],\n"
+            ."  \"suggestions_for_improvement\": \"Actionable advice.\"\n"
+            ."}\n"
+            ."\nIf MODULE_TYPE contains \"Writing\":\n"
+            ."{\n"
+            ."  \"evaluation_type\": \"Writing\",\n"
+            ."  \"module_type\": \"Writing Task N\",\n"
+            ."  \"overall_band_score\": 0.0,\n"
+            ."  \"criteria_scores\": {\n"
+            ."    \"task_achievement_or_response\": 0.0,\n"
+            ."    \"coherence_and_cohesion\": 0.0,\n"
+            ."    \"lexical_resource\": 0.0,\n"
+            ."    \"grammatical_range_and_accuracy\": 0.0\n"
+            ."  },\n"
+            ."  \"detailed_feedback\": \"Detailed analysis of task fulfillment, structure, vocabulary, grammar.\",\n"
+            ."  \"vocabulary_corrections\": [{\"incorrect\": \"...\", \"suggested\": \"...\"}],\n"
+            ."  \"grammar_corrections\": [{\"incorrect\": \"...\", \"suggested\": \"...\"}],\n"
+            ."  \"suggestions_for_improvement\": \"Actionable advice.\"\n"
+            ."}\n"
+            ."\nProceed with the evaluation and output the JSON now.";
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -105,9 +107,9 @@ class GeminiEvaluationService
     /**
      * Evaluate a single IELTS Speaking question.
      *
-     * @param  int     $part      1, 2, or 3
+     * @param  int  $part  1, 2, or 3
      * @param  string  $question  The examiner question / cue card text
-     * @param  string  $answer    Candidate's spoken answer (transcript text)
+     * @param  string  $answer  Candidate's spoken answer (transcript text)
      * @return array{success: bool, evaluation_text: string|null, band_score: float|null, parsed: array|null}
      */
     public function evaluateSpeakingQuestion(int $part, string $question, string $answer): array
@@ -132,7 +134,7 @@ class GeminiEvaluationService
             "MODULE_TYPE: {$moduleType}",
             "PART_CONTEXT: {$partContext}",
             "QUESTION: {$question}",
-            "IMAGE_DESCRIPTION: N/A",
+            'IMAGE_DESCRIPTION: N/A',
             "STUDENT_ANSWER: {$answerText}",
         ]);
 
@@ -146,10 +148,10 @@ class GeminiEvaluationService
     /**
      * Evaluate a single IELTS Writing task.
      *
-     * @param  int         $taskNumber   1 or 2
-     * @param  string      $question     The full task prompt / essay question
-     * @param  string|null $imageAltText Admin description of the chart/graph (Task 1 only)
-     * @param  string      $answer       Candidate's written answer
+     * @param  int  $taskNumber  1 or 2
+     * @param  string  $question  The full task prompt / essay question
+     * @param  string|null  $imageAltText  Admin description of the chart/graph (Task 1 only)
+     * @param  string  $answer  Candidate's written answer
      * @return array{success: bool, evaluation_text: string|null, band_score: float|null, parsed: array|null}
      */
     public function evaluateWritingTask(int $taskNumber, string $question, ?string $imageAltText, string $answer): array
@@ -197,22 +199,22 @@ class GeminiEvaluationService
      * @deprecated Use evaluateWritingTask() per task for better UX.
      */
     public function evaluateWriting(
-        string  $task1Question,
+        string $task1Question,
         ?string $task1ImageAltText,
-        string  $task2Question,
+        string $task2Question,
         ?string $task1Answer,
         ?string $task2Answer
     ): array {
         $task1Context = config('services.ielts.writing_task1_context', 'IELTS Writing Task 1: Summarise the graph/chart in at least 150 words.');
         $task2Context = config('services.ielts.writing_task2_context', 'IELTS Writing Task 2: Write an essay of at least 250 words.');
 
-        $batchInstruction = $this->getSystemInstruction() . "\n\n"
-            . "BATCH MODE: Evaluate BOTH Task 1 AND Task 2. Return JSON with shape:\n"
-            . "{ \"overall_band_score\": <avg rounded to 0.5>, \"task_1\": {<full Writing schema>}, \"task_2\": {<full Writing schema>} }";
+        $batchInstruction = $this->getSystemInstruction()."\n\n"
+            ."BATCH MODE: Evaluate BOTH Task 1 AND Task 2. Return JSON with shape:\n"
+            .'{ "overall_band_score": <avg rounded to 0.5>, "task_1": {<full Writing schema>}, "task_2": {<full Writing schema>} }';
 
         $img1 = ! empty(trim($task1ImageAltText ?? '')) ? trim($task1ImageAltText) : 'N/A';
-        $a1   = trim($task1Answer ?? '') ?: '[No answer submitted.]';
-        $a2   = trim($task2Answer ?? '') ?: '[No answer submitted.]';
+        $a1 = trim($task1Answer ?? '') ?: '[No answer submitted.]';
+        $a2 = trim($task2Answer ?? '') ?: '[No answer submitted.]';
 
         $userPrompt = implode("\n\n", [
             "--- TASK 1 ---\nMODULE_TYPE: Writing Task 1\nTASK_CONTEXT: {$task1Context}\nQUESTION: {$task1Question}\nIMAGE_DESCRIPTION: {$img1}\nSTUDENT_ANSWER: {$a1}",
@@ -230,27 +232,28 @@ class GeminiEvaluationService
      * Evaluate all IELTS Speaking answers in a single API call.
      *
      * @param  array  $qaItems  Each item: ['part' => int, 'question' => string, 'answer' => string]
+     *
      * @deprecated Use evaluateSpeakingQuestion() per question for better UX.
      */
     public function evaluateSpeaking(array $qaItems): array
     {
-        $batchInstruction = $this->getSystemInstruction() . "\n\n"
-            . "BATCH MODE: Evaluate ALL Speaking answers (Parts 1–3) together. Return JSON:\n"
-            . "{ \"overall_band_score\": <avg>, \"criteria_scores\": { ... }, "
-            . "\"detailed_feedback\": \"...\", \"vocabulary_corrections\": [...], "
-            . "\"grammar_corrections\": [...], \"suggestions_for_improvement\": \"...\", "
-            . "\"per_question_feedback\": [{\"part\": N, \"question\": \"...\", \"feedback\": \"...\"}] }";
+        $batchInstruction = $this->getSystemInstruction()."\n\n"
+            ."BATCH MODE: Evaluate ALL Speaking answers (Parts 1–3) together. Return JSON:\n"
+            .'{ "overall_band_score": <avg>, "criteria_scores": { ... }, '
+            .'"detailed_feedback": "...", "vocabulary_corrections": [...], '
+            .'"grammar_corrections": [...], "suggestions_for_improvement": "...", '
+            .'"per_question_feedback": [{"part": N, "question": "...", "feedback": "..."}] }';
 
         $lines = [];
         foreach ($qaItems as $i => $item) {
-            $n       = $i + 1;
-            $ans     = trim($item['answer'] ?? '') ?: '[No answer recorded.]';
+            $n = $i + 1;
+            $ans = trim($item['answer'] ?? '') ?: '[No answer recorded.]';
             $lines[] = "Q{$n} (Part {$item['part']}): {$item['question']}";
             $lines[] = "A{$n}: {$ans}";
             $lines[] = '';
         }
 
-        $userPrompt = "MODULE_TYPE: Speaking\nSTUDENT_ANSWER (all parts):\n\n" . implode("\n", $lines);
+        $userPrompt = "MODULE_TYPE: Speaking\nSTUDENT_ANSWER (all parts):\n\n".implode("\n", $lines);
 
         return $this->callGeminiApi($batchInstruction, $userPrompt);
     }
@@ -283,13 +286,13 @@ class GeminiEvaluationService
                         ['role' => 'user', 'parts' => [['text' => $userPrompt]]],
                     ],
                     'generationConfig' => [
-                        'temperature'      => 0.2,
+                        'temperature' => 0.2,
                         'responseMimeType' => 'application/json',
                     ],
                 ]);
 
             if ($response->successful()) {
-                $result  = $response->json();
+                $result = $response->json();
                 $rawText = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
                 $rawText = trim($rawText);
 
@@ -304,31 +307,39 @@ class GeminiEvaluationService
                     Log::warning('[GeminiEval] Non-JSON response', [
                         'preview' => substr($rawText, 0, 500),
                     ]);
+
                     return $this->fallbackResponse('Gemini returned a non-JSON response.');
                 }
 
-                // Support both schema conventions
-                $bandScore = $parsed['overall_band_score']
-                    ?? $parsed['band_score']
-                    ?? null;
+                $bandScore = $this->validatedBandScore($parsed);
+
+                if ($bandScore === null) {
+                    Log::warning('[GeminiEval] Invalid or missing band score', [
+                        'preview' => substr($rawText, 0, 500),
+                    ]);
+
+                    return $this->fallbackResponse('Gemini returned an invalid band score.');
+                }
 
                 return [
-                    'success'         => true,
+                    'success' => true,
                     'evaluation_text' => $rawText,        // raw JSON string for DB storage
-                    'band_score'      => $bandScore !== null ? (float) $bandScore : null,
-                    'parsed'          => $parsed,          // decoded array for immediate use
+                    'band_score' => $bandScore,
+                    'parsed' => $parsed,          // decoded array for immediate use
                 ];
             }
 
             $body = $response->body();
             Log::error('[GeminiEval] API Error', [
                 'status' => $response->status(),
-                'body'   => substr($body, 0, 1000),
+                'body' => substr($body, 0, 1000),
             ]);
-            return $this->fallbackResponse('Gemini API returned status ' . $response->status());
+
+            return $this->fallbackResponse('Gemini API returned status '.$response->status());
 
         } catch (\Exception $e) {
             Log::error('[GeminiEval] Exception', ['message' => $e->getMessage()]);
+
             return $this->fallbackResponse($e->getMessage());
         }
     }
@@ -339,11 +350,35 @@ class GeminiEvaluationService
     protected function fallbackResponse(string $reason = 'Unknown error'): array
     {
         Log::warning('[GeminiEval] Fallback triggered', ['reason' => $reason]);
+
         return [
-            'success'         => false,
+            'success' => false,
             'evaluation_text' => null,
-            'band_score'      => null,
-            'parsed'          => null,
+            'band_score' => null,
+            'parsed' => null,
         ];
+    }
+
+    private function validatedBandScore(array $parsed): ?float
+    {
+        $score = $parsed['overall_band_score']
+            ?? $parsed['band_score']
+            ?? null;
+
+        if (! is_numeric($score)) {
+            return null;
+        }
+
+        $score = (float) $score;
+        if ($score < 0.0 || $score > 9.0) {
+            return null;
+        }
+
+        $doubled = $score * 2;
+        if (abs($doubled - round($doubled)) > 0.0001) {
+            return null;
+        }
+
+        return $score;
     }
 }

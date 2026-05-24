@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('gemini_api_key', 200)->nullable()->after('email')
-                  ->comment('User-provided Gemini API key for AI evaluation of Speaking and Writing');
+                ->comment('User-provided Gemini API key for AI evaluation of Speaking and Writing');
         });
     }
 

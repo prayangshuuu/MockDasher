@@ -16,7 +16,7 @@ class WritingAnswer extends Model
     {
         return [
             'submitted_at' => 'datetime',
-            'band_score'   => 'float',
+            'band_score' => 'float',
         ];
     }
 

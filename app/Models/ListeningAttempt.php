@@ -47,6 +47,7 @@ class ListeningAttempt extends Model
         if ($this->total_correct !== null) {
             return $this->total_correct;
         }
+
         return $this->calculateRawScore();
     }
 
@@ -55,6 +56,7 @@ class ListeningAttempt extends Model
         if ($this->band_score !== null) {
             return $this->band_score;
         }
+
         return self::rawToBand($this->calculateRawScore());
     }
 
@@ -85,10 +87,14 @@ class ListeningAttempt extends Model
     {
         $correctCount = 0;
         foreach ($this->answers()->with('question')->get() as $answer) {
-            if (!$answer->question) continue;
+            if (! $answer->question) {
+                continue;
+            }
 
             $userAnswer = self::normalizeAnswer($answer->answer_text ?? '');
-            if ($userAnswer === '') continue;
+            if ($userAnswer === '') {
+                continue;
+            }
 
             $validAnswers = array_map(
                 fn ($a) => self::normalizeAnswer($a),
@@ -99,6 +105,7 @@ class ListeningAttempt extends Model
                 $correctCount++;
             }
         }
+
         return $correctCount;
     }
 
@@ -116,20 +123,48 @@ class ListeningAttempt extends Model
      */
     public static function rawToBand(int $rawScore): float
     {
-        if ($rawScore >= 39) return 9.0;
-        if ($rawScore >= 37) return 8.5;
-        if ($rawScore >= 35) return 8.0;
-        if ($rawScore >= 33) return 7.5;
-        if ($rawScore >= 30) return 7.0;
-        if ($rawScore >= 27) return 6.5;
-        if ($rawScore >= 23) return 6.0;
-        if ($rawScore >= 19) return 5.5;
-        if ($rawScore >= 15) return 5.0;
-        if ($rawScore >= 13) return 4.5;
-        if ($rawScore >= 10) return 4.0;
-        if ($rawScore >= 8)  return 3.5;
-        if ($rawScore >= 6)  return 3.0;
-        if ($rawScore >= 4)  return 2.5;
+        if ($rawScore >= 39) {
+            return 9.0;
+        }
+        if ($rawScore >= 37) {
+            return 8.5;
+        }
+        if ($rawScore >= 35) {
+            return 8.0;
+        }
+        if ($rawScore >= 33) {
+            return 7.5;
+        }
+        if ($rawScore >= 30) {
+            return 7.0;
+        }
+        if ($rawScore >= 27) {
+            return 6.5;
+        }
+        if ($rawScore >= 23) {
+            return 6.0;
+        }
+        if ($rawScore >= 19) {
+            return 5.5;
+        }
+        if ($rawScore >= 15) {
+            return 5.0;
+        }
+        if ($rawScore >= 13) {
+            return 4.5;
+        }
+        if ($rawScore >= 10) {
+            return 4.0;
+        }
+        if ($rawScore >= 8) {
+            return 3.5;
+        }
+        if ($rawScore >= 6) {
+            return 3.0;
+        }
+        if ($rawScore >= 4) {
+            return 2.5;
+        }
 
         return 0.0;
     }

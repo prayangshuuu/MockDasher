@@ -17,6 +17,7 @@ class AiContentControllerTest extends TestCase
         $user = User::factory()->create();
         $adminRole = Role::firstOrCreate(['name' => 'Admin']);
         $user->roles()->attach($adminRole);
+
         return $user;
     }
 
@@ -25,6 +26,7 @@ class AiContentControllerTest extends TestCase
         $user = User::factory()->create();
         $userRole = Role::firstOrCreate(['name' => 'User']);
         $user->roles()->attach($userRole);
+
         return $user;
     }
 
@@ -35,7 +37,7 @@ class AiContentControllerTest extends TestCase
     {
         $response = $this->post(route('admin.ai.generate'), [
             'module_type' => 'Writing Task 1',
-            'topic'       => 'Climate Change',
+            'topic' => 'Climate Change',
         ]);
 
         $response->assertRedirect('/login');
@@ -50,7 +52,7 @@ class AiContentControllerTest extends TestCase
 
         $response = $this->actingAs($user)->postJson(route('admin.ai.generate'), [
             'module_type' => 'Writing Task 1',
-            'topic'       => 'Climate Change',
+            'topic' => 'Climate Change',
         ]);
 
         $response->assertStatus(403);
@@ -65,7 +67,7 @@ class AiContentControllerTest extends TestCase
 
         $response = $this->actingAs($admin)->postJson(route('admin.ai.generate'), [
             'module_type' => '',
-            'topic'       => '',
+            'topic' => '',
         ]);
 
         $response->assertStatus(422)
@@ -81,7 +83,7 @@ class AiContentControllerTest extends TestCase
 
         $response = $this->actingAs($admin)->postJson(route('admin.ai.generate'), [
             'module_type' => 'Speaking Part 4',
-            'topic'       => 'Space Exploration',
+            'topic' => 'Space Exploration',
         ]);
 
         $response->assertStatus(422)
@@ -110,20 +112,20 @@ class AiContentControllerTest extends TestCase
                 ->with('Writing Task 1', 'Solar Energy')
                 ->andReturn([
                     'success' => true,
-                    'data'    => $mockData,
-                    'error'   => null,
+                    'data' => $mockData,
+                    'error' => null,
                 ]);
         });
 
         $response = $this->actingAs($admin)->postJson(route('admin.ai.generate'), [
             'module_type' => 'Writing Task 1',
-            'topic'       => 'Solar Energy',
+            'topic' => 'Solar Energy',
         ]);
 
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
-                'data'    => $mockData,
+                'data' => $mockData,
             ]);
     }
 
@@ -139,20 +141,20 @@ class AiContentControllerTest extends TestCase
                 ->once()
                 ->andReturn([
                     'success' => false,
-                    'data'    => null,
+                    'data' => null,
                     'error' => 'Gemini API limit exceeded.',
                 ]);
         });
 
         $response = $this->actingAs($admin)->postJson(route('admin.ai.generate'), [
             'module_type' => 'Writing Task 2',
-            'topic'       => 'Artificial Intelligence',
+            'topic' => 'Artificial Intelligence',
         ]);
 
         $response->assertStatus(422)
             ->assertJson([
                 'success' => false,
-                'error'   => 'Gemini API limit exceeded.',
+                'error' => 'Gemini API limit exceeded.',
             ]);
     }
 }

@@ -35,7 +35,7 @@ class TestHistoryController extends Controller
             'readingAttempt',
             'listeningAttempt',
             'aiWritingEvaluation',
-            'aiSpeakingEvaluation'
+            'aiSpeakingEvaluation',
         ]);
 
         return view('user.history.show', compact('attempt'));

@@ -18,22 +18,22 @@ class AiContentController extends Controller
     {
         $validated = $request->validate([
             'module_type' => 'required|string|in:Speaking Part 1,Speaking Part 2,Speaking Part 3,Writing Task 1,Writing Task 2',
-            'topic'       => 'required|string|max:200',
+            'topic' => 'required|string|max:200',
         ]);
 
         $service = app(GeminiContentCreatorService::class);
-        $result  = $service->generate($validated['module_type'], $validated['topic']);
+        $result = $service->generate($validated['module_type'], $validated['topic']);
 
         if (! $result['success']) {
             return response()->json([
                 'success' => false,
-                'error'   => $result['error'] ?? 'Generation failed. Please try again.',
+                'error' => $result['error'] ?? 'Generation failed. Please try again.',
             ], 422);
         }
 
         return response()->json([
             'success' => true,
-            'data'    => $result['data'],
+            'data' => $result['data'],
         ]);
     }
 }

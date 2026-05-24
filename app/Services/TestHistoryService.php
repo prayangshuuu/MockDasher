@@ -62,7 +62,7 @@ class TestHistoryService
         }
 
         // Module stats for strongest module (reusing fetched data + AI evaluations)
-        $readingAvg   = $readingAttempts->avg('band_score') ?: 0;
+        $readingAvg = $readingAttempts->avg('band_score') ?: 0;
         $listeningAvg = $listeningAttempts->avg('band_score') ?: 0;
 
         $writingAvg = AiWritingEvaluation::where('user_id', $user->id)

@@ -16,13 +16,13 @@ class ProfileController extends Controller
     {
         return view('profile.show', [
             'request' => $request,
-            'user'    => $request->user(),
+            'user' => $request->user(),
         ]);
     }
 
     public function update(UpdateProfileRequest $request)
     {
-        $user      = $request->user();
+        $user = $request->user();
         $validated = $request->validated();
 
         if ($request->hasFile('photo')) {
@@ -34,9 +34,9 @@ class ProfileController extends Controller
         }
 
         $user->first_name = $validated['first_name'];
-        $user->last_name  = $validated['last_name'];
-        $user->name       = trim($validated['first_name'] . ' ' . $validated['last_name']);
-        $user->email      = $validated['email'];
+        $user->last_name = $validated['last_name'];
+        $user->name = trim($validated['first_name'].' '.$validated['last_name']);
+        $user->email = $validated['email'];
 
         $user->save();
 
@@ -69,6 +69,7 @@ class ProfileController extends Controller
         // If user is clearing their key, allow it
         if (empty($key)) {
             $request->user()->update(['gemini_api_key' => null]);
+
             return back()->with('gemini_success', 'Gemini API key removed successfully.');
         }
 
@@ -86,13 +87,13 @@ class ProfileController extends Controller
 
             if ($response->status() === 400 || $response->status() === 403) {
                 return back()
-                    ->withErrors(['gemini_api_key' => 'API key verification failed: ' . ($response->json('error.message') ?? 'Invalid or unauthorized key.')])
+                    ->withErrors(['gemini_api_key' => 'API key verification failed: '.($response->json('error.message') ?? 'Invalid or unauthorized key.')])
                     ->withInput();
             }
 
             if (! $response->successful()) {
                 return back()
-                    ->withErrors(['gemini_api_key' => 'Could not verify the API key (status ' . $response->status() . '). Please check and try again.'])
+                    ->withErrors(['gemini_api_key' => 'Could not verify the API key (status '.$response->status().'). Please check and try again.'])
                     ->withInput();
             }
         } catch (\Exception $e) {

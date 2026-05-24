@@ -14,7 +14,7 @@ class WritingTaskController extends Controller
     public function create($testSetId)
     {
         $testSet = TestSet::with('test')->findOrFail($testSetId);
-        $tasks   = $testSet->writingTasks()->with('images')->orderBy('task_number')->get();
+        $tasks = $testSet->writingTasks()->with('images')->orderBy('task_number')->get();
 
         return view('admin.writing-tasks.create', compact('testSet', 'tasks'));
     }
@@ -24,15 +24,15 @@ class WritingTaskController extends Controller
         $testSet = TestSet::findOrFail($testSetId);
 
         $validated = $request->validate([
-            'task_number'        => 'required|in:1,2',
-            'task_title'         => 'required|string|max:255',
-            'task_description'   => 'nullable|string',
-            'precontext'         => 'nullable|string',
-            'task_prompt'        => 'nullable|string',
-            'instruction_text'   => 'nullable|string',
+            'task_number' => 'required|in:1,2',
+            'task_title' => 'required|string|max:255',
+            'task_description' => 'nullable|string',
+            'precontext' => 'nullable|string',
+            'task_prompt' => 'nullable|string',
+            'instruction_text' => 'nullable|string',
             'minimum_word_count' => 'required|integer|min:1',
-            'task_image'         => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
-            'image_alt_text'     => 'nullable|string|max:5000',
+            'task_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
+            'image_alt_text' => 'nullable|string|max:5000',
         ]);
 
         $task = $testSet->writingTasks()->create(Arr::except($validated, ['task_image', 'image_alt_text']));
@@ -41,7 +41,7 @@ class WritingTaskController extends Controller
             $path = $request->file('task_image')->store('writing_images', 'public');
             $task->images()->create([
                 'image_path' => $path,
-                'alt_text'   => $request->input('image_alt_text', ''),
+                'alt_text' => $request->input('image_alt_text', ''),
             ]);
         }
 
@@ -53,21 +53,22 @@ class WritingTaskController extends Controller
     public function edit(WritingTask $writing_task)
     {
         $writing_task->load('images');
+
         return view('admin.writing-tasks.edit', compact('writing_task'));
     }
 
     public function update(Request $request, WritingTask $writing_task)
     {
         $validated = $request->validate([
-            'task_number'        => 'required|in:1,2',
-            'task_title'         => 'required|string|max:255',
-            'task_description'   => 'nullable|string',
-            'precontext'         => 'nullable|string',
-            'task_prompt'        => 'nullable|string',
-            'instruction_text'   => 'nullable|string',
+            'task_number' => 'required|in:1,2',
+            'task_title' => 'required|string|max:255',
+            'task_description' => 'nullable|string',
+            'precontext' => 'nullable|string',
+            'task_prompt' => 'nullable|string',
+            'instruction_text' => 'nullable|string',
             'minimum_word_count' => 'required|integer|min:1',
-            'task_image'         => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
-            'image_alt_text'     => 'nullable|string|max:5000',
+            'task_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
+            'image_alt_text' => 'nullable|string|max:5000',
         ]);
 
         $writing_task->update(Arr::except($validated, ['task_image', 'image_alt_text']));
@@ -82,7 +83,7 @@ class WritingTaskController extends Controller
             $path = $request->file('task_image')->store('writing_images', 'public');
             $writing_task->images()->create([
                 'image_path' => $path,
-                'alt_text'   => $request->input('image_alt_text', ''),
+                'alt_text' => $request->input('image_alt_text', ''),
             ]);
         } elseif ($request->filled('image_alt_text')) {
             // Update alt_text on existing image without re-uploading
