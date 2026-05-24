@@ -27,6 +27,11 @@ class ReadingAttempt extends Model
         return $this->belongsTo(TestSet::class);
     }
 
+    public function testAttempt()
+    {
+        return $this->belongsTo(TestAttempt::class, 'test_attempt_id');
+    }
+
     public function answers()
     {
         return $this->hasMany(ReadingAnswer::class, 'test_attempt_id');

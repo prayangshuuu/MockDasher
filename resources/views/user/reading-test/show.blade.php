@@ -295,6 +295,7 @@
 
     // ── Answer Management ──
     window.setAnswer = function(qId, value) {
+        window.examHasChanges = true;
         answers[qId] = value;
         updateBubble(qId);
         updateTfngButtons(qId, value);

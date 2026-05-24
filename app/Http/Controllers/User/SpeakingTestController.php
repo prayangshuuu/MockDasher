@@ -19,8 +19,12 @@ class SpeakingTestController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        if ($attempt->status === 'completed' || $attempt->completed_at) {
-            return redirect()->route('dashboard')->with('error', 'Test already completed.');
+        if ($attempt->completed_at) {
+            return redirect()->route('user.history.show', $attempt->id)->with('error', 'This exam has already been finished.');
+        }
+
+        if ($attempt->aiSpeakingEvaluation()->exists()) {
+            return redirect()->route('user.tests.start', $attempt->testSet->test_id)->with('error', 'You have already completed the Speaking module.');
         }
 
         if (! $attempt->started_at) {
@@ -145,24 +149,24 @@ class SpeakingTestController extends Controller
      */
     public function submit(Request $request, TestAttempt $attempt)
     {
-        if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->status === 'completed') {
+        if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->completed_at) {
             abort(403);
         }
 
-        $attempt->update(['status' => 'completed', 'completed_at' => now()]);
+        $attempt->update(['status' => 'in_progress']);
         $this->evaluateAllAnswers($attempt);
         $this->saveOverallBand($attempt);
 
-        return redirect()->route('dashboard')->with('success', 'Speaking test completed successfully. Your AI evaluation report has been compiled.');
+        return redirect()->route('user.tests.start', $attempt->testSet->test_id)->with('success', 'Speaking test completed successfully. Your AI evaluation report has been compiled.');
     }
 
     protected function forceSubmit(TestAttempt $attempt)
     {
-        $attempt->update(['status' => 'completed', 'completed_at' => now()]);
+        $attempt->update(['status' => 'in_progress']);
         $this->evaluateAllAnswers($attempt);
         $this->saveOverallBand($attempt);
 
-        return redirect()->route('dashboard')->with('success', 'Time expired. Speaking test submitted. Your AI evaluation report has been compiled.');
+        return redirect()->route('user.tests.start', $attempt->testSet->test_id)->with('success', 'Time expired. Speaking test submitted. Your AI evaluation report has been compiled.');
     }
 
     /**
@@ -171,8 +175,9 @@ class SpeakingTestController extends Controller
     protected function evaluateAllAnswers(TestAttempt $attempt): void
     {
         $user = $attempt->user;
-        $apiKey = $user->getRawOriginal('gemini_api_key');
+        $apiKey = $user->getRawOriginal('gemini_api_key') ?: env('GEMINI_API_KEY');
         if (empty($apiKey)) {
+            Log::warning('No Gemini API key found for evaluation (neither user-specific nor global).');
             return;
         }
 
@@ -226,11 +231,10 @@ class SpeakingTestController extends Controller
             ->pluck('band_score')
             ->toArray();
 
-        if (empty($scores)) {
-            return;
+        $overall = 0.0;
+        if (!empty($scores)) {
+            $overall = round((array_sum($scores) / count($scores)) * 2) / 2;
         }
-
-        $overall = round((array_sum($scores) / count($scores)) * 2) / 2;
 
         // Build a combined transcript for admin review
         $transcript = $answers->map(function ($a) {

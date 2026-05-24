@@ -20,7 +20,7 @@ class ListeningTestController extends Controller
         }
 
         if ($attempt->status === 'completed') {
-            return redirect()->route('dashboard')->with('error', 'This listening test is already completed.');
+            return redirect()->route('user.tests.start', $attempt->testSet->test_id)->with('error', 'This listening test is already completed.');
         }
 
         // Start timer if first visit
@@ -188,7 +188,7 @@ class ListeningTestController extends Controller
 
         $attempt->evaluate();
 
-        return redirect()->route('dashboard')->with('success', 'Listening test submitted successfully!');
+        return redirect()->route('user.tests.start', $attempt->testSet->test_id)->with('success', 'Listening test submitted successfully!');
     }
 
     /**
@@ -199,6 +199,6 @@ class ListeningTestController extends Controller
         $attempt->update(['status' => 'completed', 'completed_at' => now()]);
         $attempt->evaluate();
 
-        return redirect()->route('dashboard')->with('success', 'Time expired. Listening test submitted automatically.');
+        return redirect()->route('user.tests.start', $attempt->testSet->test_id)->with('success', 'Time expired. Listening test submitted automatically.');
     }
 }

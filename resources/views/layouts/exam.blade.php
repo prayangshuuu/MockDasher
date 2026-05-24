@@ -142,6 +142,17 @@
             const proctorKey = "proctoring_violations_" + window.location.pathname;
             let isWarningActive = false;
             window.isAutoSubmitting = false;
+            let isUnloading = false;
+
+            window.addEventListener('beforeunload', () => {
+                isUnloading = true;
+            });
+            window.addEventListener('pagehide', () => {
+                isUnloading = true;
+            });
+            window.addEventListener('unload', () => {
+                isUnloading = true;
+            });
 
             function playWarningBeep() {
                 try {
@@ -200,7 +211,7 @@
             }
 
             function triggerViolation() {
-                if (isWarningActive || window.isAutoSubmitting) return;
+                if (isWarningActive || window.isAutoSubmitting || isUnloading) return;
                 isWarningActive = true;
                 
                 let violations = parseInt(localStorage.getItem(proctorKey) || '0');
@@ -241,8 +252,10 @@
                 }, 300);
             };
 
-            // Anti-cheat event triggers
-            window.addEventListener('blur', triggerViolation);
+            // Initialize examHasChanges flag
+            window.examHasChanges = false;
+
+            // Anti-cheat event triggers: Only trigger on actual visibility changes (tab switches or minimizing browser)
             document.addEventListener('visibilitychange', () => {
                 if (document.hidden) {
                     triggerViolation();
@@ -270,7 +283,7 @@
 
             // Accidental tab close warning
             window.onbeforeunload = function(e) {
-                if (window.isAutoSubmitting) return;
+                if (window.isAutoSubmitting || !window.examHasChanges) return;
                 const message = "Are you sure you want to leave the exam? Your progress may be lost.";
                 e.returnValue = message;
                 return message;

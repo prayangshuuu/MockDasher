@@ -453,6 +453,7 @@
                 handleRecordingComplete(qid, new Blob(chunks, { type: 'audio/webm' }));
             };
             mediaRecorder.start();
+            window.examHasChanges = true;
             recorders[qid] = { mediaRecorder, stream };
             activeQid = qid; recElapsed = 0; recMaxTime = maxSeconds; sttTranscript = '';
 

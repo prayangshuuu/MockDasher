@@ -276,6 +276,7 @@
 
     // Answers
     window.setAnswer = function(qId, val) {
+        window.examHasChanges = true;
         answers[qId] = val;
         updateNavBtn(qId);
         debouncedAutosave();

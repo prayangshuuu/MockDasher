@@ -107,7 +107,7 @@
                         <textarea id="textarea-{{ $task->id }}"
                                   data-task-id="{{ $task->id }}"
                                   data-min-words="{{ $task->minimum_word_count }}"
-                                  oninput="updateWordCount({{ $task->id }}, {{ $task->minimum_word_count }}); scheduleAutosave();"
+                                  oninput="window.examHasChanges = true; updateWordCount({{ $task->id }}, {{ $task->minimum_word_count }}); scheduleAutosave();"
                                   class="writing-textarea absolute inset-0 w-full h-full p-8 sm:p-12 text-base leading-relaxed bg-transparent border-none focus:ring-0 resize-none custom-scrollbar placeholder:text-slate-400 text-slate-800 dark:text-slate-200 outline-none {{ $isSubmitted ? 'opacity-70 cursor-default' : '' }}"
                                   placeholder="Start typing your response here..."
                                   @if($isSubmitted) readonly @endif>{{ $answer->answer_text ?? '' }}</textarea>

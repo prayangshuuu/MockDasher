@@ -65,15 +65,21 @@
                     </div>
                 </div>
 
-                <form action="{{ route('user.tests.start', $test->id) }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="module" value="listening">
-                    <button type="submit" 
-                            class="w-full flex items-center justify-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-soft hover:shadow-premium transition-all duration-200">
-                        <img src="/storage/asset/icons/start.svg" class="w-4 h-4 invert brightness-0" alt="Start" />
-                        Start Listening
-                    </button>
-                </form>
+                @if($listeningStatus === 'completed')
+                    <div class="w-full text-center bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 py-2.5 rounded-xl text-sm font-bold shadow-soft">
+                        Completed (Band {{ number_format($listeningBand ?? 0.0, 1) }})
+                    </div>
+                @else
+                    <form action="{{ route('user.tests.start', $test->id) }}" method="POST" class="w-full">
+                        @csrf
+                        <input type="hidden" name="module" value="listening">
+                        <button type="submit" 
+                                class="w-full flex items-center justify-center gap-2 {{ $listeningStatus === 'in_progress' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-indigo-500 hover:bg-indigo-600' }} text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-soft hover:shadow-premium transition-all duration-200">
+                            <img src="/storage/asset/icons/start.svg" class="w-4 h-4 invert brightness-0" alt="Start" />
+                            {{ $listeningStatus === 'in_progress' ? 'Resume Listening' : 'Start Listening' }}
+                        </button>
+                    </form>
+                @endif
             </div>
         </div>
 
@@ -98,15 +104,29 @@
                     </div>
                 </div>
 
-                <form action="{{ route('user.tests.start', $test->id) }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="module" value="reading">
-                    <button type="submit" 
-                            class="w-full flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-soft hover:shadow-premium transition-all duration-200">
-                        <img src="/storage/asset/icons/start.svg" class="w-4 h-4 invert brightness-0" alt="Start" />
-                        Start Reading
-                    </button>
-                </form>
+                @if($readingStatus === 'completed')
+                    <div class="flex flex-col gap-2 w-full">
+                        <div class="w-full text-center bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 py-2.5 rounded-xl text-sm font-bold shadow-soft">
+                            Completed (Band {{ number_format($readingBand ?? 0.0, 1) }})
+                        </div>
+                        @if($testAttempt && $testAttempt->readingAttempt)
+                            <a href="{{ route('user.reading.result', $testAttempt->readingAttempt->id) }}" 
+                               class="w-full text-center text-xs font-bold text-sky-500 hover:underline">
+                                View Reading Results
+                            </a>
+                        @endif
+                    </div>
+                @else
+                    <form action="{{ route('user.tests.start', $test->id) }}" method="POST" class="w-full">
+                        @csrf
+                        <input type="hidden" name="module" value="reading">
+                        <button type="submit" 
+                                class="w-full flex items-center justify-center gap-2 {{ $readingStatus === 'in_progress' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-sky-500 hover:bg-sky-600' }} text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-soft hover:shadow-premium transition-all duration-200">
+                            <img src="/storage/asset/icons/start.svg" class="w-4 h-4 invert brightness-0" alt="Start" />
+                            {{ $readingStatus === 'in_progress' ? 'Resume Reading' : 'Start Reading' }}
+                        </button>
+                    </form>
+                @endif
             </div>
         </div>
 
@@ -131,15 +151,21 @@
                     </div>
                 </div>
 
-                <form action="{{ route('user.tests.start', $test->id) }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="module" value="writing">
-                    <button type="submit" 
-                            class="w-full flex items-center justify-center gap-2 bg-violet-500 hover:bg-violet-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-soft hover:shadow-premium transition-all duration-200">
-                        <img src="/storage/asset/icons/start.svg" class="w-4 h-4 invert brightness-0" alt="Start" />
-                        Start Writing
-                    </button>
-                </form>
+                @if($writingStatus === 'completed')
+                    <div class="w-full text-center bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 py-2.5 rounded-xl text-sm font-bold shadow-soft">
+                        Completed (Band {{ number_format($writingBand ?? 0.0, 1) }})
+                    </div>
+                @else
+                    <form action="{{ route('user.tests.start', $test->id) }}" method="POST" class="w-full">
+                        @csrf
+                        <input type="hidden" name="module" value="writing">
+                        <button type="submit" 
+                                class="w-full flex items-center justify-center gap-2 {{ $writingStatus === 'in_progress' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-violet-500 hover:bg-violet-600' }} text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-soft hover:shadow-premium transition-all duration-200">
+                            <img src="/storage/asset/icons/start.svg" class="w-4 h-4 invert brightness-0" alt="Start" />
+                            {{ $writingStatus === 'in_progress' ? 'Resume Writing' : 'Start Writing' }}
+                        </button>
+                    </form>
+                @endif
             </div>
         </div>
 
@@ -164,18 +190,49 @@
                     </div>
                 </div>
 
-                <form action="{{ route('user.tests.start', $test->id) }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="module" value="speaking">
-                    <button type="submit" 
-                            class="w-full flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-soft hover:shadow-premium transition-all duration-200">
-                        <img src="/storage/asset/icons/start.svg" class="w-4 h-4 invert brightness-0" alt="Start" />
-                        Start Speaking
-                    </button>
-                </form>
+                @if($speakingStatus === 'completed')
+                    <div class="w-full text-center bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 py-2.5 rounded-xl text-sm font-bold shadow-soft">
+                        Completed (Band {{ number_format($speakingBand ?? 0.0, 1) }})
+                    </div>
+                @else
+                    <form action="{{ route('user.tests.start', $test->id) }}" method="POST" class="w-full">
+                        @csrf
+                        <input type="hidden" name="module" value="speaking">
+                        <button type="submit" 
+                                class="w-full flex items-center justify-center gap-2 {{ $speakingStatus === 'in_progress' ? 'bg-amber-500 hover:bg-amber-600' : 'bg-emerald-500 hover:bg-emerald-600' }} text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow-soft hover:shadow-premium transition-all duration-200">
+                            <img src="/storage/asset/icons/start.svg" class="w-4 h-4 invert brightness-0" alt="Start" />
+                            {{ $speakingStatus === 'in_progress' ? 'Resume Speaking' : 'Start Speaking' }}
+                        </button>
+                    </form>
+                @endif
             </div>
         </div>
     </div>
+
+    {{-- Finish Exam Section --}}
+    @if($testAttempt && !$testAttempt->completed_at)
+    <div class="mb-12 bg-white dark:bg-slate-900 border-2 border-indigo-500/20 dark:border-indigo-500/30 rounded-2xl p-6 sm:p-8 shadow-premium flex flex-col md:flex-row md:items-center justify-between gap-6 animate-pulse-subtle">
+        <div class="flex items-start gap-4">
+            <div class="p-3 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-500 border border-indigo-100 dark:border-indigo-900/50 rounded-xl shrink-0">
+                <img src="/storage/asset/icons/verified.svg" class="w-6 h-6 filter-indigo-600 dark:invert" alt="Exam sitting" />
+            </div>
+            <div>
+                <h3 class="text-lg font-extrabold text-slate-900 dark:text-white">Active Exam Session</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-xl">
+                    You can take the modules in any order. Once you have finished taking your desired modules, click <strong>"Finish Full Exam"</strong> to lock in your scores. Any modules you have not attempted will receive a band score of <strong>0.0</strong>.
+                </p>
+            </div>
+        </div>
+        <form action="{{ route('user.tests.finish', $testAttempt->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to finish the entire exam? This will submit and grade any un-evaluated work, and assign a band score of 0.0 to any unsubmitted modules. This action cannot be undone.');">
+            @csrf
+            <button type="submit" 
+                    class="w-full md:w-auto inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3.5 rounded-xl text-sm font-bold shadow-premium transition-all duration-200">
+                <img src="/storage/asset/icons/verified.svg" class="w-5 h-5 invert brightness-0" alt="Finish" />
+                Finish Full Exam
+            </button>
+        </form>
+    </div>
+    @endif
 
     {{-- Practice Tips Section --}}
     <div class="bg-surface-light dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">

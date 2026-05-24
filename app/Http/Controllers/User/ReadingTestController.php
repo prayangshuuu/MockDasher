@@ -16,7 +16,7 @@ class ReadingTestController extends Controller
         }
 
         if ($attempt->status === 'completed') {
-            return redirect()->route('dashboard')->with('error', 'This reading test has already been completed.');
+            return redirect()->route('user.tests.start', $attempt->testSet->test_id)->with('error', 'This reading test has already been completed.');
         }
 
         // Start timer on first visit
