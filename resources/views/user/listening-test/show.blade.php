@@ -365,22 +365,27 @@
         document.getElementById('review-panel').classList.add('hidden');
     };
 
+    window.populateListeningInputs = function() {
+        const fieldsContainer = document.getElementById('submit-fields');
+        if (!fieldsContainer) return;
+        fieldsContainer.innerHTML = '';
+        Object.keys(answers).forEach(qId => {
+            const inp = document.createElement('input');
+            inp.type = 'hidden'; inp.name = 'answers['+qId+']'; inp.value = answers[qId] || '';
+            fieldsContainer.appendChild(inp);
+        });
+        Object.keys(flags).forEach(qId => {
+            if (flags[qId]) {
+                const inp = document.createElement('input');
+                inp.type = 'hidden'; inp.name = 'flagged['+qId+']'; inp.value = '1';
+                fieldsContainer.appendChild(inp);
+            }
+        });
+    };
+
     window.confirmSubmit = function() {
         if (confirm('End Listening Test: Are you ready to submit your answers?')) {
-            const fieldsContainer = document.getElementById('submit-fields');
-            fieldsContainer.innerHTML = '';
-            Object.keys(answers).forEach(qId => {
-                const inp = document.createElement('input');
-                inp.type = 'hidden'; inp.name = 'answers['+qId+']'; inp.value = answers[qId] || '';
-                fieldsContainer.appendChild(inp);
-            });
-            Object.keys(flags).forEach(qId => {
-                if (flags[qId]) {
-                    const inp = document.createElement('input');
-                    inp.type = 'hidden'; inp.name = 'flagged['+qId+']'; inp.value = '1';
-                    fieldsContainer.appendChild(inp);
-                }
-            });
+            window.populateListeningInputs();
             document.getElementById('listening-submit-form').submit();
         }
     };

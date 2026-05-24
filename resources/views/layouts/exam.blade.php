@@ -182,12 +182,18 @@
                 
                 const speakingForm = document.getElementById('speaking-submit-form');
                 if (speakingForm) {
+                    if (typeof window.prepareSpeakingSubmit === 'function') {
+                        window.prepareSpeakingSubmit();
+                    }
                     speakingForm.submit();
                     return;
                 }
                 
                 const writingForm = document.getElementById('writing-submit-form');
                 if (writingForm) {
+                    if (typeof window.prepareWritingSubmit === 'function') {
+                        window.prepareWritingSubmit();
+                    }
                     writingForm.submit();
                     return;
                 }
@@ -203,6 +209,9 @@
                 
                 const listeningForm = document.getElementById('listening-submit-form');
                 if (listeningForm) {
+                    if (typeof window.populateListeningInputs === 'function') {
+                        window.populateListeningInputs();
+                    }
                     listeningForm.submit();
                     return;
                 }

@@ -611,9 +611,13 @@
         }
     };
 
+    window.prepareSpeakingSubmit = function() {
+        if (activeQid !== null) stopRecording();
+    };
+
     // ── End Interview ──
     window.endInterview = function() {
-        if (activeQid !== null) stopRecording();
+        window.prepareSpeakingSubmit();
         if (confirm('End Interview: Submit your speaking test?')) {
             // Show AI evaluation loader spinner blocker
             const loader = document.getElementById('ai-evaluation-loading-modal');

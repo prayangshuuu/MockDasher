@@ -332,11 +332,17 @@
         }
     };
 
+    window.prepareWritingSubmit = async function() {
+        await doAutosave();
+    };
+
     // ── End Exam ──
     window.endExam = function() {
         window.isAutoSubmitting = true;
         window.onbeforeunload = null;
-        document.getElementById('writing-submit-form').submit();
+        window.prepareWritingSubmit().then(() => {
+            document.getElementById('writing-submit-form').submit();
+        });
     };
 })();
 </script>
