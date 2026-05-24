@@ -280,14 +280,6 @@
                 window.isAutoSubmitting = true;
                 window.onbeforeunload = null;
             });
-
-            // Accidental tab close warning
-            window.onbeforeunload = function(e) {
-                if (window.isAutoSubmitting || !window.examHasChanges) return;
-                const message = "Are you sure you want to leave the exam? Your progress may be lost.";
-                e.returnValue = message;
-                return message;
-            };
         })();
     </script>
 
