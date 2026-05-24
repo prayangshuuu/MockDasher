@@ -195,13 +195,13 @@
                 <!-- Global Flash Messages -->
                 @if(session('success'))
                     <div id="user-flash-success" class="mb-8 flex items-center gap-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 px-6 py-4 rounded-xl shadow-soft font-medium">
-                        <span class="material-symbols-outlined">check_circle</span>
+                        <img src="/storage/asset/icons/check-circle.svg" class="w-5 h-5 shrink-0 dark:invert" alt="✓" />
                         <span>{{ session('success') }}</span>
                     </div>
                 @endif
                 @if(session('error'))
                     <div id="user-flash-error" class="mb-8 flex items-center gap-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 px-6 py-4 rounded-xl shadow-soft font-medium">
-                        <span class="material-symbols-outlined">error</span>
+                        <img src="/storage/asset/icons/info.svg" class="w-5 h-5 shrink-0 dark:invert" alt="!" />
                         <span>{{ session('error') }}</span>
                     </div>
                 @endif

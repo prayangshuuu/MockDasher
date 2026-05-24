@@ -164,12 +164,14 @@
     <div class="px-4 sm:px-6 lg:px-8">
         @if(session('success'))
             <div class="mt-6 flex items-center gap-3 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 px-6 py-4 text-sm font-bold text-emerald-800 dark:text-emerald-300 shadow-soft">
-                <span class="material-symbols-outlined text-[20px]">check_circle</span> {{ session('success') }}
+                <img src="/storage/asset/icons/check-circle.svg" class="w-5 h-5 shrink-0 dark:invert" alt="✓" />
+                {{ session('success') }}
             </div>
         @endif
         @if(session('error'))
             <div class="mt-6 flex items-center gap-3 rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-6 py-4 text-sm font-bold text-red-800 dark:text-red-300 shadow-soft">
-                <span class="material-symbols-outlined text-[20px]">error</span> {{ session('error') }}
+                <img src="/storage/asset/icons/info.svg" class="w-5 h-5 shrink-0 dark:invert" alt="!" />
+                {{ session('error') }}
             </div>
         @endif
     </div>
