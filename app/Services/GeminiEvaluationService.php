@@ -26,9 +26,9 @@ class GeminiEvaluationService
      */
     public function __construct(?string $apiKey = null)
     {
-        // Prefer per-user key; fall back to global env key
-        $this->apiKey  = $apiKey ?? config('services.gemini.key', env('GEMINI_API_KEY', ''));
-        $this->model   = env('GEMINI_MODEL', 'gemini-2.5-flash');
+        // Prefer per-user key; fall back to global config key
+        $this->apiKey   = $apiKey ?? config('services.gemini.key', '');
+        $this->model    = config('services.gemini.model', 'gemini-2.5-flash');
         $this->endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent";
     }
 
@@ -116,9 +116,9 @@ class GeminiEvaluationService
 
         // Load IELTS part context from env (token-efficient, admin-configurable)
         $partContext = match ($part) {
-            1 => env('IELTS_SPEAKING_PART1_CONTEXT', 'IELTS Speaking Part 1: The examiner asks about familiar topics.'),
-            2 => env('IELTS_SPEAKING_PART2_CONTEXT', 'IELTS Speaking Part 2: The candidate speaks for 1-2 minutes on a topic.'),
-            3 => env('IELTS_SPEAKING_PART3_CONTEXT', 'IELTS Speaking Part 3: The examiner and candidate discuss abstract topics.'),
+            1 => config('services.ielts.speaking_part1_context', 'IELTS Speaking Part 1: The examiner asks about familiar topics.'),
+            2 => config('services.ielts.speaking_part2_context', 'IELTS Speaking Part 2: The candidate speaks for 1-2 minutes on a topic.'),
+            3 => config('services.ielts.speaking_part3_context', 'IELTS Speaking Part 3: The examiner and candidate discuss abstract topics.'),
             default => "IELTS Speaking Part {$part}",
         };
 
@@ -158,8 +158,8 @@ class GeminiEvaluationService
 
         // Load IELTS task context from env
         $taskContext = match ($taskNumber) {
-            1 => env('IELTS_WRITING_TASK1_CONTEXT', 'IELTS Writing Task 1: Summarise the graph/chart in at least 150 words.'),
-            2 => env('IELTS_WRITING_TASK2_CONTEXT', 'IELTS Writing Task 2: Write an essay of at least 250 words.'),
+            1 => config('services.ielts.writing_task1_context', 'IELTS Writing Task 1: Summarise the graph/chart in at least 150 words.'),
+            2 => config('services.ielts.writing_task2_context', 'IELTS Writing Task 2: Write an essay of at least 250 words.'),
             default => "IELTS Writing Task {$taskNumber}",
         };
 
@@ -203,8 +203,8 @@ class GeminiEvaluationService
         ?string $task1Answer,
         ?string $task2Answer
     ): array {
-        $task1Context = env('IELTS_WRITING_TASK1_CONTEXT', 'IELTS Writing Task 1: Summarise the graph/chart in at least 150 words.');
-        $task2Context = env('IELTS_WRITING_TASK2_CONTEXT', 'IELTS Writing Task 2: Write an essay of at least 250 words.');
+        $task1Context = config('services.ielts.writing_task1_context', 'IELTS Writing Task 1: Summarise the graph/chart in at least 150 words.');
+        $task2Context = config('services.ielts.writing_task2_context', 'IELTS Writing Task 2: Write an essay of at least 250 words.');
 
         $batchInstruction = $this->getSystemInstruction() . "\n\n"
             . "BATCH MODE: Evaluate BOTH Task 1 AND Task 2. Return JSON with shape:\n"

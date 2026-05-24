@@ -88,22 +88,31 @@ class ReadingAttempt extends Model
                 continue;
             }
             
-            $userAnswer = strtolower(trim($answer->answer_text ?? ''));
-            $correctAnswer = strtolower(trim($answer->question->correct_answer ?? ''));
+            $userAnswer = self::normalizeAnswer($answer->answer_text ?? '');
+            $correctAnswer = trim($answer->question->correct_answer ?? '');
             
             if ($userAnswer === '' || $correctAnswer === '') {
                 continue;
             }
 
             // Support multiple valid answers separated by pipe (|)
-            $validAnswers = array_map(fn($a) => strtolower(trim($a)), explode('|', $answer->question->correct_answer));
+            $validAnswers = array_map(fn ($a) => self::normalizeAnswer($a), explode('|', $answer->question->correct_answer));
             
-            if (in_array($userAnswer, $validAnswers)) {
+            if (in_array($userAnswer, $validAnswers, true)) {
                 $correctCount++;
             }
         }
 
         return $correctCount;
+    }
+
+    private static function normalizeAnswer(?string $answer): string
+    {
+        $answer = strtolower(strip_tags((string) $answer));
+        $answer = preg_replace('/[^\p{L}\p{N}\s]+/u', ' ', $answer) ?? $answer;
+        $answer = preg_replace('/\s+/u', ' ', $answer) ?? $answer;
+
+        return trim($answer);
     }
 
     /**

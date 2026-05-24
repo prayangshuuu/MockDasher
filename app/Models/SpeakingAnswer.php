@@ -12,6 +12,14 @@ class SpeakingAnswer extends Model
         'evaluation_json', 'band_score', 'submitted_at',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'submitted_at' => 'datetime',
+            'band_score'   => 'float',
+        ];
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

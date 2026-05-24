@@ -12,7 +12,7 @@ class StoreTestRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return $this->user()?->isAdmin() ?? false;
     }
 
     /**
@@ -23,7 +23,10 @@ class StoreTestRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'book_number' => 'required|integer|min:1',
+            'year'        => 'required|integer|min:1900|max:2100',
+            'exam_type'   => 'required|string|max:255',
+            'status'      => 'required|in:draft,published',
         ];
     }
 }

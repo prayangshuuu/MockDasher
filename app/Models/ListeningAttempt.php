@@ -87,19 +87,28 @@ class ListeningAttempt extends Model
         foreach ($this->answers()->with('question')->get() as $answer) {
             if (!$answer->question) continue;
 
-            $userAnswer = strtolower(trim($answer->answer_text ?? ''));
+            $userAnswer = self::normalizeAnswer($answer->answer_text ?? '');
             if ($userAnswer === '') continue;
 
             $validAnswers = array_map(
-                fn($a) => strtolower(trim($a)),
+                fn ($a) => self::normalizeAnswer($a),
                 explode('|', $answer->question->correct_answer ?? '')
             );
 
-            if (in_array($userAnswer, $validAnswers)) {
+            if (in_array($userAnswer, $validAnswers, true)) {
                 $correctCount++;
             }
         }
         return $correctCount;
+    }
+
+    private static function normalizeAnswer(?string $answer): string
+    {
+        $answer = strtolower(strip_tags((string) $answer));
+        $answer = preg_replace('/[^\p{L}\p{N}\s]+/u', ' ', $answer) ?? $answer;
+        $answer = preg_replace('/\s+/u', ' ', $answer) ?? $answer;
+
+        return trim($answer);
     }
 
     /**

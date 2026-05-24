@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\AiSpeakingEvaluation;
+use App\Models\AiWritingEvaluation;
 use App\Models\ListeningAttempt;
 use App\Models\ReadingAttempt;
 
@@ -10,11 +12,11 @@ class TestHistoryService
     /**
      * Get paginated test attempts for the user.
      */
-    public function getPaginatedAttempts($user, $perPage = 10)
+    public function getPaginatedAttempts($user, int $perPage = 10)
     {
         return $user->testAttempts()
             ->with(['testSet.test'])
-            ->orderBy('created_at', 'desc')
+            ->latest()
             ->paginate($perPage);
     }
 
@@ -25,7 +27,7 @@ class TestHistoryService
     {
         // 1. Fetch completed test attempts
         $completedAttempts = $user->testAttempts()
-            ->where(fn ($q) => $q->where('status', 'completed'))
+            ->where('status', 'completed')
             ->orderBy('completed_at', 'desc')
             ->get();
 
@@ -34,15 +36,15 @@ class TestHistoryService
         // 2. Fetch related reading & listening attempts to prevent N+1 manually
         $testSetIds = $completedAttempts->pluck('test_set_id')->unique();
 
-        $readingAttempts = ReadingAttempt::where(fn ($q) => $q->where('user_id', $user->id)
+        $readingAttempts = ReadingAttempt::where('user_id', $user->id)
             ->whereIn('test_set_id', $testSetIds)
-            ->where('status', 'completed'))
+            ->where('status', 'completed')
             ->get()
             ->keyBy('test_set_id');
 
-        $listeningAttempts = ListeningAttempt::where(fn ($q) => $q->where('user_id', $user->id)
+        $listeningAttempts = ListeningAttempt::where('user_id', $user->id)
             ->whereIn('test_set_id', $testSetIds)
-            ->where('status', 'completed'))
+            ->where('status', 'completed')
             ->get()
             ->keyBy('test_set_id');
 
@@ -59,9 +61,17 @@ class TestHistoryService
             $averageBandScore = round($averageBandScore * 2) / 2;
         }
 
-        // Module stats for strongest module (reusing fetched data)
-        $readingAvg = $readingAttempts->avg('band_score') ?: 0;
+        // Module stats for strongest module (reusing fetched data + AI evaluations)
+        $readingAvg   = $readingAttempts->avg('band_score') ?: 0;
         $listeningAvg = $listeningAttempts->avg('band_score') ?: 0;
+
+        $writingAvg = AiWritingEvaluation::where('user_id', $user->id)
+            ->whereNotNull('band_score')
+            ->avg('band_score') ?: 0;
+
+        $speakingAvg = AiSpeakingEvaluation::where('user_id', $user->id)
+            ->whereNotNull('band_score')
+            ->avg('band_score') ?: 0;
 
         $moduleStats = [];
         if ($readingAvg > 0) {
@@ -69,6 +79,12 @@ class TestHistoryService
         }
         if ($listeningAvg > 0) {
             $moduleStats['Listening'] = $listeningAvg;
+        }
+        if ($writingAvg > 0) {
+            $moduleStats['Writing'] = $writingAvg;
+        }
+        if ($speakingAvg > 0) {
+            $moduleStats['Speaking'] = $speakingAvg;
         }
 
         $strongestModuleName = null;

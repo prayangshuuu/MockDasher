@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -43,7 +44,7 @@ class UserController extends Controller
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
+            'password' => Hash::make($validated['password']),
         ]);
 
         /** @var Role|null $role */
@@ -73,15 +74,11 @@ class UserController extends Controller
             'email' => $validated['email'],
         ]);
 
-        // Manually update role if applicable (assuming single role for now, depends on implementation)
-        if ($user->roles()->count() > 0) {
-            /** @var Role|null $role */
-            $role = Role::query()->where(function ($q) use ($validated) {
-                $q->where('name', '=', ucfirst($validated['role']));
-            })->first();
-            if ($role) {
-                $user->roles()->sync([$role->id]);
-            }
+        // Sync the user's role to the selected value (works whether user already has a role or not)
+        /** @var Role|null $role */
+        $role = Role::where('name', ucfirst($validated['role']))->first();
+        if ($role) {
+            $user->roles()->sync([$role->id]);
         }
 
         return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');

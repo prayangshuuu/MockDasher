@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\AiSpeakingEvaluation;
+use App\Models\AiWritingEvaluation;
 use App\Models\ListeningAttempt;
 use App\Models\ReadingAttempt;
 use App\Models\Test;
@@ -20,7 +22,7 @@ class DashboardStatsService
         $daysToExam = $user->exam_date ? Carbon::now()->startOfDay()->diffInDays($user->exam_date->startOfDay(), false) : null;
 
         $completedAttempts = $user->testAttempts()
-            ->where(['status' => 'completed'])
+            ->where('status', 'completed')
             ->get();
 
         $validAttempts = $completedAttempts->filter(fn ($a) => $a->overall_band !== null);
@@ -43,48 +45,58 @@ class DashboardStatsService
      */
     public function getModuleBreakdown($user)
     {
-        $readingAttempts = ReadingAttempt::where(fn ($q) => $q->where('user_id', $user->id)
-            ->where('status', 'completed'))
+        $readingAttempts = ReadingAttempt::where('user_id', $user->id)
+            ->where('status', 'completed')
             ->get();
         $readingAvg = $readingAttempts->count() > 0 ? $readingAttempts->avg('band_score') : null;
 
-        $listeningAttempts = ListeningAttempt::where(fn ($q) => $q->where('user_id', $user->id)
-            ->where('status', 'completed'))
+        $listeningAttempts = ListeningAttempt::where('user_id', $user->id)
+            ->where('status', 'completed')
             ->get();
         $listeningAvg = $listeningAttempts->count() > 0 ? $listeningAttempts->avg('band_score') : null;
+
+        $writingAttempts = AiWritingEvaluation::where('user_id', $user->id)
+            ->whereNotNull('band_score')
+            ->get();
+        $writingAvg = $writingAttempts->count() > 0 ? $writingAttempts->avg('band_score') : null;
+
+        $speakingAttempts = AiSpeakingEvaluation::where('user_id', $user->id)
+            ->whereNotNull('band_score')
+            ->get();
+        $speakingAvg = $speakingAttempts->count() > 0 ? $speakingAttempts->avg('band_score') : null;
 
         $moduleBreakdown = [];
 
         if ($readingAvg) {
             $moduleBreakdown[] = [
-                'name' => 'Reading',
-                'score' => round($readingAvg * 2) / 2,
+                'name'       => 'Reading',
+                'score'      => round($readingAvg * 2) / 2,
                 'percentage' => round(($readingAvg / 9) * 100),
-                'type' => 'primary',
+                'type'       => 'primary',
             ];
         }
 
         if ($listeningAvg) {
             $moduleBreakdown[] = [
-                'name' => 'Listening',
-                'score' => round($listeningAvg * 2) / 2,
+                'name'       => 'Listening',
+                'score'      => round($listeningAvg * 2) / 2,
                 'percentage' => round(($listeningAvg / 9) * 100),
-                'type' => 'primary',
+                'type'       => 'primary',
             ];
         }
 
-        // Writing & Speaking don't have automated scoring yet
         $moduleBreakdown[] = [
-            'name' => 'Writing',
-            'score' => null,
-            'percentage' => 0,
-            'type' => 'muted',
+            'name'       => 'Writing',
+            'score'      => $writingAvg !== null ? round($writingAvg * 2) / 2 : null,
+            'percentage' => $writingAvg !== null ? round(($writingAvg / 9) * 100) : 0,
+            'type'       => $writingAvg !== null ? 'primary' : 'muted',
         ];
+
         $moduleBreakdown[] = [
-            'name' => 'Speaking',
-            'score' => null,
-            'percentage' => 0,
-            'type' => 'muted',
+            'name'       => 'Speaking',
+            'score'      => $speakingAvg !== null ? round($speakingAvg * 2) / 2 : null,
+            'percentage' => $speakingAvg !== null ? round(($speakingAvg / 9) * 100) : 0,
+            'type'       => $speakingAvg !== null ? 'primary' : 'muted',
         ];
 
         return $moduleBreakdown;
@@ -96,21 +108,21 @@ class DashboardStatsService
     public function getRecommendedTests($user)
     {
         $completedTestSetIds = $user->testAttempts()
-            ->where(fn ($q) => $q->where('status', 'completed'))
+            ->where('status', 'completed')
             ->pluck('test_set_id');
 
-        $completedTestIds = TestSet::query()->whereIn('id', $completedTestSetIds)
+        $completedTestIds = TestSet::whereIn('id', $completedTestSetIds)
             ->pluck('test_id')
             ->unique();
 
-        $recommendedTests = Test::where(fn ($q) => $q->where('status', 'published'))
+        $recommendedTests = Test::where('status', 'published')
             ->whereNotIn('id', $completedTestIds)
             ->latest()
             ->take(3)
             ->get();
 
         if ($recommendedTests->count() < 3) {
-            $recommendedTests = Test::query()->where(fn ($q) => $q->where('status', 'published'))
+            $recommendedTests = Test::where('status', 'published')
                 ->latest()
                 ->take(3)
                 ->get();
@@ -137,7 +149,7 @@ class DashboardStatsService
     public function getChartData($user)
     {
         $chartAttempts = $user->testAttempts()
-            ->where(fn ($q) => $q->where('status', 'completed'))
+            ->where('status', 'completed')
             ->orderBy('completed_at', 'asc')
             ->take(6)
             ->get();

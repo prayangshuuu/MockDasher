@@ -13,29 +13,32 @@ use Illuminate\Support\Facades\Log;
 
 class WritingTestController extends Controller
 {
+    private const WRITING_LIMIT_SECONDS = 3600; // 60 minutes
+    private const GRACE_SECONDS         = 60;
+
     public function show(TestAttempt $attempt)
     {
-        if ((int) $attempt->user_id !== (int) auth()->id()) {
-            abort(403, 'Unauthorized access.');
-        }
+        $this->authorizeAttempt($attempt);
 
         if ($attempt->completed_at) {
-            return redirect()->route('user.history.show', $attempt->id)->with('error', 'This exam has already been finished.');
+            return redirect()->route('user.history.show', $attempt->id)
+                ->with('error', 'This exam has already been finished.');
         }
 
-        if ($attempt->aiWritingEvaluation()->exists()) {
-            return redirect()->route('user.tests.start', $attempt->testSet->test_id)->with('error', 'You have already completed the Writing module.');
+        if ($attempt->aiWritingEvaluation()->whereNotNull('band_score')->exists()) {
+            return redirect()->route('user.tests.start', $attempt->testSet->test_id)
+                ->with('error', 'You have already completed the Writing module.');
         }
 
-        if (! $attempt->started_at) {
-            $attempt->update(['started_at' => now(), 'status' => 'writing']);
+        if (! $attempt->writing_started_at) {
+            $attempt->update(['writing_started_at' => now(), 'status' => 'writing']);
+            $attempt->refresh();
         } elseif ($attempt->status !== 'writing') {
             $attempt->update(['status' => 'writing']);
         }
 
-        $elapsedSeconds   = now()->diffInSeconds($attempt->started_at);
-        $totalSeconds     = 60 * 60;
-        $remainingSeconds = max(0, $totalSeconds - $elapsedSeconds);
+        $elapsed          = (int) now()->diffInSeconds($attempt->writing_started_at);
+        $remainingSeconds = (int) max(0, self::WRITING_LIMIT_SECONDS - $elapsed);
 
         if ($remainingSeconds <= 0) {
             return $this->forceSubmit($attempt);
@@ -49,157 +52,202 @@ class WritingTestController extends Controller
 
     public function autosave(Request $request, TestAttempt $attempt)
     {
-        if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->status === 'completed') {
-            return response()->json(['error' => 'Unauthorized or completed'], 403);
+        $this->authorizeAttempt($attempt);
+
+        if ($attempt->status === 'completed') {
+            return response()->json(['error' => 'Already completed'], 403);
         }
 
-        // Issue 5: server-side time enforcement (60 min + 60 s grace)
-        if ($attempt->started_at && now()->diffInSeconds($attempt->started_at) > 3660) {
+        if ($this->isTimeExpired($attempt)) {
             return response()->json(['error' => 'Time expired'], 403);
         }
 
-        // Issue 4: validate input shape and size before processing
         $request->validate([
             'answers'   => 'array|max:10',
             'answers.*' => 'nullable|string|max:65535',
         ]);
 
-        // Issue 3: resolve valid task IDs scoped to this attempt's test set
-        $validTaskIds = $attempt->testSet->writingTasks->pluck('id')->toArray();
+        $validTaskIds = $attempt->testSet->writingTasks()->pluck('id')->toArray();
 
         foreach ($request->input('answers', []) as $taskId => $text) {
-            if (! in_array((int) $taskId, $validTaskIds)) {
+            if (! in_array((int) $taskId, $validTaskIds, true)) {
                 continue;
             }
 
-            $existing = WritingAnswer::where([
+            // Don't overwrite a task that has already been submitted
+            $alreadySubmitted = WritingAnswer::where([
                 'test_attempt_id' => $attempt->id,
                 'writing_task_id' => (int) $taskId,
-            ])->first();
+            ])->whereNotNull('submitted_at')->exists();
 
-            // Don't overwrite if already submitted
-            if ($existing && $existing->submitted_at) {
+            if ($alreadySubmitted) {
                 continue;
             }
 
             WritingAnswer::updateOrCreate(
-                ['user_id' => auth()->id(), 'test_attempt_id' => $attempt->id, 'writing_task_id' => (int) $taskId],
-                ['answer_text' => $text, 'word_count' => str_word_count(strip_tags((string) $text))]
+                [
+                    'user_id'         => auth()->id(),
+                    'test_attempt_id' => $attempt->id,
+                    'writing_task_id' => (int) $taskId,
+                ],
+                [
+                    'answer_text' => $text,
+                    'word_count'  => str_word_count(strip_tags((string) $text)),
+                ]
             );
         }
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'saved_at' => now()->toTimeString()]);
     }
 
     /**
-     * Submit a single writing task. Locks the answer instantly, postponing Gemini AI evaluation.
-     *
+     * Lock a single writing task answer (no AI evaluation yet).
      * POST /tests/attempts/{attempt}/writing/tasks/{task}/submit
-     * Body: { "answer": "..." }
      */
     public function submitTask(Request $request, TestAttempt $attempt, WritingTask $task)
     {
-        if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->status === 'completed') {
+        $this->authorizeAttempt($attempt);
+
+        if ($attempt->status === 'completed') {
+            return response()->json(['error' => 'Attempt already completed'], 403);
+        }
+
+        // Scope: task must belong to this attempt's test set
+        $validTaskIds = $attempt->testSet->writingTasks()->pluck('id')->toArray();
+        if (! in_array($task->id, $validTaskIds, true)) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        // Issue 3: verify the task belongs to this attempt's test set
-        $validTaskIds = $attempt->testSet->writingTasks->pluck('id')->toArray();
-        if (! in_array($task->id, $validTaskIds)) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        // Issue 5: server-side time enforcement (60 min + 60 s grace)
-        if ($attempt->started_at && now()->diffInSeconds($attempt->started_at) > 3660) {
+        if ($this->isTimeExpired($attempt)) {
             return response()->json(['error' => 'Time expired'], 403);
         }
 
-        // Check not already submitted
-        $existingSubmitted = WritingAnswer::where([
+        $alreadySubmitted = WritingAnswer::where([
             'user_id'         => auth()->id(),
             'test_attempt_id' => $attempt->id,
             'writing_task_id' => $task->id,
-        ])->whereNotNull('submitted_at')->first();
+        ])->whereNotNull('submitted_at')->exists();
 
-        if ($existingSubmitted) {
+        if ($alreadySubmitted) {
             return response()->json(['error' => 'Already submitted'], 409);
         }
 
-        // Issue 4: enforce answer size limit
         $request->validate(['answer' => 'nullable|string|max:65535']);
 
         $answer    = trim($request->input('answer', ''));
         $wordCount = $answer ? str_word_count(strip_tags($answer)) : 0;
 
-        // Save the answer and mark as submitted (locks input in taker workspace)
-        $writingAnswer = WritingAnswer::updateOrCreate(
-            ['user_id' => auth()->id(), 'test_attempt_id' => $attempt->id, 'writing_task_id' => $task->id],
-            ['answer_text' => $answer, 'word_count' => $wordCount, 'submitted_at' => now()]
+        WritingAnswer::updateOrCreate(
+            [
+                'user_id'         => auth()->id(),
+                'test_attempt_id' => $attempt->id,
+                'writing_task_id' => $task->id,
+            ],
+            [
+                'answer_text'  => $answer,
+                'word_count'   => $wordCount,
+                'submitted_at' => now(),
+            ]
         );
 
         return response()->json([
-            'success'    => true,
-            'band_score' => null,
-            'evaluation' => null,
-            'message'    => 'Task answer locked successfully. Evaluation will be compiled on final submission.'
+            'success' => true,
+            'message' => 'Task answer locked. Evaluation will be compiled on final submission.',
         ]);
     }
 
     /**
-     * Final submission — mark the attempt as completed, compile batch AI reports, and compute overall band.
+     * Final submission — trigger AI evaluation and redirect.
      */
     public function submit(Request $request, TestAttempt $attempt)
     {
-        if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->completed_at) {
-            abort(403);
+        $this->authorizeAttempt($attempt);
+        abort_if($attempt->completed_at !== null, 403, 'This exam has already been finished.');
+
+        if (! $this->evaluateAllAnswers($attempt)) {
+            return redirect()->route('user.writing.show', $attempt->id)
+                ->with('error', 'Writing evaluation could not be completed. Please check your Gemini API key and try again.');
         }
 
-        $attempt->update(['status' => 'in_progress']);
-        $this->evaluateAllAnswers($attempt);
         $this->saveOverallBand($attempt);
+        $attempt->update(['status' => 'in_progress']);
 
-        return redirect()->route('user.tests.start', $attempt->testSet->test_id)->with('success', 'Writing test completed successfully. Your AI evaluation report has been compiled.');
+        return redirect()->route('user.tests.start', $attempt->testSet->test_id)
+            ->with('success', 'Writing test completed. Your AI evaluation report has been compiled.');
     }
+
+    // ── Helpers ────────────────────────────────────────────────────────────────
 
     protected function forceSubmit(TestAttempt $attempt)
     {
-        $attempt->update(['status' => 'in_progress']);
-        $this->evaluateAllAnswers($attempt);
-        $this->saveOverallBand($attempt);
+        if (! $attempt->aiWritingEvaluation()->whereNotNull('band_score')->exists()) {
+            if (! $this->evaluateAllAnswers($attempt)) {
+                return redirect()->route('user.writing.show', $attempt->id)
+                    ->with('error', 'Time expired, but Writing evaluation could not be completed. Please check your Gemini API key and submit again.');
+            }
 
-        return redirect()->route('user.tests.start', $attempt->testSet->test_id)->with('success', 'Time expired. Writing test submitted. Your AI evaluation report has been compiled.');
+            $this->saveOverallBand($attempt);
+            $attempt->update(['status' => 'in_progress']);
+        }
+
+        return redirect()->route('user.tests.start', $attempt->testSet->test_id)
+            ->with('success', 'Time expired. Writing test submitted automatically.');
+    }
+
+    private function authorizeAttempt(TestAttempt $attempt): void
+    {
+        abort_unless((int) $attempt->user_id === (int) auth()->id(), 403, 'Unauthorized access.');
+    }
+
+    private function isTimeExpired(TestAttempt $attempt): bool
+    {
+        return $attempt->writing_started_at
+            && now()->diffInSeconds($attempt->writing_started_at) > (self::WRITING_LIMIT_SECONDS + self::GRACE_SECONDS);
     }
 
     /**
-     * Batch compile and save Gemini evaluations for all un-graded tasks in the sitting.
+     * Evaluate all un-graded writing tasks via Gemini and persist results.
      */
-    protected function evaluateAllAnswers(TestAttempt $attempt): void
+    private function evaluateAllAnswers(TestAttempt $attempt): bool
     {
-        $user = $attempt->user;
-        // Issue 10: use config() instead of env() so this works after config:cache
+        $user   = $attempt->user;
         $apiKey = $user->getRawOriginal('gemini_api_key') ?: config('services.gemini.key');
+
         if (empty($apiKey)) {
-            Log::warning('No Gemini API key found for evaluation (neither user-specific nor global).');
-            return;
+            Log::warning('[WritingTestController] No Gemini API key — skipping evaluation.', ['attempt' => $attempt->id]);
+            return false;
         }
 
         try {
             $service = GeminiEvaluationService::forUser($user);
-            $tasks = $attempt->testSet->writingTasks()->with('images')->orderBy('task_number')->get();
-            foreach ($tasks as $task) {
-                $writingAnswer = WritingAnswer::where([
-                    'test_attempt_id' => $attempt->id,
-                    'writing_task_id' => $task->id,
-                ])->first();
+            $tasks   = $attempt->testSet->writingTasks()->with('images')->orderBy('task_number')->get();
 
-                // Skip if answer is empty or already evaluated
-                if (!$writingAnswer || empty($writingAnswer->answer_text) || $writingAnswer->band_score !== null) {
+            if ($tasks->isEmpty()) {
+                Log::warning('[WritingTestController] No writing tasks configured.', ['attempt' => $attempt->id]);
+                return false;
+            }
+
+            foreach ($tasks as $task) {
+                $writingAnswer = WritingAnswer::firstOrCreate(
+                    [
+                        'user_id'         => $attempt->user_id,
+                        'test_attempt_id' => $attempt->id,
+                        'writing_task_id' => $task->id,
+                    ],
+                    [
+                        'answer_text'  => '',
+                        'word_count'   => 0,
+                        'submitted_at' => now(),
+                    ]
+                );
+
+                if ($writingAnswer->band_score !== null) {
                     continue;
                 }
 
                 $imageAltText = null;
                 if ($task->task_number === 1) {
-                    $firstImage = $task->images->first();
+                    $firstImage   = $task->images->first();
                     $imageAltText = $firstImage?->alt_text ?? $task->precontext ?? null;
                 }
 
@@ -212,59 +260,65 @@ class WritingTestController extends Controller
                     strip_tags($writingAnswer->answer_text)
                 );
 
-                // Save evaluation back to the writing_answer row
+                if (! $result['success'] || $result['band_score'] === null) {
+                    Log::warning('[WritingTestController] Gemini returned no writing score.', [
+                        'attempt' => $attempt->id,
+                        'task'    => $task->id,
+                    ]);
+                    return false;
+                }
+
                 $writingAnswer->update([
                     'evaluation_json' => $result['evaluation_text'],
                     'band_score'      => $result['band_score'],
+                    'submitted_at'    => $writingAnswer->submitted_at ?? now(),
                 ]);
 
-                // Also update the AiWritingEvaluation summary record for this attempt
-                $this->updateAiWritingEvaluationRecord($attempt, $task->task_number, $result, $writingAnswer->answer_text);
+                $this->upsertAiWritingRecord($attempt, $task->task_number, $result, $writingAnswer->answer_text);
             }
+
+            return true;
         } catch (\Exception $e) {
-            Log::error('[WritingTestController] Batch Gemini evaluation failed', [
+            Log::error('[WritingTestController] Gemini evaluation failed', [
                 'attempt' => $attempt->id,
                 'error'   => $e->getMessage(),
             ]);
+
+            return false;
         }
     }
 
     /**
-     * Update or create the AiWritingEvaluation summary record for an attempt.
-     * Called after each task is evaluated so the record stays up to date.
+     * Upsert the per-task fields on the AiWritingEvaluation summary record.
      */
-    protected function updateAiWritingEvaluationRecord(
-        TestAttempt $attempt,
-        int         $taskNumber,
-        array       $result,
-        string      $answerText
-    ): void {
-        $data = [
-            "task_{$taskNumber}_evaluation_json" => $result['evaluation_text'],
-            "task_{$taskNumber}_band_score"      => $result['band_score'],
-            "task_{$taskNumber}_answer"          => substr($answerText, 0, 65535), // TEXT limit safety
-        ];
-
+    private function upsertAiWritingRecord(TestAttempt $attempt, int $taskNumber, array $result, string $answerText): void
+    {
         AiWritingEvaluation::updateOrCreate(
             ['user_id' => $attempt->user_id, 'test_attempt_id' => $attempt->id],
-            $data
+            [
+                "task_{$taskNumber}_evaluation_json" => $result['evaluation_text'],
+                "task_{$taskNumber}_band_score"      => $result['band_score'],
+                "task_{$taskNumber}_answer"          => substr($answerText, 0, 65535),
+            ]
         );
     }
 
     /**
-     * Compute and persist the overall writing band score (average of all tasks).
+     * Compute and persist the overall writing band score (average of all tasks, rounded to 0.5).
      */
-    protected function saveOverallBand(TestAttempt $attempt): void
+    private function saveOverallBand(TestAttempt $attempt): void
     {
         $scores = $attempt->writingAnswers()
             ->whereNotNull('band_score')
             ->pluck('band_score')
             ->toArray();
 
-        $overall = 0.0;
-        if (!empty($scores)) {
-            $overall = round((array_sum($scores) / count($scores)) * 2) / 2;
+        $taskCount = $attempt->testSet->writingTasks()->count();
+        if ($taskCount === 0 || count($scores) !== $taskCount) {
+            return;
         }
+
+        $overall = round((array_sum($scores) / count($scores)) * 2) / 2;
 
         AiWritingEvaluation::updateOrCreate(
             ['user_id' => $attempt->user_id, 'test_attempt_id' => $attempt->id],

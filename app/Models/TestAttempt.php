@@ -6,13 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 class TestAttempt extends Model
 {
-    protected $fillable = ['user_id', 'test_set_id', 'status', 'started_at', 'completed_at', 'proctoring_violations'];
+    protected $fillable = [
+        'user_id', 'test_set_id', 'status',
+        'started_at', 'writing_started_at', 'speaking_started_at',
+        'completed_at', 'proctoring_violations',
+    ];
 
     protected function casts(): array
     {
         return [
-            'started_at' => 'datetime',
-            'completed_at' => 'datetime',
+            'started_at'          => 'datetime',
+            'writing_started_at'  => 'datetime',
+            'speaking_started_at' => 'datetime',
+            'completed_at'        => 'datetime',
         ];
     }
 

@@ -3,256 +3,196 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\AiSpeakingEvaluation;
+use App\Models\AiWritingEvaluation;
 use App\Models\ListeningAttempt;
 use App\Models\ReadingAttempt;
 use App\Models\Test;
 use App\Models\TestAttempt;
 use Illuminate\Http\Request;
-
-use App\Models\AiWritingEvaluation;
-use App\Models\AiSpeakingEvaluation;
+use Illuminate\Support\Facades\DB;
 
 class TestController extends Controller
 {
     public function index()
     {
-        $tests = Test::withCount('testSets')->get();
+        $tests = Test::where('status', 'published')
+            ->withCount('testSets')
+            ->latest()
+            ->get();
+
         return view('user.tests.index', compact('tests'));
     }
 
     public function start(Request $request, Test $test)
     {
-        // Get the first test set for this test (default)
+        // Only published tests are accessible to users
+        abort_if($test->status !== 'published', 404);
+
         $testSet = $test->testSets()->first();
         if (! $testSet) {
             return redirect()->route('dashboard')->with('error', 'No test sets found for this test.');
         }
 
-        // Find an active (uncompleted) TestAttempt sitting container for this user & test set.
+        // Find an active (uncompleted) TestAttempt for this user & test set.
         $testAttempt = TestAttempt::query()
             ->where('user_id', auth()->id())
             ->where('test_set_id', $testSet->id)
             ->whereNull('completed_at')
-            ->orderBy('created_at', 'desc')
+            ->orderByDesc('created_at')
             ->first();
 
-        // View modules placeholder if it's GET/no module selected
+        // GET — show module selector dashboard
         if (! $request->has('module')) {
-            // Auto-create active sitting container if none exists
-            if (!$testAttempt) {
+            if (! $testAttempt) {
                 $testAttempt = TestAttempt::create([
-                    'user_id' => auth()->id(),
+                    'user_id'     => auth()->id(),
                     'test_set_id' => $testSet->id,
-                    'status' => 'in_progress',
-                    'started_at' => now(),
+                    'status'      => 'in_progress',
+                    'started_at'  => now(),
                 ]);
             }
 
-            // Get status of each module under this attempt
+            // Eager-load all relations in one shot to avoid N+1
+            $testAttempt->loadMissing([
+                'listeningAttempt',
+                'readingAttempt',
+                'aiWritingEvaluation',
+                'aiSpeakingEvaluation',
+            ]);
+
             $listeningStatus = 'not_started';
-            $listeningBand = null;
-            if ($testAttempt->listeningAttempt) {
-                $listeningStatus = $testAttempt->listeningAttempt->status;
-                if ($listeningStatus === 'completed') {
-                    $listeningBand = $testAttempt->listeningAttempt->band_score;
-                }
+            $listeningBand   = null;
+            if ($la = $testAttempt->listeningAttempt) {
+                $listeningStatus = $la->status;
+                $listeningBand   = $la->status === 'completed' ? $la->band_score : null;
             }
 
             $readingStatus = 'not_started';
-            $readingBand = null;
-            if ($testAttempt->readingAttempt) {
-                $readingStatus = $testAttempt->readingAttempt->status;
-                if ($readingStatus === 'completed') {
-                    $readingBand = $testAttempt->readingAttempt->band_score;
-                }
+            $readingBand   = null;
+            if ($ra = $testAttempt->readingAttempt) {
+                $readingStatus = $ra->status;
+                $readingBand   = $ra->status === 'completed' ? $ra->band_score : null;
             }
 
             $writingStatus = 'not_started';
-            $writingBand = null;
-            if ($testAttempt->aiWritingEvaluation) {
+            $writingBand   = null;
+            if ($testAttempt->aiWritingEvaluation?->band_score !== null) {
                 $writingStatus = 'completed';
-                $writingBand = $testAttempt->aiWritingEvaluation->band_score;
+                $writingBand   = $testAttempt->aiWritingEvaluation->band_score;
             } elseif ($testAttempt->writingAnswers()->exists()) {
                 $writingStatus = 'in_progress';
             }
 
             $speakingStatus = 'not_started';
-            $speakingBand = null;
-            if ($testAttempt->aiSpeakingEvaluation) {
+            $speakingBand   = null;
+            if ($testAttempt->aiSpeakingEvaluation?->band_score !== null) {
                 $speakingStatus = 'completed';
-                $speakingBand = $testAttempt->aiSpeakingEvaluation->band_score;
+                $speakingBand   = $testAttempt->aiSpeakingEvaluation->band_score;
             } elseif ($testAttempt->speakingAnswers()->exists()) {
                 $speakingStatus = 'in_progress';
             }
 
             return view('user.tests.placeholder', compact(
-                'test', 'testAttempt', 
+                'test', 'testAttempt',
                 'listeningStatus', 'listeningBand',
-                'readingStatus', 'readingBand',
-                'writingStatus', 'writingBand',
-                'speakingStatus', 'speakingBand'
+                'readingStatus',   'readingBand',
+                'writingStatus',   'writingBand',
+                'speakingStatus',  'speakingBand'
             ));
         }
 
-        // Issue 8: validate the module value against an explicit allow-list
+        // POST — validate the module selection against an explicit allow-list
         $request->validate([
             'module' => 'required|string|in:writing,speaking,listening,reading',
         ]);
 
-        // If POST/module select is requested, ensure we have an active attempt
-        if (!$testAttempt) {
+        if (! $testAttempt) {
             $testAttempt = TestAttempt::create([
-                'user_id' => auth()->id(),
+                'user_id'     => auth()->id(),
                 'test_set_id' => $testSet->id,
-                'status' => 'in_progress',
-                'started_at' => now(),
+                'status'      => 'in_progress',
+                'started_at'  => now(),
             ]);
         }
 
-        // Handle specific module starts
-        if ($request->module === 'writing') {
-            if ($testAttempt->aiWritingEvaluation()->exists()) {
-                return redirect()->route('user.tests.start', $test->id)->with('error', 'You have already completed the Writing module.');
-            }
-            $testAttempt->update(['status' => 'writing']);
-            return redirect()->route('user.writing.show', $testAttempt->id);
+        $testAttempt->loadMissing(['listeningAttempt', 'readingAttempt', 'aiWritingEvaluation', 'aiSpeakingEvaluation']);
+
+        switch ($request->module) {
+            case 'writing':
+                if ($testAttempt->aiWritingEvaluation?->band_score !== null) {
+                    return redirect()->route('user.tests.start', $test->id)
+                        ->with('error', 'You have already completed the Writing module.');
+                }
+                $testAttempt->update(['status' => 'writing']);
+                return redirect()->route('user.writing.show', $testAttempt->id);
+
+            case 'speaking':
+                if ($testAttempt->aiSpeakingEvaluation?->band_score !== null) {
+                    return redirect()->route('user.tests.start', $test->id)
+                        ->with('error', 'You have already completed the Speaking module.');
+                }
+                $testAttempt->update(['status' => 'speaking']);
+                return redirect()->route('user.speaking.show', $testAttempt->id);
+
+            case 'listening':
+                if ($testAttempt->listeningAttempt?->status === 'completed') {
+                    return redirect()->route('user.tests.start', $test->id)
+                        ->with('error', 'You have already completed the Listening module.');
+                }
+                $listeningAttempt = ListeningAttempt::firstOrCreate(
+                    ['test_attempt_id' => $testAttempt->id],
+                    [
+                        'user_id'         => auth()->id(),
+                        'test_set_id'     => $testSet->id,
+                        'status'          => 'in_progress',
+                        'current_section' => 1,
+                        'started_at'      => now(),
+                    ]
+                );
+                return redirect()->route('user.listening.show', $listeningAttempt->id);
+
+            case 'reading':
+                if ($testAttempt->readingAttempt?->status === 'completed') {
+                    return redirect()->route('user.tests.start', $test->id)
+                        ->with('error', 'You have already completed the Reading module.');
+                }
+                $readingAttempt = ReadingAttempt::firstOrCreate(
+                    ['test_attempt_id' => $testAttempt->id],
+                    [
+                        'user_id'     => auth()->id(),
+                        'test_set_id' => $testSet->id,
+                        'status'      => 'in_progress',
+                        'started_at'  => now(),
+                    ]
+                );
+                return redirect()->route('user.reading.show', $readingAttempt->id);
         }
 
-        if ($request->module === 'speaking') {
-            if ($testAttempt->aiSpeakingEvaluation()->exists()) {
-                return redirect()->route('user.tests.start', $test->id)->with('error', 'You have already completed the Speaking module.');
-            }
-            $testAttempt->update(['status' => 'speaking']);
-            return redirect()->route('user.speaking.show', $testAttempt->id);
-        }
-
-        if ($request->module === 'listening') {
-            if ($testAttempt->listeningAttempt && $testAttempt->listeningAttempt->status === 'completed') {
-                return redirect()->route('user.tests.start', $test->id)->with('error', 'You have already completed the Listening module.');
-            }
-
-            /** @var ListeningAttempt $attempt */
-            $attempt = ListeningAttempt::query()->firstOrCreate([
-                'test_attempt_id' => $testAttempt->id,
-            ], [
-                'user_id' => auth()->id(),
-                'test_set_id' => $testSet->id,
-                'status' => 'in_progress',
-                'current_section' => 1,
-                'started_at' => now(),
-            ]);
-
-            return redirect()->route('user.listening.show', $attempt->id);
-        }
-
-        if ($request->module === 'reading') {
-            if ($testAttempt->readingAttempt && $testAttempt->readingAttempt->status === 'completed') {
-                return redirect()->route('user.tests.start', $test->id)->with('error', 'You have already completed the Reading module.');
-            }
-
-            /** @var ReadingAttempt $attempt */
-            $attempt = ReadingAttempt::query()->firstOrCreate([
-                'test_attempt_id' => $testAttempt->id,
-            ], [
-                'user_id' => auth()->id(),
-                'test_set_id' => $testSet->id,
-                'status' => 'in_progress',
-                'started_at' => now(),
-            ]);
-
-            return redirect()->route('user.reading.show', $attempt->id);
-        }
-
-        abort(404, 'Module not found or not yet available.');
+        abort(404, 'Module not found.');
     }
 
     public function finish(TestAttempt $attempt)
     {
-        if ((int) $attempt->user_id !== (int) auth()->id()) {
-            abort(403);
+        $this->authorize('interact', $attempt);
+
+        if ($attempt->completed_at) {
+            return redirect()->route('user.history.show', $attempt->id)
+                ->with('error', 'This exam is already finished.');
         }
 
-        if ($attempt->status === 'completed' || $attempt->completed_at) {
-            return redirect()->route('user.history.show', $attempt->id)->with('error', 'This exam is already finished.');
-        }
+        DB::transaction(function () use ($attempt) {
+            $this->zeroFillIncompleteModules($attempt);
+            $attempt->update(['status' => 'completed', 'completed_at' => now()]);
+        });
 
-        // 1. Mark Listening as completed/0.0 if not finished
-        $listening = $attempt->listeningAttempt;
-        if (!$listening) {
-            ListeningAttempt::create([
-                'test_attempt_id' => $attempt->id,
-                'user_id' => $attempt->user_id,
-                'test_set_id' => $attempt->test_set_id,
-                'status' => 'completed',
-                'total_correct' => 0,
-                'band_score' => 0.0,
-                'started_at' => now(),
-                'completed_at' => now(),
-            ]);
-        } elseif ($listening->status !== 'completed') {
-            $listening->update([
-                'status' => 'completed',
-                'total_correct' => 0,
-                'band_score' => 0.0,
-                'completed_at' => now(),
-            ]);
-        }
-
-        // 2. Mark Reading as completed/0.0 if not finished
-        $reading = $attempt->readingAttempt;
-        if (!$reading) {
-            ReadingAttempt::create([
-                'test_attempt_id' => $attempt->id,
-                'user_id' => $attempt->user_id,
-                'test_set_id' => $attempt->test_set_id,
-                'status' => 'completed',
-                'total_correct' => 0,
-                'band_score' => 0.0,
-                'started_at' => now(),
-                'completed_at' => now(),
-            ]);
-        } elseif ($reading->status !== 'completed') {
-            $reading->update([
-                'status' => 'completed',
-                'total_correct' => 0,
-                'band_score' => 0.0,
-                'completed_at' => now(),
-            ]);
-        }
-
-        // 3. Mark Writing as completed/0.0 if not finished
-        $writingEval = $attempt->aiWritingEvaluation;
-        if (!$writingEval) {
-            AiWritingEvaluation::create([
-                'test_attempt_id' => $attempt->id,
-                'user_id' => $attempt->user_id,
-                'band_score' => 0.0,
-            ]);
-        }
-
-        // 4. Mark Speaking as completed/0.0 if not finished
-        $speakingEval = $attempt->aiSpeakingEvaluation;
-        if (!$speakingEval) {
-            AiSpeakingEvaluation::create([
-                'test_attempt_id' => $attempt->id,
-                'user_id' => $attempt->user_id,
-                'band_score' => 0.0,
-            ]);
-        }
-
-        // 5. Complete the overall TestAttempt sitting
-        $attempt->update([
-            'status' => 'completed',
-            'completed_at' => now(),
-        ]);
-
-        return redirect()->route('user.history.show', $attempt->id)->with('success', 'Full exam sitting completed! Unfinished modules were graded as 0.0.');
+        return redirect()->route('user.history.show', $attempt->id)
+            ->with('success', 'Full exam sitting completed! Unfinished modules were graded as 0.0.');
     }
 
     /**
-     * Issue 9: Record a proctoring violation server-side.
-     * The client sends a signal on each visibilitychange; the server tracks the count
-     * and auto-submits the attempt once the threshold is exceeded.
+     * Record a proctoring violation server-side.
+     * Returns JSON; the client uses the response to show the correct warning count.
      */
     public function recordViolation(Request $request, TestAttempt $attempt)
     {
@@ -264,40 +204,49 @@ class TestController extends Controller
             return response()->json(['status' => 'already_completed'], 200);
         }
 
-        $violations = (int) $attempt->proctoring_violations + 1;
-        $attempt->update(['proctoring_violations' => $violations]);
-
         $maxViolations = 3;
 
-        if ($violations >= $maxViolations) {
-            // Force-complete the attempt with zeroes for unfinished modules
-            // Reuse the finish logic by delegating to a shared private method
-            // so we do not duplicate code.
-            $this->forceFinish($attempt);
+        DB::transaction(function () use ($attempt) {
+            $fresh = TestAttempt::lockForUpdate()->find($attempt->id);
+            if ($fresh->completed_at) {
+                return (int) $fresh->proctoring_violations;
+            }
+            $fresh->increment('proctoring_violations');
+        });
+
+        // Re-fetch after the increment to get the authoritative count
+        $attempt->refresh();
+        $violations = (int) $attempt->proctoring_violations;
+
+        if ($violations >= $maxViolations && ! $attempt->completed_at) {
+            DB::transaction(function () use ($attempt) {
+                $fresh = TestAttempt::lockForUpdate()->find($attempt->id);
+                if ($fresh->completed_at) return;
+                $this->zeroFillIncompleteModules($fresh);
+                $fresh->update(['status' => 'completed', 'completed_at' => now()]);
+            });
 
             return response()->json([
                 'status'     => 'terminated',
                 'violations' => $violations,
                 'message'    => 'Exam terminated due to proctoring violations.',
-            ], 200);
+            ]);
         }
 
         return response()->json([
-            'status'          => 'warned',
-            'violations'      => $violations,
-            'remaining'       => $maxViolations - $violations,
-        ], 200);
+            'status'     => 'warned',
+            'violations' => $violations,
+            'remaining'  => max(0, $maxViolations - $violations),
+        ]);
     }
 
     /**
-     * Force-finish an attempt (zero-score any incomplete modules) without an HTTP redirect.
-     * Used internally by recordViolation.
+     * Zero-fill all incomplete modules for an attempt.
+     * Called from both finish() and recordViolation() so logic lives in one place.
      */
-    private function forceFinish(TestAttempt $attempt): void
+    private function zeroFillIncompleteModules(TestAttempt $attempt): void
     {
-        if ($attempt->completed_at) {
-            return;
-        }
+        $attempt->loadMissing(['listeningAttempt', 'readingAttempt', 'aiWritingEvaluation', 'aiSpeakingEvaluation']);
 
         $listening = $attempt->listeningAttempt;
         if (! $listening) {
@@ -312,7 +261,12 @@ class TestController extends Controller
                 'completed_at'    => now(),
             ]);
         } elseif ($listening->status !== 'completed') {
-            $listening->update(['status' => 'completed', 'total_correct' => 0, 'band_score' => 0.0, 'completed_at' => now()]);
+            $listening->update([
+                'status'        => 'completed',
+                'total_correct' => 0,
+                'band_score'    => 0.0,
+                'completed_at'  => now(),
+            ]);
         }
 
         $reading = $attempt->readingAttempt;
@@ -328,17 +282,32 @@ class TestController extends Controller
                 'completed_at'    => now(),
             ]);
         } elseif ($reading->status !== 'completed') {
-            $reading->update(['status' => 'completed', 'total_correct' => 0, 'band_score' => 0.0, 'completed_at' => now()]);
+            $reading->update([
+                'status'        => 'completed',
+                'total_correct' => 0,
+                'band_score'    => 0.0,
+                'completed_at'  => now(),
+            ]);
         }
 
         if (! $attempt->aiWritingEvaluation) {
-            AiWritingEvaluation::create(['test_attempt_id' => $attempt->id, 'user_id' => $attempt->user_id, 'band_score' => 0.0]);
+            AiWritingEvaluation::create([
+                'test_attempt_id' => $attempt->id,
+                'user_id'         => $attempt->user_id,
+                'band_score'      => 0.0,
+            ]);
+        } elseif ($attempt->aiWritingEvaluation->band_score === null) {
+            $attempt->aiWritingEvaluation->update(['band_score' => 0.0]);
         }
 
         if (! $attempt->aiSpeakingEvaluation) {
-            AiSpeakingEvaluation::create(['test_attempt_id' => $attempt->id, 'user_id' => $attempt->user_id, 'band_score' => 0.0]);
+            AiSpeakingEvaluation::create([
+                'test_attempt_id' => $attempt->id,
+                'user_id'         => $attempt->user_id,
+                'band_score'      => 0.0,
+            ]);
+        } elseif ($attempt->aiSpeakingEvaluation->band_score === null) {
+            $attempt->aiSpeakingEvaluation->update(['band_score' => 0.0]);
         }
-
-        $attempt->update(['status' => 'completed', 'completed_at' => now()]);
     }
 }

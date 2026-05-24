@@ -68,14 +68,14 @@ class User extends Authenticatable
         return $this->hasMany(TestAttempt::class);
     }
 
-    public function isAdmin()
+    public function isAdmin(): bool
     {
-        return $this->roles->contains('name', 'Admin');
+        return $this->roles()->where('name', 'Admin')->exists();
     }
 
     public function hasRole(string $roleName): bool
     {
-        return $this->roles->contains('name', $roleName);
+        return $this->roles()->where('name', $roleName)->exists();
     }
 
     public function writingAnswers()

@@ -12,7 +12,7 @@ class ResultController extends Controller
     {
         $query = TestAttempt::with(['user', 'test']);
 
-        if ($request->has('search') && $request->search) {
+        if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($outer) use ($search) {
                 $outer->whereHas('user', function ($q) use ($search) {
@@ -26,9 +26,29 @@ class ResultController extends Controller
 
         $attempts = $query->latest()->paginate(20);
 
-        // Calculate dynamic aggregations if needed
-        $globalAccuracy = '74%';
-        $avgTimeSpent = '42m';
+        // Real aggregations from database
+        $totalCompleted = TestAttempt::whereNotNull('completed_at')->count();
+
+        // Global accuracy: percentage of attempts that were completed
+        $totalAttempts  = TestAttempt::count();
+        $globalAccuracy = $totalAttempts > 0
+            ? round(($totalCompleted / $totalAttempts) * 100) . '%'
+            : 'N/A';
+
+        // Average time spent on completed attempts (start → complete)
+        $avgSeconds = TestAttempt::whereNotNull('completed_at')
+            ->whereNotNull('started_at')
+            ->selectRaw('AVG(TIMESTAMPDIFF(SECOND, started_at, completed_at)) as avg_seconds')
+            ->value('avg_seconds');
+
+        if ($avgSeconds !== null) {
+            $avgMinutes  = (int) round($avgSeconds / 60);
+            $hours       = intdiv($avgMinutes, 60);
+            $mins        = $avgMinutes % 60;
+            $avgTimeSpent = $hours > 0 ? "{$hours}h {$mins}m" : "{$mins}m";
+        } else {
+            $avgTimeSpent = 'N/A';
+        }
 
         return view('admin.results.index', compact('attempts', 'globalAccuracy', 'avgTimeSpent'));
     }

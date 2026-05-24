@@ -24,8 +24,8 @@ class TestHistoryController extends Controller
 
     public function show(Request $request, TestAttempt $attempt)
     {
-        // Ensure the user owns this attempt
-        if ($attempt->user_id !== $request->user()->id) {
+        // Ensure the user owns this attempt (cast both sides to int to prevent type-juggling bypass)
+        if ((int) $attempt->user_id !== (int) $request->user()->id) {
             abort(403);
         }
 

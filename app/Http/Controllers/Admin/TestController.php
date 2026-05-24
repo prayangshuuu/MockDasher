@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreTestRequest;
+use App\Http\Requests\UpdateTestRequest;
 use App\Models\Test;
-use Illuminate\Http\Request;
 
 class TestController extends Controller
 {
@@ -22,14 +23,9 @@ class TestController extends Controller
         return view('admin.tests.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreTestRequest $request)
     {
-        $validated = $request->validate([
-            'book_number' => 'required|integer',
-            'year' => 'required|integer',
-            'exam_type' => 'required|string',
-            'status' => 'required|in:draft,published',
-        ]);
+        $validated = $request->validated();
 
         /** @var Test $test */
         $test = Test::query()->create($validated);
@@ -54,14 +50,9 @@ class TestController extends Controller
         return view('admin.tests.edit', compact('test'));
     }
 
-    public function update(Request $request, Test $test)
+    public function update(UpdateTestRequest $request, Test $test)
     {
-        $validated = $request->validate([
-            'book_number' => 'required|integer',
-            'year' => 'required|integer',
-            'exam_type' => 'required|string',
-            'status' => 'required|in:draft,published',
-        ]);
+        $validated = $request->validated();
 
         $test->update($validated);
 
