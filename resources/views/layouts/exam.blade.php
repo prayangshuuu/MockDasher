@@ -254,6 +254,18 @@
             document.addEventListener('copy', e => e.preventDefault());
             document.addEventListener('paste', e => e.preventDefault());
 
+            // Override form submit to bypass warning on programmatic submits
+            const originalSubmit = HTMLFormElement.prototype.submit;
+            HTMLFormElement.prototype.submit = function() {
+                window.isAutoSubmitting = true;
+                originalSubmit.apply(this, arguments);
+            };
+
+            // Disable warning when submitting any form via standard submit button
+            document.addEventListener('submit', function() {
+                window.isAutoSubmitting = true;
+            });
+
             // Accidental tab close warning
             window.onbeforeunload = function(e) {
                 if (window.isAutoSubmitting) return;
