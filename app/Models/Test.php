@@ -13,6 +13,11 @@ class Test extends Model
         return $this->hasMany(TestSet::class);
     }
 
+    public function testSets()
+    {
+        return $this->hasMany(TestSet::class);
+    }
+
     public function getTitleAttribute()
     {
         return "IELTS {$this->book_number} {$this->exam_type} {$this->year}";
