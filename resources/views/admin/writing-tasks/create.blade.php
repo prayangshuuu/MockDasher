@@ -248,6 +248,24 @@
                     <input type="file" name="task_image" accept="image/*" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:bg-primary/10 file:text-primary file:font-bold file:text-xs file:cursor-pointer hover:file:bg-primary/20">
                 </div>
             </div>
+
+            {{-- Image Alt Text for Gemini AI Evaluation (Task 1 only) --}}
+            <div class="space-y-2 p-5 rounded-xl border-2 border-violet-200 dark:border-violet-700 bg-violet-50/50 dark:bg-violet-900/10" id="image-alt-text-field">
+                <label class="block text-xs font-black text-violet-600 dark:text-violet-400 uppercase tracking-widest">
+                    <span class="material-symbols-outlined text-sm align-middle mr-1">smart_toy</span>
+                    Image Description for AI Evaluation (Alt Text)
+                    <span class="ml-2 px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-600 text-[9px] font-black uppercase tracking-widest border border-violet-200 dark:border-violet-700">GEMINI INPUT</span>
+                </label>
+                <p class="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                    <strong class="text-violet-600">Task 1 only.</strong>
+                    The image above is displayed to students as a visual. This text is what gets sent to the Gemini AI for evaluating the student's response — describe the graph, chart, or table data in complete detail.<br>
+                    <em>Example: "A line graph comparing internet usage rates in five countries (UK, USA, China, India, Brazil) from 2000 to 2020. The UK started at 26% in 2000 and rose to 96% in 2020, the highest of all countries..."</em>
+                </p>
+                <textarea name="image_alt_text" id="form-image-alt-text" rows="5"
+                          class="w-full px-4 py-4 rounded-xl border border-violet-200 dark:border-violet-700 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm"
+                          placeholder="Describe the chart/graph/table data here so Gemini can evaluate the student's response...">{{ old('image_alt_text') }}</textarea>
+            </div>
+
             <div class="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-800">
                 <button type="submit" class="inline-flex items-center gap-2 bg-primary hover:bg-primary-hover text-white px-8 py-2.5 rounded-xl text-sm font-bold shadow-soft hover:shadow-premium transition-all duration-300">
                     <img src="/storage/asset/icons/create.svg" class="w-4 h-4 invert brightness-0" alt="Create" />

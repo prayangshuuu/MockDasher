@@ -6,35 +6,79 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Exam') — {{ config('app.name', 'MockDasher') }}</title>
 
-    {{-- Material Symbols --}}
+    {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap" rel="stylesheet" />
 
-    {{-- Alpine.js --}}
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    {{-- Tailwind CDN + Configuration --}}
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
-    {{-- Vite: Tailwind v4 CSS + App JS --}}
+    <style>
+        :root {
+            --shadow-soft: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-premium: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07);
+            --shadow-lift: 0 25px 50px -12px rgb(0 0 0 / 0.15);
+        }
+        .font-display { font-family: 'Inter', sans-serif; }
+    </style>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4F46E5",
+                        "primary-hover": "#4338CA",
+                        "background-light": "#F8FAFC",
+                        "background-dark": "#0F172A",
+                        "surface-light": "#FFFFFF",
+                        "surface-dark": "#1E293B",
+                        "error": "#EF4444",
+                        "success": "#10B981",
+                    },
+                    fontFamily: { "display": ["Inter", "sans-serif"] },
+                    borderRadius: {
+                        "xs": "0.375rem", "sm": "0.5rem", "base": "0.75rem", "DEFAULT": "0.75rem",
+                        "md": "0.75rem", "lg": "1rem", "xl": "1.5rem", "2xl": "2rem",
+                        "3xl": "2.5rem", "full": "9999px"
+                    },
+                    boxShadow: {
+                        'soft': 'var(--shadow-soft)',
+                        'premium': 'var(--shadow-premium)',
+                        'lift': 'var(--shadow-lift)',
+                    }
+                },
+            },
+        }
+    </script>
+
+    {{-- Vite: App CSS + App JS --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @stack('styles')
 </head>
 
-<body class="h-full overflow-hidden bg-[var(--color-bg-secondary)] font-sans text-[var(--color-text-primary)] antialiased flex flex-col">
+<body class="h-full overflow-hidden bg-background-light dark:bg-background-dark font-sans text-slate-800 dark:text-slate-100 antialiased flex flex-col">
 
     {{-- ═══════════════════════════════════════════════════════════════════════
          TOP BAR — Flat, distraction-free
          ═══════════════════════════════════════════════════════════════════════ --}}
-    <header class="z-50 flex h-14 shrink-0 items-center justify-between border-b border-[var(--color-divider)] bg-[var(--color-bg-primary)] px-4 sm:px-6 lg:px-8">
+    <header class="z-50 flex h-14 shrink-0 items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-surface-light dark:bg-surface-dark px-4 sm:px-6 lg:px-8">
 
         {{-- Left: Brand + Test Info --}}
         <div class="flex min-w-0 items-center gap-3">
-            <div class="flex size-8 shrink-0 items-center justify-center rounded-[var(--radius-base)] bg-[var(--color-primary)] text-white">
-                <span class="material-symbols-outlined text-lg" style="font-variation-settings:'FILL' 1">menu_book</span>
+            <div class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-soft">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
+                    <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+                </svg>
             </div>
             <div class="min-w-0">
-                <p class="text-[10px] font-bold uppercase tracking-widest text-[var(--color-primary)] leading-none">@yield('test_type', 'Exam')</p>
-                <h1 class="truncate text-sm font-bold text-[var(--color-text-primary)]">@yield('test_title', 'Mock Test')</h1>
+                <p class="text-[9px] font-black uppercase tracking-widest text-primary leading-none">@yield('test_type', 'Exam')</p>
+                <h1 class="truncate text-sm font-extrabold text-slate-900 dark:text-white mt-0.5 tracking-tight">@yield('test_title', 'Mock Test')</h1>
             </div>
         </div>
 
@@ -47,12 +91,12 @@
         <div class="flex items-center gap-4">
             @yield('top_right_actions')
 
-            <div class="hidden items-center gap-3 border-l border-[var(--color-divider)] pl-4 sm:flex">
+            <div class="hidden items-center gap-3 border-l border-slate-200 dark:border-slate-800 pl-4 sm:flex">
                 <div class="text-right">
-                    <p class="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] leading-none">Candidate</p>
-                    <p class="text-xs font-bold text-[var(--color-text-primary)]">{{ auth()->user()->name }}</p>
+                    <p class="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 leading-none">Candidate</p>
+                    <p class="text-xs font-bold text-slate-800 dark:text-slate-200 mt-1">{{ auth()->user()->name }}</p>
                 </div>
-                <div class="flex size-8 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--color-primary)_12%,transparent)] text-xs font-bold text-[var(--color-primary)] overflow-hidden">
+                <div class="flex size-8 items-center justify-center rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-xs font-bold text-primary overflow-hidden border border-indigo-100 dark:border-indigo-800/80 shadow-sm shrink-0">
                     @if(auth()->user()->profile_photo_path)
                         <img class="h-full w-full object-cover" src="{{ Storage::url(auth()->user()->profile_photo_path) }}" alt="{{ auth()->user()->name }}">
                     @else
@@ -69,6 +113,156 @@
     <main class="relative flex flex-1 flex-col overflow-hidden">
         @yield('content')
     </main>
+
+    {{-- Proctoring Warning Overlay Modal --}}
+    <div id="proctoring-warning-modal" class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md"></div>
+        <div class="relative w-full max-w-md rounded-2xl border border-red-200 dark:border-red-900/50 bg-white/95 dark:bg-slate-900/95 p-6 shadow-lift text-center">
+            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-50 dark:bg-red-950/30 text-red-600 mb-4 border border-red-100 dark:border-red-900/40">
+                <svg class="h-8 w-8 animate-bounce text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2 uppercase tracking-wide">Proctoring Violation Alert!</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400 mb-6 font-medium">
+                You switched tabs or lost focus on the exam window. This is strictly prohibited. 
+                <br/><br/>
+                Warnings remaining: <span id="proctoring-warning-count" class="font-bold text-red-600 text-base">3</span> / 3.
+                <br/>
+                On the next violation, your exam will be <strong class="text-red-500">automatically submitted</strong> and locked.
+            </p>
+            <button type="button" onclick="resumeProctoredExam()" class="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-xl text-sm font-bold shadow-soft transition-all duration-200 focus:outline-none">
+                I Understand & Resume Exam
+            </button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const proctorKey = "proctoring_violations_" + window.location.pathname;
+            let isWarningActive = false;
+            window.isAutoSubmitting = false;
+
+            function playWarningBeep() {
+                try {
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // A4 tone
+                    gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    oscillator.start();
+                    setTimeout(() => {
+                        oscillator.stop();
+                        audioCtx.close();
+                    }, 300);
+                } catch(e) {}
+            }
+
+            function autoSubmitActiveExam() {
+                if (window.isAutoSubmitting) return;
+                window.isAutoSubmitting = true;
+                
+                window.onbeforeunload = null;
+                
+                console.log("Proctoring: Auto-submitting active exam...");
+                
+                const speakingForm = document.getElementById('speaking-submit-form');
+                if (speakingForm) {
+                    speakingForm.submit();
+                    return;
+                }
+                
+                const writingForm = document.getElementById('writing-submit-form');
+                if (writingForm) {
+                    writingForm.submit();
+                    return;
+                }
+                
+                const readingForm = document.getElementById('final-submit-form');
+                if (readingForm) {
+                    if (typeof populateHiddenInputs === 'function') {
+                        populateHiddenInputs();
+                    }
+                    readingForm.submit();
+                    return;
+                }
+                
+                const listeningForm = document.getElementById('listening-submit-form');
+                if (listeningForm) {
+                    listeningForm.submit();
+                    return;
+                }
+                
+                window.location.href = "/dashboard";
+            }
+
+            function triggerViolation() {
+                if (isWarningActive || window.isAutoSubmitting) return;
+                isWarningActive = true;
+                
+                let violations = parseInt(localStorage.getItem(proctorKey) || '0');
+                violations++;
+                localStorage.setItem(proctorKey, violations);
+                
+                playWarningBeep();
+                
+                const modal = document.getElementById('proctoring-warning-modal');
+                const warningCountEl = document.getElementById('proctoring-warning-count');
+                
+                if (violations >= 3) {
+                    if (warningCountEl) warningCountEl.textContent = '0';
+                    if (modal) {
+                        modal.querySelector('h3').textContent = 'EXAM TERMINATED!';
+                        modal.querySelector('p').innerHTML = 'You have exceeded the maximum of 3 focus-loss violations. Your exam is being automatically submitted now...';
+                        modal.querySelector('button').style.display = 'none';
+                        modal.classList.remove('hidden');
+                    }
+                    setTimeout(() => {
+                        autoSubmitActiveExam();
+                    }, 1500);
+                } else {
+                    if (warningCountEl) warningCountEl.textContent = (3 - violations).toString();
+                    if (modal) {
+                        modal.classList.remove('hidden');
+                    }
+                }
+            }
+
+            window.resumeProctoredExam = function() {
+                const modal = document.getElementById('proctoring-warning-modal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                }
+                setTimeout(() => {
+                    isWarningActive = false;
+                }, 300);
+            };
+
+            // Anti-cheat event triggers
+            window.addEventListener('blur', triggerViolation);
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    triggerViolation();
+                }
+            });
+
+            // Prevent shortcuts and context menu
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('copy', e => e.preventDefault());
+            document.addEventListener('paste', e => e.preventDefault());
+
+            // Accidental tab close warning
+            window.onbeforeunload = function(e) {
+                if (window.isAutoSubmitting) return;
+                const message = "Are you sure you want to leave the exam? Your progress may be lost.";
+                e.returnValue = message;
+                return message;
+            };
+        })();
+    </script>
 
     @stack('scripts')
 </body>

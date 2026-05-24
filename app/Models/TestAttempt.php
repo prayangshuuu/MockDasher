@@ -45,14 +45,12 @@ class TestAttempt extends Model
 
     public function readingAttempt()
     {
-        return $this->hasOne(ReadingAttempt::class, 'test_set_id', 'test_set_id')
-            ->where(fn ($q) => $q->where('user_id', $this->user_id));
+        return $this->hasOne(ReadingAttempt::class, 'test_attempt_id');
     }
 
     public function listeningAttempt()
     {
-        return $this->hasOne(ListeningAttempt::class, 'test_set_id', 'test_set_id')
-            ->where(fn ($q) => $q->where('user_id', $this->user_id));
+        return $this->hasOne(ListeningAttempt::class, 'test_attempt_id');
     }
 
     public function aiWritingEvaluation()

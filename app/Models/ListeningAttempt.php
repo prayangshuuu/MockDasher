@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ListeningAttempt extends Model
 {
     protected $fillable = [
-        'user_id', 'test_set_id', 'current_section', 'status',
+        'user_id', 'test_set_id', 'test_attempt_id', 'current_section', 'status',
         'total_correct', 'band_score',
         'started_at', 'transfer_started_at', 'completed_at',
     ];

@@ -11,9 +11,22 @@ class AiWritingEvaluation extends Model
         'test_attempt_id',
         'task_1_answer',
         'task_2_answer',
-        'evaluation_text',
-        'band_score',
+        'task_1_evaluation_json',    // Full Gemini JSON for Task 1
+        'task_2_evaluation_json',    // Full Gemini JSON for Task 2
+        'task_1_band_score',         // Band score for Task 1
+        'task_2_band_score',         // Band score for Task 2
+        'evaluation_text',           // Legacy combined evaluation text
+        'band_score',                // Overall averaged band score
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'task_1_band_score' => 'float',
+            'task_2_band_score' => 'float',
+            'band_score'        => 'float',
+        ];
+    }
 
     public function user()
     {

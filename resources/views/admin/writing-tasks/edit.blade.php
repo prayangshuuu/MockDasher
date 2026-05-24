@@ -77,19 +77,38 @@
             </div>
             @endif
 
-            <div class="p-8 rounded-[2rem] bg-slate-50 dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div class="flex-1">
-                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Upload New Task Image</label>
-                    <p class="text-[10px] font-bold text-slate-400 italic mb-4">Optional. Will replace any existing image.</p>
-                    <input type="file" name="task_image" class="text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-6 file:rounded-xl file:border-0 file:text-xs file:font-black file:uppercase file:tracking-widest file:bg-primary file:text-white hover:file:opacity-90 transition-all">
-                </div>
-                
-                @if($writing_task->images->isNotEmpty())
-                    <div class="w-48 shrink-0">
-                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 text-center">Current Image</p>
-                        <img src="{{ Storage::url($writing_task->images->first()->image_path) }}" alt="Task Image" class="w-full h-auto rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div class="p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-800 space-y-5">
+                <div class="flex flex-col md:flex-row items-start gap-6">
+                    <div class="flex-1">
+                        <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Upload New Task Image</label>
+                        <p class="text-[10px] font-bold text-slate-400 italic mb-4">Optional. Will replace any existing image.</p>
+                        <input type="file" name="task_image" class="text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-6 file:rounded-xl file:border-0 file:text-xs file:font-black file:uppercase file:tracking-widest file:bg-primary file:text-white hover:file:opacity-90 transition-all">
                     </div>
-                @endif
+
+                    @if($writing_task->images->isNotEmpty())
+                        <div class="w-48 shrink-0">
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 text-center">Current Image</p>
+                            <img src="{{ Storage::url($writing_task->images->first()->image_path) }}" alt="Task Image" class="w-full h-auto rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        </div>
+                    @endif
+                </div>
+
+                {{-- Image Alt Text for Gemini AI Evaluation --}}
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-violet-500 uppercase tracking-widest">
+                        <span class="material-symbols-outlined text-sm align-middle mr-1">smart_toy</span>
+                        Image Description for AI Evaluation (Alt Text)
+                        <span class="ml-2 px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-600 text-[9px] font-black uppercase tracking-widest">GEMINI INPUT</span>
+                    </label>
+                    <p class="text-[10px] font-semibold text-slate-400">
+                        <strong class="text-violet-500">Task 1 only.</strong>
+                        The image is shown to students as a visual. This text is what gets sent to Gemini for AI grading — describe the graph, table, or chart data in detail so the AI can assess whether the student summarised it correctly.<br>
+                        <em>Example: "A bar chart showing the percentage of internet users in five countries (UK, USA, China, India, Brazil) between 2000 and 2020. The UK had the highest usage at 96% in 2020..."</em>
+                    </p>
+                    <textarea name="image_alt_text" rows="5"
+                              class="w-full px-5 py-4 rounded-2xl border-2 border-violet-200 dark:border-violet-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:ring-4 focus:ring-violet-500/20 focus:border-violet-500 transition-all shadow-sm"
+                              placeholder="Describe the chart/graph/table data here so Gemini can evaluate the student's response...">{{ $writing_task->images->first()?->alt_text ?? $writing_task->precontext ?? '' }}</textarea>
+                </div>
             </div>
 
             <div class="pt-8 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">

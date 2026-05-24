@@ -29,16 +29,19 @@ class User extends Authenticatable
         'exam_date',
         'first_name',
         'last_name',
+        'gemini_api_key',   // User's personal Gemini API key for AI evaluation
     ];
 
     /**
      * The attributes that should be hidden for serialization.
+     * gemini_api_key is hidden so it is never exposed in JSON responses.
      *
      * @var list<string>
      */
     protected $hidden = [
         'password',
         'remember_token',
+        'gemini_api_key',   // Never expose API keys in API responses
     ];
 
     /**

@@ -43,16 +43,23 @@ class ListeningTestController extends Controller
 
         // If in transfer mode, calculate transfer remaining time
         $transferRemainingSeconds = null;
+        $listeningRemainingSeconds = null;
         if ($attempt->status === 'transfer' && $attempt->transfer_started_at) {
             $elapsed = now()->diffInSeconds($attempt->transfer_started_at);
             $transferRemainingSeconds = max(0, 600 - $elapsed); // 10 minutes
             if ($transferRemainingSeconds <= 0) {
                 return $this->forceSubmit($attempt);
             }
+        } elseif ($attempt->status === 'in_progress' && $attempt->started_at) {
+            $elapsed = now()->diffInSeconds($attempt->started_at);
+            $listeningRemainingSeconds = max(0, 1800 - $elapsed); // 30 minutes
+            if ($listeningRemainingSeconds <= 0) {
+                return $this->forceSubmit($attempt);
+            }
         }
 
         return view('user.listening-test.show', compact(
-            'attempt', 'test', 'sections', 'savedAnswers', 'flaggedAnswers', 'transferRemainingSeconds'
+            'attempt', 'test', 'sections', 'savedAnswers', 'flaggedAnswers', 'transferRemainingSeconds', 'listeningRemainingSeconds'
         ));
     }
 

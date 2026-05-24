@@ -31,7 +31,7 @@ class TestHistoryController extends Controller
 
         $attempt->load([
             'testSet.test',
-            'writingAnswers',
+            'writingAnswers.writingTask',
             'readingAttempt',
             'listeningAttempt',
             'aiWritingEvaluation',

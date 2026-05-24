@@ -79,32 +79,23 @@
     </div>
 
     <nav class="flex-1 space-y-1 overflow-y-auto px-4 py-6">
-        <p class="mb-3 px-2 text-[11px] font-black uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500">Main</p>
+        <p class="mb-3 px-2 text-[11px] font-black uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500">Menu</p>
         @php
             $navItems = [
-                ['label' => 'Dashboard', 'icon' => 'dashboard', 'route' => 'dashboard', 'match' => 'dashboard'],
-                ['label' => 'Mock Tests', 'icon' => 'quiz', 'route' => 'user.tests.index', 'match' => 'user.tests.*'],
-                ['label' => 'Test History', 'icon' => 'history', 'route' => 'user.history.index', 'match' => 'user.history.*'],
+                ['label' => 'Dashboard',    'icon' => '/storage/asset/icons/overview.svg',  'route' => 'dashboard',          'match' => 'dashboard'],
+                ['label' => 'Mock Tests',   'icon' => '/storage/asset/icons/library.svg',   'route' => 'user.tests.index',   'match' => 'user.tests.*'],
+                ['label' => 'Test History', 'icon' => '/storage/asset/icons/history.svg',   'route' => 'user.history.index', 'match' => 'user.history.*'],
+                ['label' => 'Settings',     'icon' => '/storage/asset/icons/settings.svg',  'route' => 'profile.show',       'match' => 'profile.*'],
             ];
         @endphp
         @foreach($navItems as $item)
             @php $isActive = request()->routeIs($item['match']); @endphp
             <a href="{{ route($item['route']) }}"
                class="group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all duration-300 {{ $isActive ? 'bg-primary text-white shadow-soft' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white' }}">
-                <span class="material-symbols-outlined text-[20px] transition-colors {{ $isActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300' }}" @if($isActive) style="font-variation-settings:'FILL' 1" @endif>{{ $item['icon'] }}</span>
+                <img src="{{ $item['icon'] }}" class="w-5 h-5 transition-all duration-300 {{ $isActive ? 'invert brightness-0' : 'opacity-50 group-hover:opacity-100' }}" alt="{{ $item['label'] }}" />
                 {{ $item['label'] }}
             </a>
         @endforeach
-
-        <div class="my-3 border-t border-slate-200 dark:border-slate-800"></div>
-        <p class="mb-3 px-2 text-[11px] font-black uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500">Account</p>
-
-        @php $settingsActive = request()->routeIs('profile.show'); @endphp
-        <a href="{{ route('profile.show') }}"
-           class="group flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-colors {{ $settingsActive ? 'bg-primary text-white shadow-soft' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white' }}">
-            <span class="material-symbols-outlined text-[20px] transition-colors {{ $settingsActive ? 'text-white' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300' }}" @if($settingsActive) style="font-variation-settings:'FILL' 1" @endif>settings</span>
-            Settings
-        </a>
     </nav>
 
     <div class="border-t border-slate-200 dark:border-slate-800 px-6 py-5 bg-slate-50/50 dark:bg-slate-900/20">
@@ -118,7 +109,7 @@
             </div>
             <div class="min-w-0">
                 <p class="truncate text-sm font-bold text-slate-900 dark:text-white">{{ auth()->user()->name }}</p>
-                <p class="truncate text-xs text-slate-500 dark:text-slate-400 font-medium">{{ auth()->user()->email }}</p>
+                <p class="truncate text-[11px] font-black uppercase tracking-wider text-primary mt-0.5">Student</p>
             </div>
         </div>
     </div>
@@ -156,10 +147,8 @@
             </button>
             <div x-cloak x-show="open" x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-4" class="absolute right-0 top-full mt-3 w-56 rounded-2xl border border-slate-200 dark:border-slate-700 bg-surface-light dark:bg-surface-dark p-2 shadow-lift">
                 <a href="{{ route('profile.show') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-300 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white rounded-xl">
-                    <span class="material-symbols-outlined text-[20px] opacity-60">person</span> My Profile
-                </a>
-                <a href="{{ route('profile.show') }}" class="flex items-center gap-3 px-4 py-3 text-sm font-bold text-slate-700 dark:text-slate-300 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-white rounded-xl">
-                    <span class="material-symbols-outlined text-[20px] opacity-60">settings</span> Settings
+                    <img src="/storage/asset/icons/settings.svg" class="w-5 h-5 opacity-50" alt="Settings" />
+                    Settings
                 </a>
                 <div class="my-1 border-t border-slate-100 dark:border-slate-800"></div>
                 <form method="POST" action="{{ route('logout') }}">

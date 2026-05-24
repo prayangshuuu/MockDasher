@@ -30,53 +30,75 @@ class TestController extends Controller
             return redirect()->route('dashboard')->with('error', 'No test sets found for this test.');
         }
 
-        // Handle specific module starts
-        if ($request->module === 'writing') {
-            /** @var TestAttempt $attempt */
-            $attempt = TestAttempt::query()->firstOrCreate([
+        // Find an active (uncompleted) TestAttempt sitting container for this user & test set.
+        $testAttempt = TestAttempt::query()
+            ->where('user_id', auth()->id())
+            ->where('test_set_id', $testSet->id)
+            ->whereNull('completed_at')
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        // Check if the requested module has already been started/completed in this TestAttempt container
+        $needsNewAttempt = false;
+        if ($testAttempt) {
+            if ($request->module === 'writing' && ($testAttempt->writingAnswers()->exists() || $testAttempt->aiWritingEvaluation()->exists())) {
+                $needsNewAttempt = true;
+            } elseif ($request->module === 'speaking' && ($testAttempt->speakingAnswers()->exists() || $testAttempt->aiSpeakingEvaluation()->exists())) {
+                $needsNewAttempt = true;
+            } elseif ($request->module === 'listening' && $testAttempt->listeningAttempt()->exists()) {
+                $needsNewAttempt = true;
+            } elseif ($request->module === 'reading' && $testAttempt->readingAttempt()->exists()) {
+                $needsNewAttempt = true;
+            }
+        } else {
+            $needsNewAttempt = true;
+        }
+
+        if ($needsNewAttempt) {
+            $testAttempt = TestAttempt::create([
                 'user_id' => auth()->id(),
                 'test_set_id' => $testSet->id,
-                'status' => 'writing',
+                'status' => 'in_progress',
+                'started_at' => now(),
             ]);
+        }
 
-            return redirect()->route('user.writing.show', $attempt->id);
+        // Handle specific module starts
+        if ($request->module === 'writing') {
+            $testAttempt->update(['status' => 'writing']);
+            return redirect()->route('user.writing.show', $testAttempt->id);
         }
 
         if ($request->module === 'speaking') {
-            /** @var TestAttempt $attempt */
-            $attempt = TestAttempt::query()->firstOrCreate([
-                'user_id' => auth()->id(),
-                'test_set_id' => $testSet->id,
-                'status' => 'speaking',
-            ]);
-
-            return redirect()->route('user.speaking.show', $attempt->id);
+            $testAttempt->update(['status' => 'speaking']);
+            return redirect()->route('user.speaking.show', $testAttempt->id);
         }
 
         if ($request->module === 'listening') {
             /** @var ListeningAttempt $attempt */
             $attempt = ListeningAttempt::query()->firstOrCreate([
+                'test_attempt_id' => $testAttempt->id,
+            ], [
                 'user_id' => auth()->id(),
                 'test_set_id' => $testSet->id,
+                'status' => 'in_progress',
+                'current_section' => 1,
+                'started_at' => now(),
             ]);
-            if ($attempt->wasRecentlyCreated) {
-                $attempt->update([
-                    'status' => 'in_progress',
-                    'current_section' => 1,
-                ]);
-            }
 
             return redirect()->route('user.listening.show', $attempt->id);
         }
 
         if ($request->module === 'reading') {
             /** @var ReadingAttempt $attempt */
-            $attempt = ReadingAttempt::query()->firstOrCreate(
-                ['user_id' => auth()->id(), 'test_set_id' => $testSet->id]
-            );
-            if ($attempt->wasRecentlyCreated) {
-                $attempt->update(['status' => 'in_progress']);
-            }
+            $attempt = ReadingAttempt::query()->firstOrCreate([
+                'test_attempt_id' => $testAttempt->id,
+            ], [
+                'user_id' => auth()->id(),
+                'test_set_id' => $testSet->id,
+                'status' => 'in_progress',
+                'started_at' => now(),
+            ]);
 
             return redirect()->route('user.reading.show', $attempt->id);
         }

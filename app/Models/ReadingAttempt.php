@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ReadingAttempt extends Model
 {
-    protected $fillable = ['user_id', 'test_set_id', 'status', 'total_correct', 'band_score', 'started_at', 'completed_at'];
+    protected $fillable = ['user_id', 'test_set_id', 'test_attempt_id', 'status', 'total_correct', 'band_score', 'started_at', 'completed_at'];
 
     protected function casts(): array
     {

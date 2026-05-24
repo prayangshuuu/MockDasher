@@ -10,9 +10,17 @@ class AiSpeakingEvaluation extends Model
         'user_id',
         'test_attempt_id',
         'full_transcript',
-        'evaluation_text',
-        'band_score',
+        'evaluation_json',   // Full aggregated Gemini JSON for all speaking parts
+        'evaluation_text',   // Legacy text field
+        'band_score',        // Overall averaged band score
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'band_score' => 'float',
+        ];
+    }
 
     public function user()
     {

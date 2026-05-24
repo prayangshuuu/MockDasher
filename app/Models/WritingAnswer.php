@@ -33,4 +33,9 @@ class WritingAnswer extends Model
     {
         return $this->belongsTo(WritingTask::class, 'writing_task_id');
     }
+
+    public function writingTask()
+    {
+        return $this->belongsTo(WritingTask::class, 'writing_task_id');
+    }
 }
