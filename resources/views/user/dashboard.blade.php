@@ -84,35 +84,87 @@
 <section class="mb-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
 
     {{-- Score Progression (2/3 width) --}}
-    <div class="lg:col-span-2 bg-surface-light dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden">
-        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Score Improvement</h3>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Your band scores across recent tests</p>
-                </div>
+    <div class="lg:col-span-2 bg-surface-light dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden flex flex-col justify-between">
+        <style>
+            @keyframes growUp {
+                from { transform: scaleY(0); }
+                to { transform: scaleY(1); }
+            }
+            .animate-grow-up {
+                animation: growUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                transform-origin: bottom;
+            }
+        </style>
+        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <div>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <img src="/storage/asset/icons/bar-chart.svg" class="w-5 h-5 filter-indigo-600 dark:invert shrink-0" alt="Chart" />
+                    Score Improvement
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Your band scores across recent tests</p>
+            </div>
+            <div class="flex items-center gap-4 text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-widest shrink-0 mt-1 sm:mt-0">
+                <span class="flex items-center gap-1.5">
+                    <span class="size-2 rounded-full bg-slate-350 dark:bg-slate-700"></span> Past Attempts
+                </span>
+                <span class="flex items-center gap-1.5">
+                    <span class="size-2 rounded-full bg-gradient-to-r from-primary to-purple-500 shadow-sm"></span> Latest Score
+                </span>
             </div>
         </div>
-        <div class="p-6">
+        <div class="p-6 flex-1 flex flex-col justify-center">
             @if(count($chartData) > 0)
-                <div class="flex h-52 items-end gap-3">
-                    @foreach($chartData as $data)
-                        <div class="group relative flex flex-1 flex-col items-center">
-                            <div class="absolute -top-7 left-1/2 -translate-x-1/2 rounded-lg bg-slate-900 dark:bg-slate-700 px-2 py-1 text-[10px] font-bold text-white opacity-0 transition-opacity group-hover:opacity-100 whitespace-nowrap pointer-events-none shadow-lg z-10">
-                                Band {{ $data['score'] > 0 ? number_format($data['score'], 1) : 'N/A' }}
-                            </div>
-                            <div
-                                class="w-full rounded-t-xl transition-all duration-700 {{ $loop->last ? 'bg-primary' : 'bg-primary/25 dark:bg-primary/20' }}"
-                                style="height: {{ max($data['height'], 8) }}%"
-                            ></div>
-                            <span class="mt-2 text-[10px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">{{ $data['label'] }}</span>
+                <div class="flex h-56 items-stretch gap-4">
+                    {{-- Y-Axis Labels --}}
+                    <div class="flex flex-col justify-between text-[10px] font-extrabold text-slate-400 dark:text-slate-500 w-8 pr-2 shrink-0 py-2 border-r border-slate-100 dark:border-slate-800/80">
+                        <span>9.0</span>
+                        <span>7.5</span>
+                        <span>6.0</span>
+                        <span>4.5</span>
+                        <span>3.0</span>
+                        <span>1.5</span>
+                        <span>0.0</span>
+                    </div>
+
+                    {{-- Main Chart Box --}}
+                    <div class="flex-1 relative min-w-0 h-full">
+                        {{-- Horizontal Grid Lines --}}
+                        <div class="absolute inset-0 flex flex-col justify-between pointer-events-none py-2 z-0">
+                            <div class="border-b border-dashed border-slate-100 dark:border-slate-800/80 w-full h-0"></div>
+                            <div class="border-b border-dashed border-slate-100 dark:border-slate-800/80 w-full h-0"></div>
+                            <div class="border-b border-dashed border-slate-100 dark:border-slate-800/80 w-full h-0"></div>
+                            <div class="border-b border-dashed border-slate-100 dark:border-slate-800/80 w-full h-0"></div>
+                            <div class="border-b border-dashed border-slate-100 dark:border-slate-800/80 w-full h-0"></div>
+                            <div class="border-b border-dashed border-slate-100 dark:border-slate-800/80 w-full h-0"></div>
+                            <div class="border-b border-solid border-slate-200 dark:border-slate-700/80 w-full h-0"></div>
                         </div>
-                    @endforeach
+
+                        {{-- Flex Bars --}}
+                        <div class="absolute inset-0 flex items-end gap-3 sm:gap-4 md:gap-6 z-10 px-2 py-2">
+                            @foreach($chartData as $data)
+                                <div class="group relative flex flex-1 flex-col items-center h-full justify-end min-w-0">
+                                    {{-- Tooltip --}}
+                                    <div class="absolute -top-7 left-1/2 -translate-x-1/2 rounded-lg bg-slate-900 dark:bg-slate-700 px-2 py-1 text-[10px] font-bold text-white opacity-0 transition-opacity group-hover:opacity-100 whitespace-nowrap pointer-events-none shadow-lg z-20">
+                                        Band {{ $data['score'] > 0 ? number_format($data['score'], 1) : 'N/A' }}
+                                    </div>
+                                    
+                                    {{-- Column Bar --}}
+                                    <div
+                                        class="w-full rounded-t-lg sm:rounded-t-xl transition-all duration-500 ease-out transform hover:scale-x-105 hover:brightness-110 animate-grow-up {{ $loop->last ? 'bg-gradient-to-t from-primary to-purple-500 shadow-md shadow-indigo-500/20' : 'bg-gradient-to-t from-slate-200/90 to-slate-350 dark:from-slate-800/90 dark:to-slate-700 opacity-80 hover:opacity-100' }}"
+                                        style="height: {{ max($data['height'], 8) }}%"
+                                    ></div>
+                                    
+                                    {{-- X-Axis Label --}}
+                                    <span class="mt-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 truncate w-full text-center">{{ $data['label'] }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
             @else
-                <div class="flex h-52 flex-col items-center justify-center text-center gap-3">
-                    <span class="material-symbols-outlined text-5xl text-slate-300 dark:text-slate-700">bar_chart</span>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">Complete a test to see your score progression</p>
+                <div class="flex h-56 flex-col items-center justify-center text-center gap-3">
+                    <img src="/storage/asset/icons/bar-chart.svg" class="w-12 h-12 opacity-30 dark:invert" alt="Empty" />
+                    <p class="text-sm font-bold text-slate-500 dark:text-slate-400">Complete a test to see your score progression</p>
                 </div>
             @endif
         </div>
