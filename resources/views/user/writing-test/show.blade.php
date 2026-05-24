@@ -208,6 +208,8 @@
     setInterval(function() {
         timeRemaining--;
         if (timeRemaining <= 0) {
+            window.isAutoSubmitting = true;
+            window.onbeforeunload = null;
             document.getElementById('writing-submit-form').submit();
             return;
         }
@@ -332,6 +334,8 @@
 
     // ── End Exam ──
     window.endExam = function() {
+        window.isAutoSubmitting = true;
+        window.onbeforeunload = null;
         document.getElementById('writing-submit-form').submit();
     };
 })();

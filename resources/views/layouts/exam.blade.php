@@ -258,12 +258,14 @@
             const originalSubmit = HTMLFormElement.prototype.submit;
             HTMLFormElement.prototype.submit = function() {
                 window.isAutoSubmitting = true;
+                window.onbeforeunload = null;
                 originalSubmit.apply(this, arguments);
             };
 
             // Disable warning when submitting any form via standard submit button
             document.addEventListener('submit', function() {
                 window.isAutoSubmitting = true;
+                window.onbeforeunload = null;
             });
 
             // Accidental tab close warning
