@@ -53,10 +53,28 @@ class WritingTestController extends Controller
             return response()->json(['error' => 'Unauthorized or completed'], 403);
         }
 
-        foreach ($request->answers as $taskId => $text) {
+        // Issue 5: server-side time enforcement (60 min + 60 s grace)
+        if ($attempt->started_at && now()->diffInSeconds($attempt->started_at) > 3660) {
+            return response()->json(['error' => 'Time expired'], 403);
+        }
+
+        // Issue 4: validate input shape and size before processing
+        $request->validate([
+            'answers'   => 'array|max:10',
+            'answers.*' => 'nullable|string|max:65535',
+        ]);
+
+        // Issue 3: resolve valid task IDs scoped to this attempt's test set
+        $validTaskIds = $attempt->testSet->writingTasks->pluck('id')->toArray();
+
+        foreach ($request->input('answers', []) as $taskId => $text) {
+            if (! in_array((int) $taskId, $validTaskIds)) {
+                continue;
+            }
+
             $existing = WritingAnswer::where([
                 'test_attempt_id' => $attempt->id,
-                'writing_task_id' => $taskId,
+                'writing_task_id' => (int) $taskId,
             ])->first();
 
             // Don't overwrite if already submitted
@@ -65,7 +83,7 @@ class WritingTestController extends Controller
             }
 
             WritingAnswer::updateOrCreate(
-                ['user_id' => auth()->id(), 'test_attempt_id' => $attempt->id, 'writing_task_id' => $taskId],
+                ['user_id' => auth()->id(), 'test_attempt_id' => $attempt->id, 'writing_task_id' => (int) $taskId],
                 ['answer_text' => $text, 'word_count' => str_word_count(strip_tags((string) $text))]
             );
         }
@@ -85,6 +103,17 @@ class WritingTestController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        // Issue 3: verify the task belongs to this attempt's test set
+        $validTaskIds = $attempt->testSet->writingTasks->pluck('id')->toArray();
+        if (! in_array($task->id, $validTaskIds)) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        // Issue 5: server-side time enforcement (60 min + 60 s grace)
+        if ($attempt->started_at && now()->diffInSeconds($attempt->started_at) > 3660) {
+            return response()->json(['error' => 'Time expired'], 403);
+        }
+
         // Check not already submitted
         $existingSubmitted = WritingAnswer::where([
             'user_id'         => auth()->id(),
@@ -96,7 +125,8 @@ class WritingTestController extends Controller
             return response()->json(['error' => 'Already submitted'], 409);
         }
 
-        $request->validate(['answer' => 'nullable|string']);
+        // Issue 4: enforce answer size limit
+        $request->validate(['answer' => 'nullable|string|max:65535']);
 
         $answer    = trim($request->input('answer', ''));
         $wordCount = $answer ? str_word_count(strip_tags($answer)) : 0;
@@ -146,7 +176,8 @@ class WritingTestController extends Controller
     protected function evaluateAllAnswers(TestAttempt $attempt): void
     {
         $user = $attempt->user;
-        $apiKey = $user->getRawOriginal('gemini_api_key') ?: env('GEMINI_API_KEY');
+        // Issue 10: use config() instead of env() so this works after config:cache
+        $apiKey = $user->getRawOriginal('gemini_api_key') ?: config('services.gemini.key');
         if (empty($apiKey)) {
             Log::warning('No Gemini API key found for evaluation (neither user-specific nor global).');
             return;

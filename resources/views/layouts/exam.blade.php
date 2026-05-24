@@ -139,20 +139,29 @@
 
     <script>
         (function() {
-            const proctorKey = "proctoring_violations_" + window.location.pathname;
+            // Issue 9: violation count is now authoritative on the server.
+            // localStorage is kept only as a display cache; the server count governs termination.
             let isWarningActive = false;
             window.isAutoSubmitting = false;
             let isUnloading = false;
+            let serverViolations = 0; // updated from server responses
 
-            window.addEventListener('beforeunload', () => {
-                isUnloading = true;
-            });
-            window.addEventListener('pagehide', () => {
-                isUnloading = true;
-            });
-            window.addEventListener('unload', () => {
-                isUnloading = true;
-            });
+            // Derive the violation-report URL from the current path pattern:
+            // /tests/attempts/{id}/writing  →  /tests/attempts/{id}/violation
+            const pathParts = window.location.pathname.split('/');
+            // pathParts: ['', 'tests', 'attempts', '{id}', 'writing'|'speaking'|...]
+            let violationUrl = null;
+            if (pathParts[1] === 'tests' && pathParts[2] === 'attempts' && pathParts[3]) {
+                violationUrl = '/tests/attempts/' + pathParts[3] + '/violation';
+            }
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')
+                ? document.querySelector('meta[name="csrf-token"]').content
+                : '';
+
+            window.addEventListener('beforeunload', () => { isUnloading = true; });
+            window.addEventListener('pagehide',     () => { isUnloading = true; });
+            window.addEventListener('unload',       () => { isUnloading = true; });
 
             function playWarningBeep() {
                 try {
@@ -162,77 +171,77 @@
                     oscillator.connect(gainNode);
                     gainNode.connect(audioCtx.destination);
                     oscillator.type = 'sine';
-                    oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // A4 tone
+                    oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
                     gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
                     oscillator.start();
-                    setTimeout(() => {
-                        oscillator.stop();
-                        audioCtx.close();
-                    }, 300);
+                    setTimeout(() => { oscillator.stop(); audioCtx.close(); }, 300);
                 } catch(e) {}
             }
 
             function autoSubmitActiveExam() {
                 if (window.isAutoSubmitting) return;
                 window.isAutoSubmitting = true;
-                
                 window.onbeforeunload = null;
-                
-                console.log("Proctoring: Auto-submitting active exam...");
-                
+
                 const speakingForm = document.getElementById('speaking-submit-form');
                 if (speakingForm) {
-                    if (typeof window.prepareSpeakingSubmit === 'function') {
-                        window.prepareSpeakingSubmit();
-                    }
-                    speakingForm.submit();
-                    return;
+                    if (typeof window.prepareSpeakingSubmit === 'function') window.prepareSpeakingSubmit();
+                    speakingForm.submit(); return;
                 }
-                
                 const writingForm = document.getElementById('writing-submit-form');
                 if (writingForm) {
-                    if (typeof window.prepareWritingSubmit === 'function') {
-                        window.prepareWritingSubmit();
-                    }
-                    writingForm.submit();
-                    return;
+                    if (typeof window.prepareWritingSubmit === 'function') window.prepareWritingSubmit();
+                    writingForm.submit(); return;
                 }
-                
                 const readingForm = document.getElementById('final-submit-form');
                 if (readingForm) {
-                    if (typeof populateHiddenInputs === 'function') {
-                        populateHiddenInputs();
-                    }
-                    readingForm.submit();
-                    return;
+                    if (typeof populateHiddenInputs === 'function') populateHiddenInputs();
+                    readingForm.submit(); return;
                 }
-                
                 const listeningForm = document.getElementById('listening-submit-form');
                 if (listeningForm) {
-                    if (typeof window.populateListeningInputs === 'function') {
-                        window.populateListeningInputs();
-                    }
-                    listeningForm.submit();
-                    return;
+                    if (typeof window.populateListeningInputs === 'function') window.populateListeningInputs();
+                    listeningForm.submit(); return;
                 }
-                
-                window.location.href = "/dashboard";
+                window.location.href = '/dashboard';
             }
 
-            function triggerViolation() {
+            // Issue 9: report the violation to the server; act on the server's authoritative count.
+            async function reportViolationToServer() {
+                if (!violationUrl || !csrfToken) return { violations: 1, status: 'warned', remaining: 2 };
+                try {
+                    const resp = await fetch(violationUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                        body: JSON.stringify({}),
+                    });
+                    return await resp.json();
+                } catch (e) {
+                    // Network failure: fall back to local counter (best-effort)
+                    return null;
+                }
+            }
+
+            async function triggerViolation() {
                 if (isWarningActive || window.isAutoSubmitting || isUnloading) return;
                 isWarningActive = true;
-                
-                let violations = parseInt(localStorage.getItem(proctorKey) || '0');
-                violations++;
-                localStorage.setItem(proctorKey, violations);
-                
+
                 playWarningBeep();
-                
+
+                // Report to server and use server's authoritative violation count
+                const result = await reportViolationToServer();
+                const violations = result ? result.violations : (serverViolations + 1);
+                serverViolations = violations;
+
                 const modal = document.getElementById('proctoring-warning-modal');
                 const warningCountEl = document.getElementById('proctoring-warning-count');
-                
-                if (violations >= 3) {
+                const terminated = result ? result.status === 'terminated' : violations >= 3;
+
+                if (terminated) {
                     if (warningCountEl) warningCountEl.textContent = '0';
                     if (modal) {
                         modal.querySelector('h3').textContent = 'EXAM TERMINATED!';
@@ -240,14 +249,11 @@
                         modal.querySelector('button').style.display = 'none';
                         modal.classList.remove('hidden');
                     }
-                    setTimeout(() => {
-                        autoSubmitActiveExam();
-                    }, 1500);
+                    setTimeout(() => { autoSubmitActiveExam(); }, 1500);
                 } else {
-                    if (warningCountEl) warningCountEl.textContent = (3 - violations).toString();
-                    if (modal) {
-                        modal.classList.remove('hidden');
-                    }
+                    const remaining = result ? result.remaining : (3 - violations);
+                    if (warningCountEl) warningCountEl.textContent = remaining.toString();
+                    if (modal) modal.classList.remove('hidden');
                 }
             }
 

@@ -36,6 +36,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tests', [TestController::class, 'index'])->name('user.tests.index');
     Route::match(['get', 'post'], '/tests/{test}/start', [TestController::class, 'start'])->name('user.tests.start');
     Route::post('/tests/attempts/{attempt}/finish', [TestController::class, 'finish'])->name('user.tests.finish');
+    Route::post('/tests/attempts/{attempt}/violation', [TestController::class, 'recordViolation'])->name('user.tests.violation');
 
     Route::get('/tests/attempts/{attempt}/writing', [WritingTestController::class, 'show'])->name('user.writing.show');
     Route::post('/tests/attempts/{attempt}/writing/autosave', [WritingTestController::class, 'autosave'])->name('user.writing.autosave');

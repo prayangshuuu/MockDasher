@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TestAttempt extends Model
 {
-    protected $fillable = ['user_id', 'test_set_id', 'status', 'started_at', 'completed_at'];
+    protected $fillable = ['user_id', 'test_set_id', 'status', 'started_at', 'completed_at', 'proctoring_violations'];
 
     protected function casts(): array
     {

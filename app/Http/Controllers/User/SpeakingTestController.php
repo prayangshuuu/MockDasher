@@ -66,18 +66,29 @@ class SpeakingTestController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
+        // Issue 5: server-side time enforcement (20 min + 60 s grace)
+        if ($attempt->started_at && now()->diffInSeconds($attempt->started_at) > 1260) {
+            return response()->json(['error' => 'Time expired'], 403);
+        }
+
         $request->validate([
-            'question_id' => 'required|exists:speaking_questions,id',
-            'audio'       => 'required|file|max:10240',
-            'transcript'  => 'nullable|string',
-            'duration'    => 'nullable|integer',
+            'question_id' => 'required|integer',
+            'audio'       => 'required|file|mimes:webm,ogg,mp4,mpeg,mp3,wav|max:10240',
+            'transcript'  => 'nullable|string|max:10000',
+            'duration'    => 'nullable|integer|min:0|max:600',
         ]);
+
+        // Issue 6: verify the question belongs to this attempt's test set
+        $validQuestionIds = $attempt->testSet->speakingQuestions->pluck('id')->toArray();
+        if (! in_array((int) $request->question_id, $validQuestionIds)) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
 
         // Don't overwrite a submitted answer
         $existing = SpeakingAnswer::where([
             'user_id'              => auth()->id(),
             'test_attempt_id'      => $attempt->id,
-            'speaking_question_id' => $request->question_id,
+            'speaking_question_id' => (int) $request->question_id,
         ])->whereNotNull('submitted_at')->first();
 
         if ($existing) {
@@ -90,7 +101,7 @@ class SpeakingTestController extends Controller
             [
                 'user_id'              => auth()->id(),
                 'test_attempt_id'      => $attempt->id,
-                'speaking_question_id' => $request->question_id,
+                'speaking_question_id' => (int) $request->question_id,
             ],
             [
                 'audio_path'       => $path,
@@ -111,6 +122,17 @@ class SpeakingTestController extends Controller
     {
         if ((int) $attempt->user_id !== (int) auth()->id() || $attempt->status === 'completed') {
             return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        // Issue 7: verify the question belongs to this attempt's test set
+        $validQuestionIds = $attempt->testSet->speakingQuestions->pluck('id')->toArray();
+        if (! in_array($question->id, $validQuestionIds)) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        // Issue 5: server-side time enforcement (20 min + 60 s grace)
+        if ($attempt->started_at && now()->diffInSeconds($attempt->started_at) > 1260) {
+            return response()->json(['error' => 'Time expired'], 403);
         }
 
         // Check already submitted
@@ -175,7 +197,8 @@ class SpeakingTestController extends Controller
     protected function evaluateAllAnswers(TestAttempt $attempt): void
     {
         $user = $attempt->user;
-        $apiKey = $user->getRawOriginal('gemini_api_key') ?: env('GEMINI_API_KEY');
+        // Issue 10: use config() instead of env() so this works after config:cache
+        $apiKey = $user->getRawOriginal('gemini_api_key') ?: config('services.gemini.key');
         if (empty($apiKey)) {
             Log::warning('No Gemini API key found for evaluation (neither user-specific nor global).');
             return;

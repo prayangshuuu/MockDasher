@@ -94,6 +94,11 @@ class TestController extends Controller
             ));
         }
 
+        // Issue 8: validate the module value against an explicit allow-list
+        $request->validate([
+            'module' => 'required|string|in:writing,speaking,listening,reading',
+        ]);
+
         // If POST/module select is requested, ensure we have an active attempt
         if (!$testAttempt) {
             $testAttempt = TestAttempt::create([
@@ -242,5 +247,98 @@ class TestController extends Controller
         ]);
 
         return redirect()->route('user.history.show', $attempt->id)->with('success', 'Full exam sitting completed! Unfinished modules were graded as 0.0.');
+    }
+
+    /**
+     * Issue 9: Record a proctoring violation server-side.
+     * The client sends a signal on each visibilitychange; the server tracks the count
+     * and auto-submits the attempt once the threshold is exceeded.
+     */
+    public function recordViolation(Request $request, TestAttempt $attempt)
+    {
+        if ((int) $attempt->user_id !== (int) auth()->id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        if ($attempt->completed_at) {
+            return response()->json(['status' => 'already_completed'], 200);
+        }
+
+        $violations = (int) $attempt->proctoring_violations + 1;
+        $attempt->update(['proctoring_violations' => $violations]);
+
+        $maxViolations = 3;
+
+        if ($violations >= $maxViolations) {
+            // Force-complete the attempt with zeroes for unfinished modules
+            // Reuse the finish logic by delegating to a shared private method
+            // so we do not duplicate code.
+            $this->forceFinish($attempt);
+
+            return response()->json([
+                'status'     => 'terminated',
+                'violations' => $violations,
+                'message'    => 'Exam terminated due to proctoring violations.',
+            ], 200);
+        }
+
+        return response()->json([
+            'status'          => 'warned',
+            'violations'      => $violations,
+            'remaining'       => $maxViolations - $violations,
+        ], 200);
+    }
+
+    /**
+     * Force-finish an attempt (zero-score any incomplete modules) without an HTTP redirect.
+     * Used internally by recordViolation.
+     */
+    private function forceFinish(TestAttempt $attempt): void
+    {
+        if ($attempt->completed_at) {
+            return;
+        }
+
+        $listening = $attempt->listeningAttempt;
+        if (! $listening) {
+            ListeningAttempt::create([
+                'test_attempt_id' => $attempt->id,
+                'user_id'         => $attempt->user_id,
+                'test_set_id'     => $attempt->test_set_id,
+                'status'          => 'completed',
+                'total_correct'   => 0,
+                'band_score'      => 0.0,
+                'started_at'      => now(),
+                'completed_at'    => now(),
+            ]);
+        } elseif ($listening->status !== 'completed') {
+            $listening->update(['status' => 'completed', 'total_correct' => 0, 'band_score' => 0.0, 'completed_at' => now()]);
+        }
+
+        $reading = $attempt->readingAttempt;
+        if (! $reading) {
+            ReadingAttempt::create([
+                'test_attempt_id' => $attempt->id,
+                'user_id'         => $attempt->user_id,
+                'test_set_id'     => $attempt->test_set_id,
+                'status'          => 'completed',
+                'total_correct'   => 0,
+                'band_score'      => 0.0,
+                'started_at'      => now(),
+                'completed_at'    => now(),
+            ]);
+        } elseif ($reading->status !== 'completed') {
+            $reading->update(['status' => 'completed', 'total_correct' => 0, 'band_score' => 0.0, 'completed_at' => now()]);
+        }
+
+        if (! $attempt->aiWritingEvaluation) {
+            AiWritingEvaluation::create(['test_attempt_id' => $attempt->id, 'user_id' => $attempt->user_id, 'band_score' => 0.0]);
+        }
+
+        if (! $attempt->aiSpeakingEvaluation) {
+            AiSpeakingEvaluation::create(['test_attempt_id' => $attempt->id, 'user_id' => $attempt->user_id, 'band_score' => 0.0]);
+        }
+
+        $attempt->update(['status' => 'completed', 'completed_at' => now()]);
     }
 }

@@ -60,14 +60,39 @@ class ReadingTestController extends Controller
             return response()->json(['error' => 'Unauthorized or completed'], 403);
         }
 
-        $flagged = $request->input('flagged', []);
+        // Issue 5: server-side time enforcement (60 min + 60 s grace)
+        if ($attempt->started_at && now()->diffInSeconds($attempt->started_at) > 3660) {
+            return response()->json(['error' => 'Time expired'], 403);
+        }
 
-        foreach ($request->input('answers', []) as $questionId => $answerText) {
+        // Issue 4: validate input shape and size
+        $request->validate([
+            'answers'   => 'array|max:50',
+            'answers.*' => 'nullable|string|max:1000',
+            'flagged'   => 'array|max:50',
+            'flagged.*' => 'nullable|boolean',
+        ]);
+
+        // Issue 2: resolve valid question IDs scoped to this attempt's test set
+        $validQuestionIds = $attempt->testSet
+            ->readingPassages()
+            ->with(['questionGroups.questions'])
+            ->get()
+            ->flatMap(fn ($p) => $p->questionGroups->flatMap(fn ($g) => $g->questions->pluck('id')))
+            ->toArray();
+
+        $flagged = $request->input('flagged', []);
+        $answers = $request->input('answers', []);
+
+        foreach ($answers as $questionId => $answerText) {
+            if (! in_array((int) $questionId, $validQuestionIds)) {
+                continue;
+            }
             ReadingAnswer::updateOrCreate(
                 [
                     'user_id' => auth()->id(),
                     'test_attempt_id' => $attempt->id,
-                    'question_id' => $questionId,
+                    'question_id' => (int) $questionId,
                 ],
                 [
                     'answer_text' => $answerText,
@@ -77,12 +102,15 @@ class ReadingTestController extends Controller
         }
 
         foreach ($flagged as $questionId => $isFlagged) {
-            if (! array_key_exists($questionId, $request->input('answers', []))) {
+            if (! in_array((int) $questionId, $validQuestionIds)) {
+                continue;
+            }
+            if (! array_key_exists($questionId, $answers)) {
                 ReadingAnswer::updateOrCreate(
                     [
                         'user_id' => auth()->id(),
                         'test_attempt_id' => $attempt->id,
-                        'question_id' => $questionId,
+                        'question_id' => (int) $questionId,
                     ],
                     [
                         'is_flagged' => (bool) $isFlagged,
@@ -100,14 +128,34 @@ class ReadingTestController extends Controller
             abort(403);
         }
 
-        $flagged = $request->input('flagged', []);
+        // Issue 4: validate input shape and size
+        $request->validate([
+            'answers'   => 'array|max:50',
+            'answers.*' => 'nullable|string|max:1000',
+            'flagged'   => 'array|max:50',
+            'flagged.*' => 'nullable|boolean',
+        ]);
 
-        foreach ($request->input('answers', []) as $questionId => $answerText) {
+        // Issue 2: resolve valid question IDs scoped to this attempt's test set
+        $validQuestionIds = $attempt->testSet
+            ->readingPassages()
+            ->with(['questionGroups.questions'])
+            ->get()
+            ->flatMap(fn ($p) => $p->questionGroups->flatMap(fn ($g) => $g->questions->pluck('id')))
+            ->toArray();
+
+        $flagged = $request->input('flagged', []);
+        $answers = $request->input('answers', []);
+
+        foreach ($answers as $questionId => $answerText) {
+            if (! in_array((int) $questionId, $validQuestionIds)) {
+                continue;
+            }
             ReadingAnswer::updateOrCreate(
                 [
                     'user_id' => auth()->id(),
                     'test_attempt_id' => $attempt->id,
-                    'question_id' => $questionId,
+                    'question_id' => (int) $questionId,
                 ],
                 [
                     'answer_text' => $answerText,
@@ -117,12 +165,15 @@ class ReadingTestController extends Controller
         }
 
         foreach ($flagged as $questionId => $isFlagged) {
-            if (! array_key_exists($questionId, $request->input('answers', []))) {
+            if (! in_array((int) $questionId, $validQuestionIds)) {
+                continue;
+            }
+            if (! array_key_exists($questionId, $answers)) {
                 ReadingAnswer::updateOrCreate(
                     [
                         'user_id' => auth()->id(),
                         'test_attempt_id' => $attempt->id,
-                        'question_id' => $questionId,
+                        'question_id' => (int) $questionId,
                     ],
                     [
                         'is_flagged' => (bool) $isFlagged,

@@ -69,7 +69,7 @@
                 <div class="passage-content mx-auto max-w-3xl space-y-6" data-passage="{{ $passage->passage_number }}" style="display:none;">
                     <h2 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">{{ $passage->title }}</h2>
                     <div class="prose max-w-none text-base leading-[1.9] text-slate-600 dark:text-slate-350">
-                        {!! $passage->content !!}
+                        {!! nl2br(e($passage->content)) !!}
                     </div>
                 </div>
             @endforeach

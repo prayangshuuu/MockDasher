@@ -72,15 +72,39 @@ class ListeningTestController extends Controller
             return response()->json(['error' => 'Unauthorized or completed'], 403);
         }
 
+        // Issue 5: server-side time enforcement (30 min + 60 s grace)
+        if ($attempt->started_at && now()->diffInSeconds($attempt->started_at) > 1860) {
+            return response()->json(['error' => 'Time expired'], 403);
+        }
+
+        // Issue 4: validate input shape and size before processing
+        $request->validate([
+            'answers'   => 'array|max:50',
+            'answers.*' => 'nullable|string|max:1000',
+            'flagged'   => 'array|max:50',
+            'flagged.*' => 'nullable|boolean',
+        ]);
+
+        // Issue 2: resolve valid question IDs scoped to this attempt's test set
+        $validQuestionIds = $attempt->testSet
+            ->listeningSections()
+            ->with('questions')
+            ->get()
+            ->flatMap(fn ($s) => $s->questions->pluck('id'))
+            ->toArray();
+
         $answers = $request->input('answers', []);
         $flagged = $request->input('flagged', []);
 
         foreach ($answers as $questionId => $answerText) {
+            if (! in_array((int) $questionId, $validQuestionIds)) {
+                continue;
+            }
             ListeningAnswer::updateOrCreate(
                 [
                     'user_id' => auth()->id(),
                     'test_attempt_id' => $attempt->id,
-                    'question_id' => $questionId,
+                    'question_id' => (int) $questionId,
                 ],
                 [
                     'answer_text' => $answerText,
@@ -90,12 +114,15 @@ class ListeningTestController extends Controller
         }
 
         foreach ($flagged as $questionId => $isFlagged) {
+            if (! in_array((int) $questionId, $validQuestionIds)) {
+                continue;
+            }
             if (! array_key_exists($questionId, $answers)) {
                 ListeningAnswer::updateOrCreate(
                     [
                         'user_id' => auth()->id(),
                         'test_attempt_id' => $attempt->id,
-                        'question_id' => $questionId,
+                        'question_id' => (int) $questionId,
                     ],
                     [
                         'is_flagged' => (bool) $isFlagged,
@@ -149,15 +176,34 @@ class ListeningTestController extends Controller
             abort(403);
         }
 
+        // Issue 4: validate input shape and size
+        $request->validate([
+            'answers'   => 'array|max:50',
+            'answers.*' => 'nullable|string|max:1000',
+            'flagged'   => 'array|max:50',
+            'flagged.*' => 'nullable|boolean',
+        ]);
+
+        // Issue 2: resolve valid question IDs scoped to this attempt's test set
+        $validQuestionIds = $attempt->testSet
+            ->listeningSections()
+            ->with('questions')
+            ->get()
+            ->flatMap(fn ($s) => $s->questions->pluck('id'))
+            ->toArray();
+
         // Save any final answers passed in payload
         $answers = $request->input('answers', []);
         $flagged = $request->input('flagged', []);
         foreach ($answers as $questionId => $answerText) {
+            if (! in_array((int) $questionId, $validQuestionIds)) {
+                continue;
+            }
             ListeningAnswer::updateOrCreate(
                 [
                     'user_id' => auth()->id(),
                     'test_attempt_id' => $attempt->id,
-                    'question_id' => $questionId,
+                    'question_id' => (int) $questionId,
                 ],
                 [
                     'answer_text' => $answerText,
@@ -167,12 +213,15 @@ class ListeningTestController extends Controller
         }
 
         foreach ($flagged as $questionId => $isFlagged) {
+            if (! in_array((int) $questionId, $validQuestionIds)) {
+                continue;
+            }
             if (! array_key_exists($questionId, $answers)) {
                 ListeningAnswer::updateOrCreate(
                     [
                         'user_id' => auth()->id(),
                         'test_attempt_id' => $attempt->id,
-                        'question_id' => $questionId,
+                        'question_id' => (int) $questionId,
                     ],
                     [
                         'is_flagged' => (bool) $isFlagged,
