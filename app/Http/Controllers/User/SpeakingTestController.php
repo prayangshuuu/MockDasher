@@ -192,12 +192,28 @@ class SpeakingTestController extends Controller
         if ($evaluation->evaluation_status === 'completed') {
             $attempt->update(['status' => 'in_progress']);
 
-            return redirect()->route('user.tests.start', $attempt->testSet->test_id)
+            return redirect()->route('user.speaking.result', $attempt->id)
                 ->with('success', 'Speaking test completed. Your AI evaluation report has been compiled.');
         }
 
-        return redirect()->route('user.tests.start', $attempt->testSet->test_id)
+        return redirect()->route('user.speaking.result', $attempt->id)
             ->with('success', 'Speaking test submitted. Your AI evaluation is in progress.');
+    }
+
+    public function result(TestAttempt $attempt)
+    {
+        $this->authorizeAttempt($attempt);
+
+        if (!$attempt->completed_at && $attempt->status !== 'speaking' && !$attempt->aiSpeakingEvaluation) {
+            return redirect()->route('user.speaking.show', $attempt->id);
+        }
+
+        $speakingQuestions = $attempt->testSet->speakingQuestions()->orderBy('part')->orderBy('id')->get();
+        $parts = $speakingQuestions->groupBy('part');
+        $existingAnswers = $attempt->speakingAnswers()->get()->keyBy('speaking_question_id');
+        $evaluation = $attempt->aiSpeakingEvaluation;
+
+        return view('user.speaking-test.result', compact('attempt', 'parts', 'speakingQuestions', 'existingAnswers', 'evaluation'));
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────────
@@ -223,7 +239,7 @@ class SpeakingTestController extends Controller
             }
         }
 
-        return redirect()->route('user.tests.start', $attempt->testSet->test_id)
+        return redirect()->route('user.speaking.result', $attempt->id)
             ->with('success', 'Time expired. Speaking test submitted automatically.');
     }
 

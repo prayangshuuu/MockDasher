@@ -19,10 +19,10 @@
         </div>
         <div class="flex items-center gap-3">
             <span class="px-4 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-bold uppercase tracking-widest text-slate-500">ID: #{{ $result->id }}</span>
-            <button class="inline-flex items-center gap-2 text-sm font-bold text-primary hover:text-primary-hover transition-colors px-4 py-2 rounded-lg border border-primary/20 hover:bg-primary/5">
+            <a href="{{ route('admin.results.pdf', $result->id) }}" class="inline-flex items-center gap-2 text-sm font-bold text-primary hover:text-primary-hover transition-colors px-4 py-2 rounded-lg border border-primary/20 hover:bg-primary/5">
                 <img src="/storage/asset/icons/pdf.svg" class="w-4 h-4" alt="PDF" />
                 Export PDF
-            </button>
+            </a>
         </div>
     </div>
 

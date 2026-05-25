@@ -346,10 +346,8 @@
                         <span class="text-white font-bold">Estimated Band Score</span>
                         <span class="bg-emerald-400 text-slate-900 px-3 py-1 rounded-full text-xs font-bold">+1.5 Improvement</span>
                     </div>
-                    <div class="h-48 flex items-end gap-3 px-2" x-data="{ heights: ['40%', '55%', '45%', '70%', '85%', '95%'] }">
-                        <template x-for="(height, index) in heights" :key="index">
-                            <div class="flex-1 bg-white/20 rounded-t-lg transition-all hover:bg-white/40" :class="{'!bg-white shadow-lg': index === 5}" :style="`height: ${height}`"></div>
-                        </template>
+                    <div class="h-48 flex items-end gap-3 px-2">
+                        <canvas id="welcomeProgressChart" class="w-full" height="192"></canvas>
                     </div>
                     <div class="flex justify-between mt-4 text-white/60 text-xs font-medium">
                         <span>WK 1</span>
@@ -445,7 +443,7 @@
                 <div class="bg-surface-light dark:bg-surface-dark p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-soft text-center group hover:-translate-y-2 hover:shadow-premium transition-all duration-300">
                     <div class="relative w-32 h-32 mx-auto mb-6">
                         <div class="absolute inset-0 bg-gradient-to-br from-primary to-violet-500 rounded-full blur-lg opacity-40 group-hover:opacity-60 transition-opacity"></div>
-                        <img class="relative w-32 h-32 rounded-full object-cover border-4 border-white dark:border-slate-800 shadow-md" src="/storage/asset/team/dipanwita.png" alt="Dipanwita Maitra">
+                        <img class="relative w-32 h-32 rounded-full object-cover border-4 border-white dark:border-slate-800 shadow-md" src="/storage/asset/team/dipanwita.jpeg" alt="Dipanwita Maitra">
                     </div>
                     <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-1">Dipanwita Maitra</h3>
                     <p class="text-primary font-semibold text-sm mb-3">UI/UX Designer</p>
@@ -525,6 +523,71 @@
         </div>
     </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    const ctx = document.getElementById('welcomeProgressChart');
+    if (!ctx) return;
+
+    const weeks = ['WK 1', 'WK 2', 'WK 3', 'WK 4', 'WK 5', 'CURRENT'];
+    const scores = [3.5, 5.0, 4.0, 6.5, 7.5, 8.5];
+
+    const bgColors = scores.map((_, i) =>
+        i === scores.length - 1 ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.22)'
+    );
+    const hoverColors = scores.map((_, i) =>
+        i === scores.length - 1 ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.4)'
+    );
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: weeks,
+            datasets: [{
+                data: scores,
+                backgroundColor: bgColors,
+                hoverBackgroundColor: hoverColors,
+                borderRadius: 8,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: false,
+            maintainAspectRatio: false,
+            animation: { duration: 1200, easing: 'easeOutQuart' },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(15,23,42,0.95)',
+                    titleFont: { weight: 'bold', size: 11 },
+                    bodyFont: { size: 13, weight: '700' },
+                    padding: 10,
+                    cornerRadius: 10,
+                    displayColors: false,
+                    callbacks: {
+                        label: ctx => `Band: ${ctx.parsed.y.toFixed(1)}`,
+                    },
+                },
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: 'rgba(255,255,255,0.55)',
+                        font: { weight: '700', size: 10 },
+                    },
+                    border: { display: false },
+                },
+                y: {
+                    display: false,
+                    min: 0,
+                    max: 9,
+                },
+            },
+        }
+    });
+})();
+</script>
 </body>
 
 </html>

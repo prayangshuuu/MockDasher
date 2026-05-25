@@ -207,6 +207,25 @@
         </div>
     </div>
 
+    {{-- Chart.js Module Performance Charts --}}
+    <div class="bg-surface-light dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
+            <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <img src="/storage/asset/icons/bar-chart.svg" class="w-5 h-5 filter-indigo-600 dark:invert shrink-0" alt="Chart" />
+                Module Performance Overview
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Visual breakdown across all four IELTS skills</p>
+        </div>
+        <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
+            <div class="relative h-64">
+                <canvas id="moduleRadarChart"></canvas>
+            </div>
+            <div class="relative h-64">
+                <canvas id="moduleBarChart"></canvas>
+            </div>
+        </div>
+    </div>
+
     {{-- AI Examiner Detailed Feedback & Reports --}}
     @if($attempt->writingAnswers->count() > 0 || $attempt->aiSpeakingEvaluation)
     <div class="space-y-8 pt-2">
@@ -356,3 +375,148 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+    const isDark = document.documentElement.classList.contains('dark');
+    const gridColor  = isDark ? 'rgba(51,65,85,0.6)'  : 'rgba(226,232,240,0.8)';
+    const labelColor = isDark ? '#94A3B8' : '#64748B';
+    const tooltipBg  = isDark ? '#1E293B' : '#0F172A';
+
+    const listening = {{ $attempt->listening_band ?? 'null' }};
+    const reading   = {{ $attempt->reading_band ?? 'null' }};
+    const writing   = {{ $attempt->aiWritingEvaluation?->band_score ?? 'null' }};
+    const speaking  = {{ $attempt->aiSpeakingEvaluation?->band_score ?? 'null' }};
+
+    const labels  = ['Listening', 'Reading', 'Writing', 'Speaking'];
+    const rawData = [listening ?? 0, reading ?? 0, writing ?? 0, speaking ?? 0];
+    const colors  = ['#6366F1', '#06B6D4', '#8B5CF6', '#10B981'];
+
+    // ── Radar Chart ───────────────────────────────────────────────────────────
+    const radarCtx = document.getElementById('moduleRadarChart');
+    if (radarCtx) {
+        new Chart(radarCtx, {
+            type: 'radar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Band Score',
+                    data: rawData,
+                    backgroundColor: 'rgba(99,102,241,0.18)',
+                    borderColor: '#6366F1',
+                    borderWidth: 2.5,
+                    pointBackgroundColor: colors,
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: tooltipBg,
+                        titleFont: { weight: 'bold', size: 11 },
+                        bodyFont: { size: 12, weight: '700' },
+                        padding: 10,
+                        cornerRadius: 10,
+                        displayColors: false,
+                        callbacks: {
+                            label: ctx => rawData[ctx.dataIndex] > 0
+                                ? `Band: ${rawData[ctx.dataIndex].toFixed(1)}`
+                                : 'Pending / N/A',
+                        },
+                    },
+                },
+                scales: {
+                    r: {
+                        min: 0,
+                        max: 9,
+                        ticks: {
+                            stepSize: 1.5,
+                            color: labelColor,
+                            backdropColor: 'transparent',
+                            font: { size: 9, weight: '700' },
+                            callback: v => v.toFixed(1),
+                        },
+                        grid: { color: gridColor },
+                        pointLabels: {
+                            color: isDark ? '#E2E8F0' : '#1E293B',
+                            font: { size: 12, weight: '700' },
+                        },
+                        angleLines: { color: gridColor },
+                    },
+                },
+            }
+        });
+    }
+
+    // ── Bar Chart ─────────────────────────────────────────────────────────────
+    const barCtx = document.getElementById('moduleBarChart');
+    if (barCtx) {
+        const bgColors = colors.map((c, i) => rawData[i] > 0 ? c + 'CC' : (isDark ? '#334155' : '#E2E8F0'));
+        const borderColors = colors.map((c, i) => rawData[i] > 0 ? c : (isDark ? '#475569' : '#CBD5E1'));
+
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Band Score',
+                    data: rawData,
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
+                    borderWidth: 2,
+                    borderRadius: 10,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: tooltipBg,
+                        titleFont: { weight: 'bold', size: 11 },
+                        bodyFont: { size: 12, weight: '700' },
+                        padding: 10,
+                        cornerRadius: 10,
+                        displayColors: false,
+                        callbacks: {
+                            label: ctx => ctx.parsed.y > 0
+                                ? `Band: ${ctx.parsed.y.toFixed(1)}`
+                                : 'Pending / N/A',
+                        },
+                    },
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: isDark ? '#E2E8F0' : '#334155', font: { weight: '700', size: 12 } },
+                        border: { display: false },
+                    },
+                    y: {
+                        min: 0,
+                        max: 9,
+                        ticks: {
+                            stepSize: 1.5,
+                            color: labelColor,
+                            font: { weight: '700', size: 10 },
+                            callback: v => v.toFixed(1),
+                        },
+                        grid: { color: gridColor },
+                        border: { display: false },
+                    },
+                },
+            }
+        });
+    }
+})();
+</script>
+@endpush

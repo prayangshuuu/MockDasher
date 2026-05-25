@@ -50,9 +50,7 @@
         <div class="w-full max-w-[480px] space-y-8">
             <div class="flex flex-col items-center text-center">
                 <a href="{{ url('/') }}" class="flex items-center gap-2 mb-8 group cursor-pointer hover:opacity-90 transition-opacity">
-                    <div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white">
-                        <span class="material-symbols-outlined text-2xl">bolt</span>
-                    </div>
+                    <img src="/storage/asset/logo.png" alt="MockDasher Logo" class="h-10" />
                     <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">MockDasher</h2>
                 </a>
                 <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Create your account</h1>
@@ -62,7 +60,7 @@
             <div class="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-premium border border-slate-200 dark:border-slate-800">
                 <form method="POST" action="{{ route('register') }}" class="space-y-5">
                     @csrf
-                    
+
                     <div class="space-y-2">
                         <label class="text-sm font-medium leading-none {{ $errors->has('name') ? 'text-red-500' : '' }}" for="name">Full Name</label>
                         <div class="relative">
@@ -116,7 +114,7 @@
                             I agree to the <span class="text-primary font-medium cursor-default" title="Coming soon">Terms of Service</span> and <span class="text-primary font-medium cursor-default" title="Coming soon">Privacy Policy</span>
                         </label>
                     </div>
-                    
+
                     <button class="w-full flex items-center justify-center h-12 px-4 py-2 bg-gradient-to-r from-primary to-[#6366f1] text-white text-sm font-semibold rounded-base shadow-lift hover:opacity-90 transition-opacity active:scale-[0.98]" type="submit">
                         Get Started
                     </button>
@@ -143,7 +141,7 @@
             </div>
 
             <p class="text-center text-sm text-slate-600 dark:text-slate-400">
-                Already have an account? 
+                Already have an account?
                 <a class="font-semibold text-primary hover:text-primary/80 transition-colors" href="{{ route('login') }}">Sign In</a>
             </p>
         </div>

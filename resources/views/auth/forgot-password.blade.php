@@ -23,9 +23,7 @@
 <div class="w-full max-w-[480px] space-y-8">
     <div class="flex flex-col items-center text-center">
         <a href="{{ url('/') }}" class="flex items-center gap-2 mb-8 group cursor-pointer hover:opacity-90 transition-opacity">
-            <div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white">
-                <span class="material-symbols-outlined text-2xl">bolt</span>
-            </div>
+            <img src="/storage/asset/logo.png" alt="MockDasher Logo" class="h-10" />
             <h2 class="text-2xl font-bold tracking-tight">MockDasher</h2>
         </a>
         <h1 class="text-3xl font-bold tracking-tight">Forgot your password?</h1>

@@ -185,12 +185,27 @@ class WritingTestController extends Controller
         if ($evaluation->evaluation_status === 'completed') {
             $attempt->update(['status' => 'in_progress']);
 
-            return redirect()->route('user.tests.start', $attempt->testSet->test_id)
+            return redirect()->route('user.writing.result', $attempt->id)
                 ->with('success', 'Writing test completed. Your AI evaluation report has been compiled.');
         }
 
-        return redirect()->route('user.tests.start', $attempt->testSet->test_id)
+        return redirect()->route('user.writing.result', $attempt->id)
             ->with('success', 'Writing test submitted. Your AI evaluation is in progress.');
+    }
+
+    public function result(TestAttempt $attempt)
+    {
+        $this->authorizeAttempt($attempt);
+
+        if (!$attempt->completed_at && $attempt->status !== 'writing' && !$attempt->aiWritingEvaluation) {
+            return redirect()->route('user.writing.show', $attempt->id);
+        }
+
+        $tasks = $attempt->testSet->writingTasks()->with('images')->orderBy('task_number')->get();
+        $answers = $attempt->writingAnswers->keyBy('writing_task_id');
+        $evaluation = $attempt->aiWritingEvaluation;
+
+        return view('user.writing-test.result', compact('attempt', 'tasks', 'answers', 'evaluation'));
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────────
@@ -216,7 +231,7 @@ class WritingTestController extends Controller
             }
         }
 
-        return redirect()->route('user.tests.start', $attempt->testSet->test_id)
+        return redirect()->route('user.writing.result', $attempt->id)
             ->with('success', 'Time expired. Writing test submitted automatically.');
     }
 

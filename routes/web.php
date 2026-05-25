@@ -42,16 +42,19 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/tests/attempts/{attempt}/writing/autosave', [WritingTestController::class, 'autosave'])->name('user.writing.autosave');
     Route::post('/tests/attempts/{attempt}/writing/tasks/{task}/submit', [WritingTestController::class, 'submitTask'])->name('user.writing.submitTask');
     Route::post('/tests/attempts/{attempt}/writing/submit', [WritingTestController::class, 'submit'])->name('user.writing.submit');
+    Route::get('/tests/attempts/{attempt}/writing/result', [WritingTestController::class, 'result'])->name('user.writing.result');
 
     Route::get('/tests/attempts/{attempt}/speaking', [SpeakingTestController::class, 'show'])->name('user.speaking.show');
     Route::post('/tests/attempts/{attempt}/speaking/upload-audio', [SpeakingTestController::class, 'uploadAudio'])->name('user.speaking.uploadAudio');
     Route::post('/tests/attempts/{attempt}/speaking/questions/{question}/submit', [SpeakingTestController::class, 'submitQuestion'])->name('user.speaking.submitQuestion');
     Route::post('/tests/attempts/{attempt}/speaking/submit', [SpeakingTestController::class, 'submit'])->name('user.speaking.submit');
+    Route::get('/tests/attempts/{attempt}/speaking/result', [SpeakingTestController::class, 'result'])->name('user.speaking.result');
 
     Route::get('/tests/attempts/{attempt}/listening', [ListeningTestController::class, 'show'])->name('user.listening.show');
     Route::post('/tests/attempts/{attempt}/listening/autosave', [ListeningTestController::class, 'autosave'])->name('user.listening.autosave');
     Route::post('/tests/attempts/{attempt}/listening/complete-section', [ListeningTestController::class, 'completeSection'])->name('user.listening.completeSection');
     Route::post('/tests/attempts/{attempt}/listening/submit', [ListeningTestController::class, 'submit'])->name('user.listening.submit');
+    Route::get('/tests/attempts/{attempt}/listening/result', [ListeningTestController::class, 'result'])->name('user.listening.result');
 
     Route::get('/tests/attempts/{attempt}/reading', [ReadingTestController::class, 'show'])->name('user.reading.show');
     Route::post('/tests/attempts/{attempt}/reading/autosave', [ReadingTestController::class, 'autosave'])->name('user.reading.autosave');
@@ -120,5 +123,6 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('users', UserController::class)->except(['show']);
         Route::get('results', [ResultController::class, 'index'])->name('results.index');
         Route::get('results/{result}', [ResultController::class, 'show'])->name('results.show');
+        Route::get('results/{result}/pdf', [ResultController::class, 'exportPdf'])->name('results.pdf');
     });
 });

@@ -59,4 +59,12 @@ class ResultController extends Controller
 
         return view('admin.results.show', compact('result'));
     }
+
+    public function exportPdf(TestAttempt $result)
+    {
+        $result->load(['user', 'test', 'writingAnswers.writingTask', 'speakingAnswers', 'aiWritingEvaluation', 'aiSpeakingEvaluation']);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.results.show', compact('result'));
+        return $pdf->download('result-' . $result->id . '.pdf');
+    }
 }

@@ -144,8 +144,31 @@ class ListeningTestController extends Controller
         $attempt->update(['status' => 'completed', 'completed_at' => now()]);
         $attempt->evaluate();
 
-        return redirect()->route('user.tests.start', $attempt->testSet->test_id)
+        return redirect()->route('user.listening.result', $attempt->id)
             ->with('success', 'Listening test submitted successfully!');
+    }
+
+    public function result(ListeningAttempt $attempt)
+    {
+        $this->authorizeAttempt($attempt);
+
+        if ($attempt->status !== 'completed') {
+            return redirect()->route('user.listening.show', $attempt->id);
+        }
+
+        $testSet = $attempt->testSet;
+        $test = $testSet->test;
+        $sections = $testSet->listeningSections()
+            ->with(['questions.options'])
+            ->orderBy('section_number')
+            ->get();
+
+        $answers = $attempt->answers()->with('question')->get()->keyBy('question_id');
+        $totalQuestions = $sections->flatMap(fn ($s) => $s->questions)->count();
+
+        return view('user.listening-test.result', compact(
+            'attempt', 'test', 'sections', 'answers', 'totalQuestions'
+        ));
     }
 
     protected function forceSubmit(ListeningAttempt $attempt)
@@ -155,7 +178,7 @@ class ListeningTestController extends Controller
             $attempt->evaluate();
         }
 
-        return redirect()->route('user.tests.start', $attempt->testSet->test_id)
+        return redirect()->route('user.listening.result', $attempt->id)
             ->with('success', 'Time expired. Listening test submitted automatically.');
     }
 

@@ -51,8 +51,8 @@
     <!-- Logo Section -->
     <div class="flex flex-col items-center mb-8">
         <a href="{{ url('/') }}" class="flex flex-col items-center hover:opacity-90 transition-opacity">
-            <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white mb-4 shadow-lg shadow-primary/30">
-                <span class="material-symbols-outlined text-3xl">bolt</span>
+            <div class="flex items-center justify-center mb-4">
+                <img src="/storage/asset/logo.png" alt="MockDasher Logo" class="h-16" />
             </div>
             <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">MockDasher</h1>
         </a>
@@ -140,7 +140,7 @@
 
     <!-- Footer -->
     <p class="text-center mt-8 text-sm text-slate-500 dark:text-slate-400">
-        Don't have an account? 
+        Don't have an account?
         <a class="text-primary font-semibold hover:underline" href="{{ route('register') }}">Create one</a>
     </p>
 
