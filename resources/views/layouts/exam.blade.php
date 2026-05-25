@@ -96,12 +96,8 @@
                     <p class="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 leading-none">Candidate</p>
                     <p class="text-xs font-bold text-slate-800 dark:text-slate-200 mt-1">{{ auth()->user()->name }}</p>
                 </div>
-                <div class="flex size-8 items-center justify-center rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-xs font-bold text-primary overflow-hidden border border-indigo-100 dark:border-indigo-800/80 shadow-sm shrink-0">
-                    @if(auth()->user()->profile_photo_path)
-                        <img class="h-full w-full object-cover" src="{{ Storage::url(auth()->user()->profile_photo_path) }}" alt="{{ auth()->user()->name }}">
-                    @else
-                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                    @endif
+                <div class="flex size-8 items-center justify-center rounded-full bg-indigo-50 dark:bg-indigo-900/30 overflow-hidden border border-indigo-100 dark:border-indigo-800/80 shadow-sm shrink-0">
+                    <img class="h-full w-full object-cover" src="{{ auth()->user()->getAvatarUrl() }}" alt="{{ auth()->user()->name }}">
                 </div>
             </div>
         </div>

@@ -108,13 +108,7 @@
         <!-- Desktop Nav -->
         <div class="hidden md:flex items-center gap-8">
             <div class="flex items-center gap-3">
-                @if(auth()->check() && auth()->user()->profile_photo_path)
-                    <img src="{{ Storage::url(auth()->user()->profile_photo_path) }}" alt="Profile" class="h-10 w-10 rounded-full object-cover border border-slate-200 dark:border-slate-700 shadow-sm">
-                @else
-                    <div class="h-10 w-10 rounded-full bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 flex items-center justify-center text-sm font-bold text-primary shadow-sm">
-                        {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
-                    </div>
-                @endif
+                <img src="{{ auth()->user()->getAvatarUrl() }}" alt="Profile" class="h-10 w-10 rounded-full object-cover border border-slate-200 dark:border-slate-700 shadow-sm">
                 <a href="{{ route('profile.show') }}" class="text-sm font-bold text-slate-900 dark:text-white hover:text-primary dark:hover:text-primary transition-colors">{{ auth()->user()->name ?? 'Profile' }}</a>
             </div>
 
@@ -142,13 +136,7 @@
         class="md:hidden bg-white/90 dark:bg-slate-900/90 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800 p-6 absolute top-20 left-0 right-0 shadow-xl z-40">
         <div class="flex flex-col gap-4">
             <div class="flex items-center gap-3 mb-4">
-                @if(auth()->check() && auth()->user()->profile_photo_path)
-                    <img src="{{ Storage::url(auth()->user()->profile_photo_path) }}" alt="Profile" class="h-10 w-10 rounded-full object-cover border border-slate-200 dark:border-slate-700">
-                @else
-                    <div class="h-10 w-10 rounded-full bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 flex items-center justify-center text-sm font-bold text-primary">
-                        {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
-                    </div>
-                @endif
+                <img src="{{ auth()->user()->getAvatarUrl() }}" alt="Profile" class="h-10 w-10 rounded-full object-cover border border-slate-200 dark:border-slate-700">
                 <a href="{{ route('profile.show') }}" class="text-lg font-bold text-slate-900 dark:text-white">{{ auth()->user()->name ?? 'Profile' }}</a>
             </div>
             <a class="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white" href="{{ route('dashboard') }}">

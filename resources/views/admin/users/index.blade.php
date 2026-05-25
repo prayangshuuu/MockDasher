@@ -51,11 +51,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center gap-3">
                                     <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-xs font-bold text-primary overflow-hidden border border-indigo-100 dark:border-indigo-800">
-                                        @if($user->profile_photo_path)
-                                            <img class="h-full w-full object-cover" src="{{ Storage::url($user->profile_photo_path) }}" alt="{{ $user->name }}">
-                                        @else
-                                            {{ strtoupper(substr($user->name, 0, 1)) }}
-                                        @endif
+                                        <img class="h-full w-full object-cover" src="{{ $user->getAvatarUrl() }}" alt="{{ $user->name }}">
                                     </div>
                                     <span class="text-sm font-bold text-slate-900 dark:text-white">
                                         {{ $user->name }}

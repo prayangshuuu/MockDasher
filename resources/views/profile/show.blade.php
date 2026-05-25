@@ -36,13 +36,7 @@
                     {{-- Avatar --}}
                     <div class="flex items-center gap-6 mb-8">
                         <div class="relative group size-20 shrink-0 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm">
-                            @if($user->profile_photo_path)
-                                <img class="w-full h-full object-cover" src="{{ Storage::url($user->profile_photo_path) }}" alt="{{ $user->name }}"/>
-                            @else
-                                <div class="w-full h-full flex items-center justify-center bg-indigo-50 dark:bg-indigo-900/30 text-primary font-bold text-2xl">
-                                    {{ strtoupper(substr($user->first_name ?: $user->name, 0, 1)) }}
-                                </div>
-                            @endif
+                            <img class="w-full h-full object-cover" src="{{ $user->getAvatarUrl() }}" alt="{{ $user->name }}" id="avatar-preview"/>
                             <label for="photo-upload" class="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                                 <img src="/storage/asset/icons/edit.svg" class="w-6 h-6 invert brightness-0" alt="Edit Photo" />
                             </label>

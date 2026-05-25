@@ -99,11 +99,7 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
                                     <div class="flex size-8 shrink-0 items-center justify-center rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-xs font-bold text-primary overflow-hidden border border-indigo-100 dark:border-indigo-800">
-                                        @if($attempt->user->profile_photo_path ?? false)
-                                            <img class="h-full w-full object-cover" src="{{ Storage::url($attempt->user->profile_photo_path) }}" alt="{{ $attempt->user->name }}">
-                                        @else
-                                            {{ strtoupper(substr($attempt->user->name ?? 'U', 0, 1)) }}
-                                        @endif
+                                        <img class="h-full w-full object-cover" src="{{ $attempt->user->getAvatarUrl() }}" alt="{{ $attempt->user->name }}">
                                     </div>
                                     <span class="text-sm font-bold text-slate-900 dark:text-white">
                                         {{ $attempt->user->name ?? 'Unknown Student' }}

@@ -82,4 +82,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(WritingAnswer::class);
     }
+
+    /**
+     * Get the user's avatar URL.
+     * Returns the uploaded photo if set, otherwise falls back to the default avatar.
+     */
+    public function getAvatarUrl(): string
+    {
+        if ($this->profile_photo_path) {
+            return \Illuminate\Support\Facades\Storage::url($this->profile_photo_path);
+        }
+
+        return asset('storage/asset/defaultavatar.png');
+    }
 }

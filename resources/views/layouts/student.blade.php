@@ -100,12 +100,8 @@
 
     <div class="border-t border-slate-200 dark:border-slate-800 px-6 py-5 bg-slate-50/50 dark:bg-slate-900/20">
         <div class="flex items-center gap-3">
-            <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-sm font-bold text-primary overflow-hidden border border-indigo-100 dark:border-indigo-800 shadow-sm">
-                @if(auth()->user()->profile_photo_path)
-                    <img class="h-full w-full object-cover" src="{{ Storage::url(auth()->user()->profile_photo_path) }}" alt="{{ auth()->user()->name }}">
-                @else
-                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                @endif
+            <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-indigo-50 dark:bg-indigo-900/30 overflow-hidden border border-indigo-100 dark:border-indigo-800 shadow-sm">
+                <img class="h-full w-full object-cover" src="{{ auth()->user()->getAvatarUrl() }}" alt="{{ auth()->user()->name }}">
             </div>
             <div class="min-w-0">
                 <p class="truncate text-sm font-bold text-slate-900 dark:text-white">{{ auth()->user()->name }}</p>
@@ -132,12 +128,8 @@
 
         <div x-data="{ open: false }" class="relative flex items-center gap-3">
             <button @click="open = !open" @click.outside="open = false" class="flex items-center gap-3 rounded-full px-2 py-1.5 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700">
-                <div class="flex size-9 items-center justify-center rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-xs font-bold text-primary overflow-hidden border border-indigo-100 dark:border-indigo-800 shadow-sm">
-                    @if(auth()->user()->profile_photo_path)
-                        <img class="h-full w-full object-cover" src="{{ Storage::url(auth()->user()->profile_photo_path) }}" alt="{{ auth()->user()->name }}">
-                    @else
-                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                    @endif
+                <div class="flex size-9 items-center justify-center rounded-full bg-indigo-50 dark:bg-indigo-900/30 overflow-hidden border border-indigo-100 dark:border-indigo-800 shadow-sm">
+                    <img class="h-full w-full object-cover" src="{{ auth()->user()->getAvatarUrl() }}" alt="{{ auth()->user()->name }}">
                 </div>
                 <div class="hidden text-left sm:block">
                     <p class="text-sm font-bold leading-none text-slate-900 dark:text-white">{{ auth()->user()->name }}</p>
