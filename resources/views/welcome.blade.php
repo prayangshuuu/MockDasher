@@ -265,19 +265,6 @@
         </div>
     </main>
 
-    <!-- Social Proof -->
-    <section class="py-16 border-y border-slate-200 dark:border-slate-800 bg-white/30 dark:bg-slate-900/30">
-        <div class="max-w-7xl mx-auto px-6">
-            <p class="text-center text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-10">Trusted by over 50,000 test-takers</p>
-            <div class="flex flex-wrap justify-center items-center gap-x-12 gap-y-8 md:gap-x-24 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
-                <p class="text-2xl font-bold text-slate-400">ACADEMIA</p>
-                <p class="text-2xl font-bold text-slate-400">EDUFLOW</p>
-                <p class="text-2xl font-bold text-slate-400">GLOBALED</p>
-                <p class="text-2xl font-bold text-slate-400">STUDYPORT</p>
-                <p class="text-2xl font-bold text-slate-400">LEARNLY</p>
-            </div>
-        </div>
-    </section>
 
     <!-- Features Grid -->
     <section id="features" class="py-24 px-6">

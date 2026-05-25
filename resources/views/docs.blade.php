@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 
-    <style>
+    <style type="text/tailwindcss">
         :root {
             --shadow-soft: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
             --shadow-premium: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07);
@@ -195,17 +195,17 @@
     {{-- Mobile sidebar overlay --}}
     <div x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 z-30 bg-slate-950/60 backdrop-blur-sm lg:hidden" @click="sidebarOpen = false"></div>
     <aside x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full" class="fixed left-0 top-14 bottom-0 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 overflow-y-auto z-40 lg:hidden p-4 space-y-0.5">
-        <a href="#overview"     class="nav-link" @click="sidebarOpen=false">Overview</a>
-        <a href="#pitch"        class="nav-link" @click="sidebarOpen=false">Executive Pitch</a>
-        <a href="#metrics"      class="nav-link" @click="sidebarOpen=false">Live Metrics</a>
-        <a href="#modules"      class="nav-link" @click="sidebarOpen=false">Exam Modules</a>
-        <a href="#ai"           class="nav-link" @click="sidebarOpen=false">AI Engine</a>
-        <a href="#security"     class="nav-link" @click="sidebarOpen=false">Security</a>
-        <a href="#architecture" class="nav-link" @click="sidebarOpen=false">Architecture</a>
-        <a href="#techstack"    class="nav-link" @click="sidebarOpen=false">Tech Stack</a>
-        <a href="#datamodel"    class="nav-link" @click="sidebarOpen=false">Data Model</a>
-        <a href="#team"         class="nav-link" @click="sidebarOpen=false">Team</a>
-        <a href="#roadmap"      class="nav-link" @click="sidebarOpen=false">Roadmap</a>
+        <a href="#overview"     class="nav-link" onclick="setActive('overview')" @click="sidebarOpen=false">Overview</a>
+        <a href="#pitch"        class="nav-link" onclick="setActive('pitch')" @click="sidebarOpen=false">Executive Pitch</a>
+        <a href="#metrics"      class="nav-link" onclick="setActive('metrics')" @click="sidebarOpen=false">Live Metrics</a>
+        <a href="#modules"      class="nav-link" onclick="setActive('modules')" @click="sidebarOpen=false">Exam Modules</a>
+        <a href="#ai"           class="nav-link" onclick="setActive('ai')" @click="sidebarOpen=false">AI Engine</a>
+        <a href="#security"     class="nav-link" onclick="setActive('security')" @click="sidebarOpen=false">Security</a>
+        <a href="#architecture" class="nav-link" onclick="setActive('architecture')" @click="sidebarOpen=false">Architecture</a>
+        <a href="#techstack"    class="nav-link" onclick="setActive('techstack')" @click="sidebarOpen=false">Tech Stack</a>
+        <a href="#datamodel"    class="nav-link" onclick="setActive('datamodel')" @click="sidebarOpen=false">Data Model</a>
+        <a href="#team"         class="nav-link" onclick="setActive('team')" @click="sidebarOpen=false">Team</a>
+        <a href="#roadmap"      class="nav-link" onclick="setActive('roadmap')" @click="sidebarOpen=false">Roadmap</a>
     </aside>
 
     {{-- ── MAIN CONTENT ──────────────────────────────────── --}}
