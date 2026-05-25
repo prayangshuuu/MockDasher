@@ -9,16 +9,35 @@ use App\Services\GeminiEvaluationService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class EvaluateSpeakingSubmission implements ShouldQueue
 {
     use Queueable;
+
+    public int $tries = 3;
+    public int $timeout = 300;
+    public array $backoff = [30, 90, 180];
 
     protected int $testAttemptId;
 
     public function __construct(int $testAttemptId)
     {
         $this->testAttemptId = $testAttemptId;
+        $this->onQueue('ai-evaluation');
+    }
+
+    public function failed(Throwable $exception): void
+    {
+        Log::error("EvaluateSpeakingSubmission permanently failed for attempt {$this->testAttemptId}: ".$exception->getMessage());
+
+        $summary = AiSpeakingEvaluation::where('test_attempt_id', $this->testAttemptId)->first();
+        if ($summary) {
+            $summary->update([
+                'evaluation_status' => 'failed',
+                'failure_reason' => 'Job failed after all retries: '.mb_substr($exception->getMessage(), 0, 500),
+            ]);
+        }
     }
 
     public function handle(): void

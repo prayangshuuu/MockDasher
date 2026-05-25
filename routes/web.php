@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\FailedJobController;
+use App\Http\Controllers\ApiDocsController;
 use App\Http\Controllers\DocsController;
 use App\Http\Controllers\Admin\AiContentController;
 use App\Http\Controllers\Admin\ListeningSectionController;
@@ -32,6 +34,7 @@ Route::get('/', function () {
 });
 
 Route::get('/docs', [DocsController::class, 'index'])->name('docs');
+Route::get('/api-docs', [ApiDocsController::class, 'index'])->name('api-docs');
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
 
@@ -127,5 +130,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('results', [ResultController::class, 'index'])->name('results.index');
         Route::get('results/{result}', [ResultController::class, 'show'])->name('results.show');
         Route::get('results/{result}/pdf', [ResultController::class, 'exportPdf'])->name('results.pdf');
+
+        // Failed Jobs / Queue Dashboard
+        Route::get('failed-jobs', [FailedJobController::class, 'index'])->name('failed-jobs.index');
+        Route::post('failed-jobs/{uuid}/retry', [FailedJobController::class, 'retry'])->name('failed-jobs.retry');
+        Route::post('failed-jobs/retry-all', [FailedJobController::class, 'retryAll'])->name('failed-jobs.retry-all');
+        Route::delete('failed-jobs/{uuid}', [FailedJobController::class, 'destroy'])->name('failed-jobs.destroy');
+        Route::delete('failed-jobs', [FailedJobController::class, 'destroyAll'])->name('failed-jobs.destroy-all');
     });
 });
