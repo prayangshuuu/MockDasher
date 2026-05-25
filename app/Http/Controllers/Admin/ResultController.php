@@ -62,9 +62,26 @@ class ResultController extends Controller
 
     public function exportPdf(TestAttempt $result)
     {
-        $result->load(['user', 'test', 'writingAnswers.writingTask', 'speakingAnswers', 'aiWritingEvaluation', 'aiSpeakingEvaluation']);
+        $result->load([
+            'user',
+            'test',
+            'testSet',
+            'writingAnswers.writingTask',
+            'speakingAnswers.question',
+            'aiWritingEvaluation',
+            'aiSpeakingEvaluation',
+            'readingAttempt',
+            'listeningAttempt',
+        ]);
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.results.show', compact('result'));
-        return $pdf->download('result-' . $result->id . '.pdf');
+        $logoPath = storage_path('app/public/asset/logo.png');
+        $logoSrc = file_exists($logoPath)
+            ? 'data:image/png;base64,'.base64_encode(file_get_contents($logoPath))
+            : null;
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.results.pdf', compact('result', 'logoSrc'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('mockdasher-result-'.$result->id.'.pdf');
     }
 }
