@@ -154,7 +154,7 @@ class IeltsTestSeeder extends Seeder
         ]);
 
         // ── Writing Tasks ──
-        WritingTask::updateOrCreate(
+        $wt1 = WritingTask::updateOrCreate(
             ['test_set_id' => $testSet->id, 'task_number' => 1],
             [
                 'task_title' => 'Writing Task 1',
@@ -163,6 +163,11 @@ class IeltsTestSeeder extends Seeder
                 'instruction_text' => 'Write at least 150 words.',
                 'minimum_word_count' => 150,
             ]
+        );
+
+        $wt1->images()->updateOrCreate(
+            ['image_path' => 'asset/Seed/a20t1w1.jpg'],
+            ['alt_text' => 'Tables showing the total population of New York City and its five districts from 1800 to 2000']
         );
 
         WritingTask::updateOrCreate(
@@ -204,19 +209,35 @@ class IeltsTestSeeder extends Seeder
         // ── Listening Sections & Questions ──
         $sec1 = ListeningSection::updateOrCreate(
             ['test_set_id' => $testSet->id, 'section_number' => 1],
-            ['instruction_text' => 'Complete the table below. Write ONE WORD AND/OR A NUMBER for each answer.', 'passage_text' => null]
+            [
+                'instruction_text' => 'Complete the table below. Write ONE WORD AND/OR A NUMBER for each answer.',
+                'passage_text' => null,
+                'audio_path' => 'asset/Seed/cambridge-ielts-20-academic-listening-1-audio-1.mp3',
+            ]
         );
         $sec2 = ListeningSection::updateOrCreate(
             ['test_set_id' => $testSet->id, 'section_number' => 2],
-            ['instruction_text' => 'Choose the correct letter, A, B or C.', 'passage_text' => null]
+            [
+                'instruction_text' => 'Choose the correct letter, A, B or C.',
+                'passage_text' => null,
+                'audio_path' => 'asset/Seed/cambridge-ielts-20-academic-listening-1-audio-1.mp3',
+            ]
         );
         $sec3 = ListeningSection::updateOrCreate(
             ['test_set_id' => $testSet->id, 'section_number' => 3],
-            ['instruction_text' => 'Choose TWO letters, A-E.', 'passage_text' => null]
+            [
+                'instruction_text' => 'Choose TWO letters, A-E.',
+                'passage_text' => null,
+                'audio_path' => 'asset/Seed/cambridge-ielts-20-academic-listening-1-audio-1.mp3',
+            ]
         );
         $sec4 = ListeningSection::updateOrCreate(
             ['test_set_id' => $testSet->id, 'section_number' => 4],
-            ['instruction_text' => 'Complete the notes below. Write ONE WORD ONLY for each answer.', 'passage_text' => null]
+            [
+                'instruction_text' => 'Complete the notes below. Write ONE WORD ONLY for each answer.',
+                'passage_text' => null,
+                'audio_path' => 'asset/Seed/cambridge-ielts-20-academic-listening-1-audio-1.mp3',
+            ]
         );
 
         // Section 1: Fill-in-blank Q1-10
