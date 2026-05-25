@@ -35,20 +35,44 @@
 @section('content')
 <style>
     .mcq-option:has(input:checked) {
-        border-color: #6366f1; /* indigo-500 */
+        border-color: #6366f1;
         background-color: rgba(99, 102, 241, 0.04);
-        color: #4f46e5; /* indigo-600 */
+        color: #4f46e5;
     }
     .dark .mcq-option:has(input:checked) {
-        border-color: #818cf8; /* indigo-400 */
+        border-color: #818cf8;
         background-color: rgba(129, 140, 248, 0.08);
-        color: #c7d2fe; /* indigo-200 */
+        color: #c7d2fe;
     }
+    .ielts-highlight {
+        border-radius: 2px;
+        cursor: pointer;
+        transition: opacity 0.15s;
+    }
+    .ielts-highlight:hover { opacity: 0.75; }
+    #highlight-toolbar { pointer-events: none; }
+    #highlight-toolbar.visible { pointer-events: auto; }
 </style>
+
+{{-- Floating Highlight Toolbar --}}
+<div id="highlight-toolbar" class="fixed z-[300] select-none" style="display:none;">
+    <div class="flex items-center gap-1.5 bg-slate-900 text-white rounded-2xl px-3 py-2 shadow-lift border border-slate-700/80 backdrop-blur-sm">
+        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest mr-0.5">Highlight</span>
+        <button onclick="applyHighlight('#fef08a')" class="size-5 rounded-md hover:scale-125 transition-transform focus:outline-none border-2 border-yellow-400/60" style="background:#fef08a;" title="Yellow"></button>
+        <button onclick="applyHighlight('#bbf7d0')" class="size-5 rounded-md hover:scale-125 transition-transform focus:outline-none border-2 border-green-400/60"  style="background:#bbf7d0;" title="Green"></button>
+        <button onclick="applyHighlight('#fecdd3')" class="size-5 rounded-md hover:scale-125 transition-transform focus:outline-none border-2 border-pink-400/60"   style="background:#fecdd3;" title="Pink"></button>
+        <button onclick="applyHighlight('#bfdbfe')" class="size-5 rounded-md hover:scale-125 transition-transform focus:outline-none border-2 border-blue-400/60"   style="background:#bfdbfe;" title="Blue"></button>
+        <div class="w-px h-4 bg-slate-700 mx-0.5"></div>
+        <button onclick="hideHighlightToolbar()" class="size-5 rounded-md bg-slate-700 hover:bg-slate-600 transition-colors text-slate-300 flex items-center justify-center focus:outline-none" title="Cancel">
+            <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+    </div>
+    <div class="flex justify-center"><div style="width:10px;height:6px;background:#0f172a;clip-path:polygon(0 0,100% 0,50% 100%);" class="mt-px opacity-90"></div></div>
+</div>
 
 <div id="reading-app" class="flex flex-1 flex-col overflow-hidden">
 
-    {{-- Passage Tabs --}}
+    {{-- Passage Tabs + Highlight hint --}}
     <div class="flex h-11 shrink-0 items-center gap-1 border-b border-slate-200 dark:border-slate-800 bg-surface-light dark:bg-surface-dark px-4 sm:px-6 lg:px-8">
         @foreach($passages as $passage)
             <button onclick="switchPassage({{ $passage->passage_number }})"
@@ -58,17 +82,21 @@
                 Passage {{ $passage->passage_number }}
             </button>
         @endforeach
+        <div class="ml-auto flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-900/40 text-amber-600 dark:text-amber-400 text-[9px] font-black uppercase tracking-widest">
+            <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+            Select text to highlight
+        </div>
     </div>
 
     {{-- Main Split View --}}
     <div class="flex flex-1 overflow-hidden">
 
         {{-- Left: Passage Text --}}
-        <div class="w-1/2 overflow-y-auto border-r border-slate-200 dark:border-slate-800 bg-surface-light dark:bg-surface-dark p-6 sm:p-8 lg:p-12 custom-scrollbar">
+        <div class="w-1/2 overflow-y-auto border-r border-slate-200 dark:border-slate-800 bg-surface-light dark:bg-surface-dark p-6 sm:p-8 lg:p-12 custom-scrollbar" id="passage-panel">
             @foreach($passages as $passage)
-                <div class="passage-content mx-auto max-w-3xl space-y-6" data-passage="{{ $passage->passage_number }}" style="display:none;">
+                <div class="passage-content mx-auto max-w-3xl space-y-6" data-passage="{{ $passage->passage_number }}" id="passage-text-{{ $passage->passage_number }}" style="display:none;">
                     <h2 class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">{{ $passage->title }}</h2>
-                    <div class="prose max-w-none text-base leading-[1.9] text-slate-600 dark:text-slate-350">
+                    <div class="highlightable-text prose max-w-none text-base leading-[1.9] text-slate-600 dark:text-slate-350 select-text">
                         {!! nl2br(e($passage->content)) !!}
                     </div>
                 </div>
@@ -408,6 +436,82 @@
 
     // Initialize state
     Object.keys(answers).forEach(qId => { if (answers[qId]) { updateBubble(qId); updateTfngButtons(qId, answers[qId]); } });
+
+    // ═══════════════════════════════════════════════════════════════
+    //  IELTS TEXT HIGHLIGHTING FEATURE
+    // ═══════════════════════════════════════════════════════════════
+    let _pendingRange = null;
+    const toolbar = document.getElementById('highlight-toolbar');
+
+    // Show toolbar above the selection when user releases mouse in passage
+    document.getElementById('passage-panel').addEventListener('mouseup', function(e) {
+        // Ignore clicks on existing highlights or non-passage elements
+        if (e.target.classList.contains('ielts-highlight')) return;
+
+        // Defer slightly so browser finalises the selection
+        setTimeout(function() {
+            const sel = window.getSelection();
+            if (!sel || sel.isCollapsed || !sel.rangeCount) return;
+
+            const range = sel.getRangeAt(0);
+            const passagePanel = document.getElementById('passage-panel');
+            if (!passagePanel.contains(range.commonAncestorContainer)) return;
+            if (!range.toString().trim()) return;
+
+            _pendingRange = range.cloneRange();
+
+            // Position the toolbar above the selection
+            const rect = range.getBoundingClientRect();
+            const toolbarH = 46; // approx height
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + window.scrollY - toolbarH - 8;
+
+            toolbar.style.left = Math.max(4, cx - 100) + 'px';
+            toolbar.style.top  = (rect.top - toolbarH - 8) + 'px'; // fixed position
+            toolbar.style.display = 'block';
+            toolbar.classList.add('visible');
+        }, 30);
+    });
+
+    // Hide toolbar when clicking outside passage or toolbar
+    document.addEventListener('mousedown', function(e) {
+        if (!toolbar.contains(e.target) && !document.getElementById('passage-panel').contains(e.target)) {
+            hideHighlightToolbar();
+        }
+    });
+
+    window.applyHighlight = function(color) {
+        if (!_pendingRange) return;
+        try {
+            // Extract the selected content and wrap it in a <mark>
+            const fragment = _pendingRange.extractContents();
+            const mark = document.createElement('mark');
+            mark.style.backgroundColor = color;
+            mark.style.borderRadius = '3px';
+            mark.className = 'ielts-highlight';
+            mark.title = 'Click to remove highlight';
+            mark.addEventListener('click', function(ev) {
+                ev.stopPropagation();
+                const parent = this.parentNode;
+                while (this.firstChild) parent.insertBefore(this.firstChild, this);
+                parent.removeChild(this);
+                parent.normalize();
+            });
+            mark.appendChild(fragment);
+            _pendingRange.insertNode(mark);
+        } catch (err) {
+            // Complex cross-element selection — ignore gracefully
+        }
+        window.getSelection()?.removeAllRanges();
+        hideHighlightToolbar();
+    };
+
+    window.hideHighlightToolbar = function() {
+        toolbar.style.display = 'none';
+        toolbar.classList.remove('visible');
+        _pendingRange = null;
+        window.getSelection()?.removeAllRanges();
+    };
 })();
 </script>
 @endpush

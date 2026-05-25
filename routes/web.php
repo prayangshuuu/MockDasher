@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\DocsController;
 use App\Http\Controllers\Admin\AiContentController;
 use App\Http\Controllers\Admin\ListeningSectionController;
 use App\Http\Controllers\Admin\QuestionController;
@@ -29,6 +30,8 @@ Route::get('/', function () {
 
     return view('welcome');
 });
+
+Route::get('/docs', [DocsController::class, 'index'])->name('docs');
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
 

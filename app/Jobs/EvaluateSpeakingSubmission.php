@@ -84,6 +84,16 @@ class EvaluateSpeakingSubmission implements ShouldQueue
                     );
 
                     if (! $result['success'] || $result['band_score'] === null) {
+                        Log::warning("EvaluateSpeakingSubmission: Gemini failed for question {$question->id}, retrying once.");
+                        sleep(5);
+                        $result = $service->evaluateSpeakingQuestion(
+                            (int) $question->part,
+                            (string) $question->question_text,
+                            trim((string) $answer->transcript_text)
+                        );
+                    }
+
+                    if (! $result['success'] || $result['band_score'] === null) {
                         $summary->update([
                             'evaluation_status' => 'failed',
                             'failure_reason' => "Gemini returned no score for Speaking question {$question->id}.",

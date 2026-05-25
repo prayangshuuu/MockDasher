@@ -266,6 +266,15 @@
             // Initialize examHasChanges flag
             window.examHasChanges = false;
 
+            // Guard against accidental navigation/reload during exam
+            window.onbeforeunload = function(e) {
+                if (!window.isAutoSubmitting) {
+                    const msg = 'Your exam is in progress. Leaving this page will interrupt your test.';
+                    e.returnValue = msg;
+                    return msg;
+                }
+            };
+
             // Anti-cheat event triggers: Only trigger on actual visibility changes (tab switches or minimizing browser)
             document.addEventListener('visibilitychange', () => {
                 if (document.hidden) {
@@ -273,10 +282,21 @@
                 }
             });
 
-            // Prevent shortcuts and context menu
-            document.addEventListener('contextmenu', e => e.preventDefault());
-            document.addEventListener('copy', e => e.preventDefault());
-            document.addEventListener('paste', e => e.preventDefault());
+            // Allow copy/paste/context-menu inside form elements (textarea, input)
+            // so candidates can cut/paste within their own answer boxes.
+            function isFormElement(target) {
+                const tag = target.tagName ? target.tagName.toLowerCase() : '';
+                return tag === 'textarea' || tag === 'input';
+            }
+            document.addEventListener('contextmenu', e => {
+                if (!isFormElement(e.target)) e.preventDefault();
+            });
+            document.addEventListener('copy', e => {
+                if (!isFormElement(e.target)) e.preventDefault();
+            });
+            document.addEventListener('paste', e => {
+                if (!isFormElement(e.target)) e.preventDefault();
+            });
 
             // Override form submit to bypass warning on programmatic submits
             const originalSubmit = HTMLFormElement.prototype.submit;

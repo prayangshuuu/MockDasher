@@ -275,8 +275,8 @@ class GeminiEvaluationService
     protected function callGeminiApi(string $systemInstruction, string $userPrompt): array
     {
         try {
-            $response = Http::timeout(60)
-                ->retry(2, 2000)
+            $response = Http::timeout(90)
+                ->retry(3, 3000, fn ($exception) => true)
                 ->withHeaders(['Content-Type' => 'application/json'])
                 ->post("{$this->endpoint}?key={$this->apiKey}", [
                     'system_instruction' => [
@@ -287,31 +287,45 @@ class GeminiEvaluationService
                     ],
                     'generationConfig' => [
                         'temperature' => 0.2,
+                        'maxOutputTokens' => 4096,
                         'responseMimeType' => 'application/json',
                     ],
                 ]);
 
             if ($response->successful()) {
                 $result = $response->json();
-                $rawText = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
-                $rawText = trim($rawText);
 
-                // Strip markdown fences if present (defensive)
-                $rawText = preg_replace('/^```(?:json)?\s*/i', '', $rawText);
-                $rawText = preg_replace('/\s*```$/', '', $rawText);
-                $rawText = trim($rawText);
+                // Check for blocked / filtered responses
+                $candidate = $result['candidates'][0] ?? null;
+                if (! $candidate) {
+                    $blockReason = $result['promptFeedback']['blockReason'] ?? 'UNKNOWN';
+                    Log::warning('[GeminiEval] No candidates returned', ['blockReason' => $blockReason]);
+
+                    return $this->fallbackResponse("Response blocked by Gemini safety filters: {$blockReason}");
+                }
+
+                $finishReason = $candidate['finishReason'] ?? 'STOP';
+                if (in_array($finishReason, ['SAFETY', 'RECITATION'])) {
+                    Log::warning('[GeminiEval] Blocked candidate', ['finishReason' => $finishReason]);
+
+                    return $this->fallbackResponse("Gemini candidate blocked: {$finishReason}");
+                }
+
+                $rawText = $candidate['content']['parts'][0]['text'] ?? '';
+                $rawText = $this->extractJson($rawText);
 
                 $parsed = json_decode($rawText, true);
 
                 if (json_last_error() !== JSON_ERROR_NONE || ! is_array($parsed)) {
                     Log::warning('[GeminiEval] Non-JSON response', [
+                        'finish_reason' => $finishReason,
                         'preview' => substr($rawText, 0, 500),
                     ]);
 
                     return $this->fallbackResponse('Gemini returned a non-JSON response.');
                 }
 
-                $bandScore = $this->validatedBandScore($parsed);
+                $bandScore = $this->extractBandScore($parsed);
 
                 if ($bandScore === null) {
                     Log::warning('[GeminiEval] Invalid or missing band score', [
@@ -323,9 +337,9 @@ class GeminiEvaluationService
 
                 return [
                     'success' => true,
-                    'evaluation_text' => $rawText,        // raw JSON string for DB storage
+                    'evaluation_text' => $rawText,
                     'band_score' => $bandScore,
-                    'parsed' => $parsed,          // decoded array for immediate use
+                    'parsed' => $parsed,
                 ];
             }
 
@@ -345,6 +359,34 @@ class GeminiEvaluationService
     }
 
     /**
+     * Aggressively extract the first valid JSON object from a raw string.
+     * Handles markdown fences, leading/trailing prose, and partial wrapping.
+     */
+    private function extractJson(string $raw): string
+    {
+        $raw = trim($raw);
+
+        // Strip ```json ... ``` fences
+        $raw = preg_replace('/^```(?:json)?\s*/i', '', $raw);
+        $raw = preg_replace('/\s*```\s*$/i', '', $raw);
+        $raw = trim($raw);
+
+        // If it already starts with { return as-is
+        if (str_starts_with($raw, '{')) {
+            return $raw;
+        }
+
+        // Try to find the first { ... } block
+        $start = strpos($raw, '{');
+        $end   = strrpos($raw, '}');
+        if ($start !== false && $end !== false && $end > $start) {
+            return substr($raw, $start, $end - $start + 1);
+        }
+
+        return $raw;
+    }
+
+    /**
      * Return a normalized failure response.
      */
     protected function fallbackResponse(string $reason = 'Unknown error'): array
@@ -359,26 +401,30 @@ class GeminiEvaluationService
         ];
     }
 
-    private function validatedBandScore(array $parsed): ?float
+    /**
+     * Extract and normalise the band score from a parsed Gemini response.
+     *
+     * Accepts any numeric value 0-9 and rounds it to the nearest valid IELTS
+     * 0.5-increment (0, 0.5, 1.0 … 9.0) rather than rejecting edge cases.
+     */
+    private function extractBandScore(array $parsed): ?float
     {
-        $score = $parsed['overall_band_score']
+        $raw = $parsed['overall_band_score']
             ?? $parsed['band_score']
+            ?? $parsed['overall_score']
             ?? null;
 
-        if (! is_numeric($score)) {
+        if (! is_numeric($raw)) {
             return null;
         }
 
-        $score = (float) $score;
+        $score = (float) $raw;
+
         if ($score < 0.0 || $score > 9.0) {
             return null;
         }
 
-        $doubled = $score * 2;
-        if (abs($doubled - round($doubled)) > 0.0001) {
-            return null;
-        }
-
-        return $score;
+        // Round to nearest IELTS 0.5 increment
+        return round($score * 2) / 2;
     }
 }

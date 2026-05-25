@@ -88,6 +88,19 @@ class EvaluateWritingSubmission implements ShouldQueue
                     );
 
                     if (! $result['success'] || $result['band_score'] === null) {
+                        Log::warning("EvaluateWritingSubmission: Gemini failed for Task {$task->task_number}, attempt {$attempt->id}. Retrying once.");
+
+                        // One additional retry with a short pause before giving up
+                        sleep(5);
+                        $result = $service->evaluateWritingTask(
+                            (int) $task->task_number,
+                            $question,
+                            $imageAltText,
+                            strip_tags((string) $answer->answer_text)
+                        );
+                    }
+
+                    if (! $result['success'] || $result['band_score'] === null) {
                         $summary->update([
                             'evaluation_status' => 'failed',
                             'failure_reason' => "Gemini returned no score for Writing Task {$task->task_number}.",

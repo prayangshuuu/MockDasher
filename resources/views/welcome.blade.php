@@ -219,13 +219,13 @@
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                 </span>
-                Computer delivered Mock
+                For the Infinity AI BuildFest 2026
             </div>
             <h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 dark:text-white leading-[1.1] tracking-tight">
-                Master the IELTS Exam with <span class="hero-gradient">Confidence</span>
+                Stop Guessing Your <span class="hero-gradient">IELTS Score</span>
             </h1>
             <p class="text-xl text-slate-600 dark:text-slate-400 leading-relaxed max-w-3xl mx-auto mt-8">
-                A clean, distraction-free environment mirroring the computer-delivered IELTS format. Get real-time feedback and detailed band score analysis.
+                Practice on the actual IELTS interface, get instant AI band scores, and stop guessing where you stand. MockDasher uses AI to grade your Writing and Speaking like a certified examiner.
             </p>
             <div class="flex flex-wrap gap-4 justify-center pt-8">
                 <a href="{{ route('register') }}"
@@ -239,6 +239,9 @@
                     Explore Features
                 </a>
             </div>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-6">
+                It's completely free. Just bring your own Gemini API key.
+            </p>
         </div>
 
         <!-- App Screenshot -->
@@ -297,16 +300,16 @@
                     <div class="feature-icon size-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-primary mb-6 shadow-sm transition-transform">
                         <img src="/storage/asset/icons/edit.svg" alt="Edit Icon" class="w-6 h-6" />
                     </div>
-                    <h3 class="text-xl font-black mb-3 dark:text-white tracking-tight">Writing Counter</h3>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">Live word counts and time management alerts to keep your essays on track and structured.</p>
+                    <h3 class="text-xl font-black mb-3 dark:text-white tracking-tight">Instant Writing Feedback</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">Get your essays graded against official IELTS criteria. Our AI provides a detailed band score and suggestions for Task Achievement, Cohesion, Vocabulary, and Grammar.</p>
                 </div>
                 <!-- Feature 3 -->
                 <div class="feature-card bg-surface-light dark:bg-surface-dark p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-soft hover:shadow-premium hover:-translate-y-1 transition-all cursor-default">
                     <div class="feature-icon size-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-primary mb-6 shadow-sm transition-transform">
                         <img src="/storage/asset/icons/microphone.svg" alt="Microphone Icon" class="w-6 h-6" />
                     </div>
-                    <h3 class="text-xl font-black mb-3 dark:text-white tracking-tight">Speaking Practice</h3>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">AI-powered speaking modules with voice recognition and immediate fluency feedback.</p>
+                    <h3 class="text-xl font-black mb-3 dark:text-white tracking-tight">AI Speaking Examiner</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed font-medium">Practice with an AI that understands fluency, pronunciation, and lexical resource. Get immediate feedback to improve your speaking confidence.</p>
                 </div>
                 <!-- Feature 4 -->
                 <div class="feature-card bg-surface-light dark:bg-surface-dark p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-soft hover:shadow-premium hover:-translate-y-1 transition-all cursor-default">
@@ -357,6 +360,42 @@
                         <span>WK 5</span>
                         <span class="text-white">CURRENT</span>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="py-24 px-6 bg-slate-50 dark:bg-slate-900/50">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16 space-y-4">
+                <h2 class="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white">Unlimited Practice, Completely Free</h2>
+                <p class="text-lg text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">MockDasher uses a 'Bring Your Own Key' model to give you full access without subscriptions. Here’s how it works:</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <!-- Step 1 -->
+                <div class="flex flex-col items-center">
+                    <div class="flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 text-primary font-extrabold text-3xl mb-6">1</div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Get Your Free Key</h3>
+                    <p class="text-slate-600 dark:text-slate-400">
+                        Generate a free Gemini API key from <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-primary font-semibold underline">Google AI Studio</a>.
+                    </p>
+                </div>
+                <!-- Step 2 -->
+                <div class="flex flex-col items-center">
+                    <div class="flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 text-primary font-extrabold text-3xl mb-6">2</div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Enter It Once</h3>
+                    <p class="text-slate-600 dark:text-slate-400">
+                        Paste the key into your MockDasher account settings. It's stored securely in your browser.
+                    </p>
+                </div>
+                <!-- Step 3 -->
+                <div class="flex flex-col items-center">
+                    <div class="flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 text-primary font-extrabold text-3xl mb-6">3</div>
+                    <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Practice Limitlessly</h3>
+                    <p class="text-slate-600 dark:text-slate-400">
+                        Enjoy unlimited AI-powered evaluations for all your Writing and Speaking tests.
+                    </p>
                 </div>
             </div>
         </div>
@@ -466,7 +505,7 @@
                     Create Your Free Account
                 </a>
             </div>
-            <p class="text-sm text-slate-400 font-medium">No credit card required • Instant access to 2 full tests</p>
+            <p class="text-sm text-slate-400 font-medium">No credit card required • Get started with your free Gemini API key</p>
         </div>
     </section>
 
@@ -518,8 +557,9 @@
             </div>
         </div>
         <div class="max-w-7xl mx-auto pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p class="text-sm text-slate-500 dark:text-slate-400">© {{ date('Y') }} MockDasher Inc. All rights reserved.</p>
-            <p class="text-xs text-slate-400 dark:text-slate-500">IELTS is a registered trademark of University of Cambridge ESOL, the British Council, and IDP Education Australia. This site and its materials are not officially endorsed by them.</p>
+            <p class="text-sm text-slate-500 dark:text-slate-400">
+                © {{ date('Y') }} <a href="https://www.dwimiksoftware.com/" target="_blank" class="hover:text-primary">Dwimik</a>. All rights reserved.
+            </p>
         </div>
     </footer>
 

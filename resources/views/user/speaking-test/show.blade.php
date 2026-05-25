@@ -275,6 +275,18 @@
         recognition.continuous = true;
         recognition.interimResults = true;
         recognition.lang = 'en-US';
+        // Chrome STT auto-stops after ~60s; restart it while recording is still active
+        recognition.onend = function() {
+            if (activeQid !== null) {
+                try { recognition.start(); } catch(e) {}
+            }
+        };
+        recognition.onerror = function(event) {
+            // 'no-speech' and 'aborted' are non-fatal; restart if recording
+            if (['no-speech', 'aborted', 'network'].includes(event.error) && activeQid !== null) {
+                try { recognition.start(); } catch(e) {}
+            }
+        };
     }
 
     // Reset top bar timer to standby limit of first unsubmitted question in active part
@@ -499,6 +511,9 @@
     function stopRecording() {
         if (activeQid === null) return;
         const qid = activeQid;
+        // Set activeQid to null BEFORE stopping recognition so the onend handler
+        // does not restart STT in an infinite loop after we explicitly stop.
+        activeQid = null;
         const rec = recorders[qid];
         if (rec && rec.mediaRecorder.state === 'recording') rec.mediaRecorder.stop();
         if (recognition) { try { recognition.stop(); } catch(e) {} }
@@ -512,9 +527,9 @@
         document.getElementById('rec-dot').className    = 'size-2 rounded-full bg-slate-300 dark:bg-slate-700';
         document.getElementById('rec-label').textContent = 'Standby';
         document.getElementById('rec-label').className  = 'text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500';
-        
+
         resetStandbyTimer();
-        activeQid = null;
+        // activeQid already set to null at the top of stopRecording()
     }
 
     async function handleRecordingComplete(qid, blob) {

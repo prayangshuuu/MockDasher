@@ -177,7 +177,9 @@
     </div>
 
     <footer class="border-t border-slate-200 dark:border-slate-800 px-6 py-8 text-center sm:text-left flex flex-col sm:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400 mt-auto">
-        <p>&copy; {{ date('Y') }} {{ config('app.name', 'MockDasher') }} Admin. All rights reserved.</p>
+        <p>
+            © {{ date('Y') }} <a href="https://www.dwimiksoftware.com/" target="_blank" class="hover:text-primary">Dwimik</a>. All rights reserved.
+        </p>
         <div class="flex gap-4">
             <span class="cursor-not-allowed hover:text-slate-800 dark:hover:text-slate-300 transition-colors" title="Coming soon">Terms</span>
             <span class="cursor-not-allowed hover:text-slate-800 dark:hover:text-slate-300 transition-colors" title="Coming soon">Privacy</span>

@@ -103,6 +103,18 @@
 
                 {{-- Right: Answer Editor --}}
                 <div class="w-1/2 flex flex-col bg-slate-50 dark:bg-slate-900/40">
+                    {{-- Mini edit toolbar (IELTS-style) --}}
+                    @if(!$isSubmitted)
+                    <div class="flex items-center gap-1 px-4 py-1.5 border-b border-slate-200 dark:border-slate-800 bg-surface-light dark:bg-surface-dark text-slate-400 dark:text-slate-500">
+                        <button type="button" onclick="execCmd('undo','textarea-{{ $task->id }}')" title="Undo (Ctrl+Z)" class="px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-black focus:outline-none transition-colors">↩ Undo</button>
+                        <button type="button" onclick="execCmd('redo','textarea-{{ $task->id }}')" title="Redo (Ctrl+Y)" class="px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-black focus:outline-none transition-colors">↪ Redo</button>
+                        <div class="w-px h-4 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+                        <button type="button" onclick="cutText('textarea-{{ $task->id }}')" title="Cut (Ctrl+X)" class="px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-black focus:outline-none transition-colors">✂ Cut</button>
+                        <button type="button" onclick="copyText('textarea-{{ $task->id }}')" title="Copy (Ctrl+C)" class="px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-black focus:outline-none transition-colors">⎘ Copy</button>
+                        <button type="button" onclick="pasteText('textarea-{{ $task->id }}')" title="Paste (Ctrl+V)" class="px-2 py-1 rounded hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-black focus:outline-none transition-colors">⎆ Paste</button>
+                        <div class="ml-auto text-[9px] font-black uppercase tracking-widest text-slate-300 dark:text-slate-600">Ctrl+Z/X/C/V supported</div>
+                    </div>
+                    @endif
                     <div class="flex-1 relative">
                         <textarea id="textarea-{{ $task->id }}"
                                   data-task-id="{{ $task->id }}"
@@ -110,6 +122,7 @@
                                   oninput="window.examHasChanges = true; updateWordCount({{ $task->id }}, {{ $task->minimum_word_count }}); scheduleAutosave();"
                                   class="writing-textarea absolute inset-0 w-full h-full p-8 sm:p-12 text-base leading-relaxed bg-transparent border-none focus:ring-0 resize-none custom-scrollbar placeholder:text-slate-400 text-slate-800 dark:text-slate-200 outline-none {{ $isSubmitted ? 'opacity-70 cursor-default' : '' }}"
                                   placeholder="Start typing your response here..."
+                                  spellcheck="true"
                                   @if($isSubmitted) readonly @endif>{{ $answer->answer_text ?? '' }}</textarea>
                     </div>
                     <div class="flex h-16 shrink-0 items-center justify-between border-t border-slate-200 dark:border-slate-800 bg-surface-light dark:bg-surface-dark px-6 shadow-sm">
@@ -259,6 +272,51 @@
     document.querySelectorAll('.writing-textarea').forEach(ta => {
         window.updateWordCount(parseInt(ta.dataset.taskId), parseInt(ta.dataset.minWords));
     });
+
+    // ── Toolbar helpers for cut / copy / paste / undo / redo ──
+    window.execCmd = function(cmd, taId) {
+        const ta = document.getElementById(taId);
+        if (!ta) return;
+        ta.focus();
+        try { document.execCommand(cmd); } catch(e) {}
+        window.examHasChanges = true;
+        const taskId = parseInt(ta.dataset.taskId);
+        const minWords = parseInt(ta.dataset.minWords);
+        window.updateWordCount(taskId, minWords);
+        scheduleAutosave();
+    };
+    window.cutText = function(taId) {
+        const ta = document.getElementById(taId);
+        if (!ta) return;
+        ta.focus();
+        const start = ta.selectionStart, end = ta.selectionEnd;
+        if (start === end) return;
+        const cut = ta.value.slice(start, end);
+        navigator.clipboard?.writeText(cut).catch(() => {});
+        ta.value = ta.value.slice(0, start) + ta.value.slice(end);
+        ta.selectionStart = ta.selectionEnd = start;
+        ta.dispatchEvent(new Event('input'));
+    };
+    window.copyText = function(taId) {
+        const ta = document.getElementById(taId);
+        if (!ta) return;
+        const text = ta.value.slice(ta.selectionStart, ta.selectionEnd) || ta.value;
+        navigator.clipboard?.writeText(text).catch(() => {});
+    };
+    window.pasteText = async function(taId) {
+        const ta = document.getElementById(taId);
+        if (!ta) return;
+        try {
+            const text = await navigator.clipboard.readText();
+            const start = ta.selectionStart, end = ta.selectionEnd;
+            ta.value = ta.value.slice(0, start) + text + ta.value.slice(end);
+            ta.selectionStart = ta.selectionEnd = start + text.length;
+            ta.focus();
+            ta.dispatchEvent(new Event('input'));
+        } catch(e) {
+            // Clipboard API blocked — user can still use Ctrl+V in the textarea
+        }
+    };
 
     // ── Autosave ──
     let autosaveTimer = null;
