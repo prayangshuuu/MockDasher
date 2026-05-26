@@ -49,9 +49,9 @@ class HistoryTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonStructure([
                 'data' => [['id', 'test_title', 'status', 'overall_band', 'started_at', 'completed_at']],
-                'meta' => ['current_page', 'last_page', 'per_page', 'total'],
+                'meta' => ['next_cursor', 'prev_cursor', 'per_page'],
             ])
-            ->assertJsonPath('meta.total', 2);
+            ->assertJsonCount(2, 'data');
     }
 
     public function test_index_does_not_return_other_users_history(): void
@@ -64,7 +64,7 @@ class HistoryTest extends TestCase
         $response = $this->getJson('/api/v1/history');
 
         $response->assertStatus(200)
-            ->assertJsonPath('meta.total', 0);
+            ->assertJsonCount(0, 'data');
     }
 
     public function test_index_requires_authentication(): void

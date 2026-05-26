@@ -7,6 +7,7 @@ use App\Models\SpeakingQuestion;
 use App\Models\TestSet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class SpeakingQuestionController extends Controller
@@ -40,6 +41,8 @@ class SpeakingQuestionController extends Controller
 
         $testSet->speakingQuestions()->create($data);
 
+        Cache::forget("testset:{$testSetId}:speaking-questions");
+
         return redirect()->route('admin.test_sets.show', $testSetId)->with('success', 'Speaking question added successfully.');
     }
 
@@ -69,6 +72,8 @@ class SpeakingQuestionController extends Controller
 
         $speaking_question->update($data);
 
+        Cache::forget("testset:{$speaking_question->test_set_id}:speaking-questions");
+
         return redirect()->route('admin.test_sets.show', $speaking_question->test_set_id)->with('success', 'Speaking question updated successfully.');
     }
 
@@ -79,6 +84,8 @@ class SpeakingQuestionController extends Controller
             Storage::disk('public')->delete($speaking_question->audio_path);
         }
         $speaking_question->delete();
+
+        Cache::forget("testset:{$testSetId}:speaking-questions");
 
         return redirect()->route('admin.test_sets.show', $testSetId)->with('success', 'Speaking question deleted successfully.');
     }

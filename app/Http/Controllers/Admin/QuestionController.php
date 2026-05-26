@@ -8,6 +8,7 @@ use App\Models\Question;
 use App\Models\ReadingPassage;
 use App\Models\ReadingQuestionGroup;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class QuestionController extends Controller
 {
@@ -21,6 +22,20 @@ class QuestionController extends Controller
             return ReadingQuestionGroup::findOrFail($id);
         }
         abort(404);
+    }
+
+    private function invalidateExamCache(string $type, $parent): void
+    {
+        if ($type === 'listening') {
+            Cache::forget("testset:{$parent->test_set_id}:listening-sections");
+        } elseif ($type === 'reading') {
+            Cache::forget("testset:{$parent->test_set_id}:reading-passages");
+        } elseif ($type === 'reading_group') {
+            $passage = ReadingPassage::find($parent->reading_passage_id);
+            if ($passage) {
+                Cache::forget("testset:{$passage->test_set_id}:reading-passages");
+            }
+        }
     }
 
     private function getRedirectRoute($type, $id)
@@ -81,6 +96,8 @@ class QuestionController extends Controller
                 }
             }
         }
+
+        $this->invalidateExamCache($type, $parent);
 
         [$route, $param] = $this->getRedirectRoute($type, $id);
 
@@ -144,6 +161,8 @@ class QuestionController extends Controller
         } else {
             $type = 'reading';
         }
+        $this->invalidateExamCache($type, $question->questionable);
+
         [$route, $param] = $this->getRedirectRoute($type, $question->questionable_id);
 
         return redirect()->route($route, $param)->with('success', 'Question updated successfully.');
@@ -152,7 +171,8 @@ class QuestionController extends Controller
     public function destroy(Question $question)
     {
         $morphType = $question->questionable_type;
-        $parentId = $question->questionable_id;
+        $parentId  = $question->questionable_id;
+        $parent    = $question->questionable;
         if ($morphType === ListeningSection::class) {
             $type = 'listening';
         } elseif ($morphType === ReadingQuestionGroup::class) {
@@ -163,6 +183,8 @@ class QuestionController extends Controller
 
         $question->options()->delete();
         $question->delete();
+
+        $this->invalidateExamCache($type, $parent);
 
         [$route, $param] = $this->getRedirectRoute($type, $parentId);
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ReadingPassage;
 use App\Models\ReadingQuestionGroup;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ReadingQuestionGroupController extends Controller
 {
@@ -27,6 +28,8 @@ class ReadingQuestionGroupController extends Controller
         ]);
 
         $passage->questionGroups()->create($validated);
+
+        Cache::forget("testset:{$passage->test_set_id}:reading-passages");
 
         return redirect()
             ->route('admin.reading-passages.edit', $passageId)
@@ -50,6 +53,11 @@ class ReadingQuestionGroupController extends Controller
 
         $group->update($validated);
 
+        $passage = ReadingPassage::find($group->reading_passage_id);
+        if ($passage) {
+            Cache::forget("testset:{$passage->test_set_id}:reading-passages");
+        }
+
         return redirect()
             ->route('admin.reading-question-groups.edit', $group->id)
             ->with('success', 'Group updated.');
@@ -58,12 +66,17 @@ class ReadingQuestionGroupController extends Controller
     public function destroy(ReadingQuestionGroup $group)
     {
         $passageId = $group->reading_passage_id;
+        $passage   = ReadingPassage::find($passageId);
         // Questions will cascade-delete via morph (handled by question model)
         $group->questions()->each(function ($q) {
             $q->options()->delete();
             $q->delete();
         });
         $group->delete();
+
+        if ($passage) {
+            Cache::forget("testset:{$passage->test_set_id}:reading-passages");
+        }
 
         return redirect()
             ->route('admin.reading-passages.edit', $passageId)

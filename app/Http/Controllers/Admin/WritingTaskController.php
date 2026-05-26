@@ -7,6 +7,7 @@ use App\Models\TestSet;
 use App\Models\WritingTask;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class WritingTaskController extends Controller
@@ -44,6 +45,8 @@ class WritingTaskController extends Controller
                 'alt_text' => $request->input('image_alt_text', ''),
             ]);
         }
+
+        Cache::forget("testset:{$testSet->id}:writing-tasks");
 
         return redirect()
             ->route('admin.test_sets.show', $testSet->id)
@@ -93,6 +96,8 @@ class WritingTaskController extends Controller
             }
         }
 
+        Cache::forget("testset:{$writing_task->test_set_id}:writing-tasks");
+
         return redirect()
             ->route('admin.test_sets.show', $writing_task->test_set_id)
             ->with('success', 'Writing task updated successfully.');
@@ -105,6 +110,8 @@ class WritingTaskController extends Controller
             Storage::disk('public')->delete($img->image_path);
         }
         $writing_task->delete();
+
+        Cache::forget("testset:{$testSetId}:writing-tasks");
 
         return redirect()
             ->route('admin.test_sets.show', $testSetId)

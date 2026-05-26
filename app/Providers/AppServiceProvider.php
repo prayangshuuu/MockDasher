@@ -24,16 +24,24 @@ class AppServiceProvider extends ServiceProvider
     private function configureRateLimiting(): void
     {
         // ── POST /api/v1/auth/login ────────────────────────────────────────────
-        // 5 attempts per minute keyed by email + IP to prevent brute-force.
+        // Two layers: per-email+IP (brute-force) and per-IP (enumeration).
         RateLimiter::for('api-login', function (Request $request) {
-            $key = strtolower((string) $request->input('email', '')).'|'.$request->ip();
+            $emailIpKey = strtolower((string) $request->input('email', '')).'|'.$request->ip();
 
-            return Limit::perMinute(5)->by($key)->response(function () {
-                return response()->json([
-                    'error'   => 'too_many_requests',
-                    'message' => 'Too many login attempts. Please wait 60 seconds.',
-                ], 429);
-            });
+            return [
+                Limit::perMinute(5)->by($emailIpKey)->response(function () {
+                    return response()->json([
+                        'error'   => 'too_many_requests',
+                        'message' => 'Too many login attempts. Please wait 60 seconds.',
+                    ], 429);
+                }),
+                Limit::perMinute(20)->by('login-ip:'.$request->ip())->response(function () {
+                    return response()->json([
+                        'error'   => 'too_many_requests',
+                        'message' => 'Too many requests from your IP. Please wait.',
+                    ], 429);
+                }),
+            ];
         });
 
         // ── General authenticated API ──────────────────────────────────────────

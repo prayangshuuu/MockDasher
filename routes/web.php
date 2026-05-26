@@ -85,6 +85,7 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('tests', App\Http\Controllers\Admin\TestController::class);
 
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/recent-attempts', [AdminDashboardController::class, 'recentAttempts'])->name('recent-attempts');
 
         Route::get('/test_sets/{test_set}', [TestSetController::class, 'show'])->name('test_sets.show');
         Route::post('/tests/{test}/test_sets', [TestSetController::class, 'store'])->name('test_sets.store');

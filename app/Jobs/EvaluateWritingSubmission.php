@@ -16,6 +16,7 @@ class EvaluateWritingSubmission implements ShouldQueue
     use Queueable;
 
     public int $tries = 3;
+    public int $maxExceptions = 3;
     public int $timeout = 300;
     public array $backoff = [30, 90, 180];
 
@@ -73,94 +74,63 @@ class EvaluateWritingSubmission implements ShouldQueue
             return;
         }
 
-        try {
-            $service = GeminiEvaluationService::forUser($attempt->user);
-            $scores = [];
+        $service = GeminiEvaluationService::forUser($attempt->user);
+        $scores = [];
 
-            foreach ($tasks as $task) {
-                $answer = WritingAnswer::firstOrCreate(
-                    [
-                        'user_id' => $attempt->user_id,
-                        'test_attempt_id' => $attempt->id,
-                        'writing_task_id' => $task->id,
-                    ],
-                    [
-                        'answer_text' => '',
-                        'word_count' => 0,
-                        'submitted_at' => now(),
-                    ]
-                );
+        foreach ($tasks as $task) {
+            $answer = WritingAnswer::firstOrCreate(
+                [
+                    'user_id' => $attempt->user_id,
+                    'test_attempt_id' => $attempt->id,
+                    'writing_task_id' => $task->id,
+                ],
+                [
+                    'answer_text' => '',
+                    'word_count' => 0,
+                    'submitted_at' => now(),
+                ]
+            );
 
-                if ($answer->band_score === null) {
-                    $imageAltText = null;
-                    if ((int) $task->task_number === 1) {
-                        $firstImage = $task->images->first();
-                        $imageAltText = $firstImage?->alt_text ?? $task->precontext ?? null;
-                    }
-
-                    $question = trim($task->task_prompt ?? $task->task_description ?? "Writing Task {$task->task_number}");
-                    $result = $service->evaluateWritingTask(
-                        (int) $task->task_number,
-                        $question,
-                        $imageAltText,
-                        strip_tags((string) $answer->answer_text)
-                    );
-
-                    if (! $result['success'] || $result['band_score'] === null) {
-                        Log::warning("EvaluateWritingSubmission: Gemini failed for Task {$task->task_number}, attempt {$attempt->id}. Retrying once.");
-
-                        // One additional retry with a short pause before giving up
-                        sleep(5);
-                        $result = $service->evaluateWritingTask(
-                            (int) $task->task_number,
-                            $question,
-                            $imageAltText,
-                            strip_tags((string) $answer->answer_text)
-                        );
-                    }
-
-                    if (! $result['success'] || $result['band_score'] === null) {
-                        $summary->update([
-                            'evaluation_status' => 'failed',
-                            'failure_reason' => "Gemini returned no score for Writing Task {$task->task_number}.",
-                        ]);
-
-                        return;
-                    }
-
-                    $answer->update([
-                        'evaluation_json' => $result['evaluation_text'],
-                        'band_score' => $result['band_score'],
-                        'submitted_at' => $answer->submitted_at ?? now(),
-                    ]);
+            if ($answer->band_score === null) {
+                $imageAltText = null;
+                if ((int) $task->task_number === 1) {
+                    $firstImage = $task->images->first();
+                    $imageAltText = $firstImage?->alt_text ?? $task->precontext ?? null;
                 }
 
-                $scores[] = (float) $answer->fresh()->band_score;
+                $question = trim($task->task_prompt ?? $task->task_description ?? "Writing Task {$task->task_number}");
+                $result = $service->evaluateWritingTask(
+                    (int) $task->task_number,
+                    $question,
+                    $imageAltText,
+                    strip_tags((string) $answer->answer_text)
+                );
 
-                $summary->fill([
-                    "task_{$task->task_number}_answer" => substr((string) $answer->answer_text, 0, 65535),
-                    "task_{$task->task_number}_evaluation_json" => $answer->fresh()->evaluation_json,
-                    "task_{$task->task_number}_band_score" => $answer->fresh()->band_score,
-                ])->save();
+                if (! $result['success'] || $result['band_score'] === null) {
+                    // Throw so the queue retries with backoff ($tries / $backoff)
+                    throw new \RuntimeException("Gemini returned no score for Writing Task {$task->task_number} on attempt {$attempt->id}.");
+                }
+
+                $answer->update([
+                    'evaluation_json' => $result['evaluation_text'],
+                    'band_score' => $result['band_score'],
+                    'submitted_at' => $answer->submitted_at ?? now(),
+                ]);
             }
 
-            if (count($scores) !== $tasks->count()) {
-                $summary->update(['evaluation_status' => 'failed', 'failure_reason' => 'Not all writing tasks were scored.']);
+            $scores[] = (float) $answer->fresh()->band_score;
 
-                return;
-            }
-
-            $summary->update([
-                'band_score' => round((array_sum($scores) / count($scores)) * 2) / 2,
-                'evaluation_status' => 'completed',
-                'failure_reason' => null,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('EvaluateWritingSubmission failed: '.$e->getMessage());
-            $summary->update([
-                'evaluation_status' => 'failed',
-                'failure_reason' => $e->getMessage(),
-            ]);
+            $summary->fill([
+                "task_{$task->task_number}_answer" => substr((string) $answer->answer_text, 0, 65535),
+                "task_{$task->task_number}_evaluation_json" => $answer->fresh()->evaluation_json,
+                "task_{$task->task_number}_band_score" => $answer->fresh()->band_score,
+            ])->save();
         }
+
+        $summary->update([
+            'band_score' => round((array_sum($scores) / count($scores)) * 2) / 2,
+            'evaluation_status' => 'completed',
+            'failure_reason' => null,
+        ]);
     }
 }

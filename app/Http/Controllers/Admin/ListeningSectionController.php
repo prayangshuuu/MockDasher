@@ -7,6 +7,7 @@ use App\Models\ListeningSection;
 use App\Models\TestSet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class ListeningSectionController extends Controller
@@ -38,6 +39,8 @@ class ListeningSectionController extends Controller
 
         $testSet->listeningSections()->create($data);
 
+        Cache::forget("testset:{$testSetId}:listening-sections");
+
         return redirect()->route('admin.test_sets.show', $testSetId)->with('success', 'Listening section added successfully.');
     }
 
@@ -66,6 +69,8 @@ class ListeningSectionController extends Controller
 
         $listening_section->update($data);
 
+        Cache::forget("testset:{$listening_section->test_set_id}:listening-sections");
+
         return redirect()->route('admin.test_sets.show', $listening_section->test_set_id)->with('success', 'Listening section updated successfully.');
     }
 
@@ -76,6 +81,8 @@ class ListeningSectionController extends Controller
             Storage::disk('public')->delete($listening_section->audio_path);
         }
         $listening_section->delete();
+
+        Cache::forget("testset:{$testSetId}:listening-sections");
 
         return redirect()->route('admin.test_sets.show', $testSetId)->with('success', 'Listening section deleted successfully.');
     }

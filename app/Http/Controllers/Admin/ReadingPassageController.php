@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ReadingPassage;
 use App\Models\TestSet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ReadingPassageController extends Controller
 {
@@ -36,6 +37,8 @@ class ReadingPassageController extends Controller
 
         $testSet->readingPassages()->create($validated);
 
+        Cache::forget("testset:{$testSetId}:reading-passages");
+
         return redirect()->route('admin.reading-passages.create', $testSetId)->with('success', 'Reading passage added successfully.');
     }
 
@@ -56,6 +59,8 @@ class ReadingPassageController extends Controller
 
         $reading_passage->update($validated);
 
+        Cache::forget("testset:{$reading_passage->test_set_id}:reading-passages");
+
         return redirect()->route('admin.reading-passages.edit', $reading_passage->id)->with('success', 'Reading passage updated successfully.');
     }
 
@@ -63,6 +68,8 @@ class ReadingPassageController extends Controller
     {
         $testSetId = $reading_passage->test_set_id;
         $reading_passage->delete();
+
+        Cache::forget("testset:{$testSetId}:reading-passages");
 
         return redirect()->route('admin.reading-passages.create', $testSetId)->with('success', 'Reading passage deleted successfully.');
     }

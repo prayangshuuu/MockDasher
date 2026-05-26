@@ -56,8 +56,8 @@ class AttemptTest extends TestCase
         $response = $this->getJson('/api/v1/attempts');
 
         $response->assertStatus(200)
-            ->assertJsonStructure(['data', 'meta' => ['current_page', 'last_page', 'per_page', 'total']])
-            ->assertJsonPath('meta.total', 2);
+            ->assertJsonStructure(['data', 'meta' => ['next_cursor', 'prev_cursor', 'per_page']])
+            ->assertJsonCount(2, 'data');
     }
 
     public function test_index_does_not_return_other_users_attempts(): void
@@ -70,7 +70,7 @@ class AttemptTest extends TestCase
         $response = $this->getJson('/api/v1/attempts');
 
         $response->assertStatus(200)
-            ->assertJsonPath('meta.total', 0);
+            ->assertJsonCount(0, 'data');
     }
 
     // ── Start ──────────────────────────────────────────────────────────────────

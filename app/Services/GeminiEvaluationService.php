@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -23,6 +24,10 @@ class GeminiEvaluationService
     protected string $endpoint;
 
     protected string $model;
+
+    private const CIRCUIT_FAILURE_THRESHOLD = 5;
+
+    private const CIRCUIT_OPEN_TTL = 60;
 
     /**
      * @param  string|null  $apiKey  User-provided API key. Falls back to global GEMINI_API_KEY env.
@@ -259,6 +264,38 @@ class GeminiEvaluationService
     }
 
     // ─────────────────────────────────────────────────────────────
+    //  CIRCUIT BREAKER
+    // ─────────────────────────────────────────────────────────────
+
+    private function circuitPrefix(): string
+    {
+        return 'gemini:cb:'.md5($this->apiKey);
+    }
+
+    private function isCircuitOpen(): bool
+    {
+        return (bool) Cache::get($this->circuitPrefix().':open');
+    }
+
+    private function recordCircuitSuccess(): void
+    {
+        Cache::forget($this->circuitPrefix().':failures');
+        Cache::forget($this->circuitPrefix().':open');
+    }
+
+    private function recordCircuitFailure(): void
+    {
+        $failKey  = $this->circuitPrefix().':failures';
+        $failures = (int) Cache::get($failKey, 0) + 1;
+        Cache::put($failKey, $failures, 300);
+
+        if ($failures >= self::CIRCUIT_FAILURE_THRESHOLD) {
+            Cache::put($this->circuitPrefix().':open', true, self::CIRCUIT_OPEN_TTL);
+            Log::warning('[GeminiCircuit] Circuit opened after '.$failures.' consecutive failures');
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────
     //  GEMINI API CALL
     // ─────────────────────────────────────────────────────────────
 
@@ -274,6 +311,12 @@ class GeminiEvaluationService
      */
     protected function callGeminiApi(string $systemInstruction, string $userPrompt): array
     {
+        if ($this->isCircuitOpen()) {
+            Log::warning('[GeminiCircuit] Circuit open — skipping API call');
+
+            return $this->fallbackResponse('Gemini API temporarily unavailable (circuit open).');
+        }
+
         try {
             $response = Http::timeout(90)
                 ->retry(3, 3000, fn ($exception) => true)
@@ -300,6 +343,7 @@ class GeminiEvaluationService
                 if (! $candidate) {
                     $blockReason = $result['promptFeedback']['blockReason'] ?? 'UNKNOWN';
                     Log::warning('[GeminiEval] No candidates returned', ['blockReason' => $blockReason]);
+                    $this->recordCircuitFailure();
 
                     return $this->fallbackResponse("Response blocked by Gemini safety filters: {$blockReason}");
                 }
@@ -307,6 +351,7 @@ class GeminiEvaluationService
                 $finishReason = $candidate['finishReason'] ?? 'STOP';
                 if (in_array($finishReason, ['SAFETY', 'RECITATION'])) {
                     Log::warning('[GeminiEval] Blocked candidate', ['finishReason' => $finishReason]);
+                    $this->recordCircuitFailure();
 
                     return $this->fallbackResponse("Gemini candidate blocked: {$finishReason}");
                 }
@@ -321,6 +366,7 @@ class GeminiEvaluationService
                         'finish_reason' => $finishReason,
                         'preview' => substr($rawText, 0, 500),
                     ]);
+                    $this->recordCircuitFailure();
 
                     return $this->fallbackResponse('Gemini returned a non-JSON response.');
                 }
@@ -331,9 +377,12 @@ class GeminiEvaluationService
                     Log::warning('[GeminiEval] Invalid or missing band score', [
                         'preview' => substr($rawText, 0, 500),
                     ]);
+                    $this->recordCircuitFailure();
 
                     return $this->fallbackResponse('Gemini returned an invalid band score.');
                 }
+
+                $this->recordCircuitSuccess();
 
                 return [
                     'success' => true,
@@ -349,10 +398,14 @@ class GeminiEvaluationService
                 'body' => substr($body, 0, 1000),
             ]);
 
+            $this->recordCircuitFailure();
+
             return $this->fallbackResponse('Gemini API returned status '.$response->status());
 
         } catch (\Exception $e) {
             Log::error('[GeminiEval] Exception', ['message' => $e->getMessage()]);
+
+            $this->recordCircuitFailure();
 
             return $this->fallbackResponse($e->getMessage());
         }

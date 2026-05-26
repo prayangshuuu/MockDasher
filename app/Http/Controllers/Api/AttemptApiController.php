@@ -19,24 +19,23 @@ class AttemptApiController extends Controller
     public function index(Request $request): JsonResponse
     {
         $userId = $request->user()->id;
-        $page   = max(1, (int) $request->input('page', 1));
+        $cursor = $request->input('cursor');
 
         $result = Cache::tags(["user-{$userId}"])->remember(
-            "attempts:{$userId}:p{$page}",
+            "attempts:{$userId}:c" . ($cursor ?? 'start'),
             60,
-            function () use ($userId, $page) {
+            function () use ($userId, $cursor) {
                 $paginator = TestAttempt::with(['test'])
                     ->where('user_id', $userId)
-                    ->latest()
-                    ->paginate(15, ['*'], 'page', $page);
+                    ->orderByDesc('id')
+                    ->cursorPaginate(15, ['*'], 'cursor', $cursor);
 
                 return [
                     'data' => collect($paginator->items())->map(fn ($a) => $this->formatAttempt($a)),
                     'meta' => [
-                        'current_page' => $paginator->currentPage(),
-                        'last_page'    => $paginator->lastPage(),
-                        'per_page'     => $paginator->perPage(),
-                        'total'        => $paginator->total(),
+                        'next_cursor' => $paginator->nextCursor()?->encode(),
+                        'prev_cursor' => $paginator->previousCursor()?->encode(),
+                        'per_page'    => $paginator->perPage(),
                     ],
                 ];
             }

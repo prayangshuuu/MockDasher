@@ -16,6 +16,7 @@ class EvaluateSpeakingSubmission implements ShouldQueue
     use Queueable;
 
     public int $tries = 3;
+    public int $maxExceptions = 3;
     public int $timeout = 300;
     public array $backoff = [30, 90, 180];
 
@@ -77,96 +78,68 @@ class EvaluateSpeakingSubmission implements ShouldQueue
             return;
         }
 
-        try {
-            $service = GeminiEvaluationService::forUser($attempt->user);
-            $scores = [];
+        $service = GeminiEvaluationService::forUser($attempt->user);
+        $scores = [];
 
-            foreach ($questions as $question) {
-                $answer = SpeakingAnswer::firstOrCreate(
-                    [
-                        'user_id' => $attempt->user_id,
-                        'test_attempt_id' => $attempt->id,
-                        'speaking_question_id' => $question->id,
-                    ],
-                    [
-                        'transcript_text' => '',
-                        'duration_seconds' => 0,
-                        'submitted_at' => now(),
-                    ]
+        foreach ($questions as $question) {
+            $answer = SpeakingAnswer::firstOrCreate(
+                [
+                    'user_id' => $attempt->user_id,
+                    'test_attempt_id' => $attempt->id,
+                    'speaking_question_id' => $question->id,
+                ],
+                [
+                    'transcript_text' => '',
+                    'duration_seconds' => 0,
+                    'submitted_at' => now(),
+                ]
+            );
+
+            if ($answer->band_score === null) {
+                $result = $service->evaluateSpeakingQuestion(
+                    (int) $question->part,
+                    (string) $question->question_text,
+                    trim((string) $answer->transcript_text)
                 );
 
-                if ($answer->band_score === null) {
-                    $result = $service->evaluateSpeakingQuestion(
-                        (int) $question->part,
-                        (string) $question->question_text,
-                        trim((string) $answer->transcript_text)
-                    );
-
-                    if (! $result['success'] || $result['band_score'] === null) {
-                        Log::warning("EvaluateSpeakingSubmission: Gemini failed for question {$question->id}, retrying once.");
-                        sleep(5);
-                        $result = $service->evaluateSpeakingQuestion(
-                            (int) $question->part,
-                            (string) $question->question_text,
-                            trim((string) $answer->transcript_text)
-                        );
-                    }
-
-                    if (! $result['success'] || $result['band_score'] === null) {
-                        $summary->update([
-                            'evaluation_status' => 'failed',
-                            'failure_reason' => "Gemini returned no score for Speaking question {$question->id}.",
-                        ]);
-
-                        return;
-                    }
-
-                    $answer->update([
-                        'evaluation_json' => $result['evaluation_text'],
-                        'band_score' => $result['band_score'],
-                        'submitted_at' => $answer->submitted_at ?? now(),
-                    ]);
+                if (! $result['success'] || $result['band_score'] === null) {
+                    // Throw so the queue retries with backoff ($tries / $backoff)
+                    throw new \RuntimeException("Gemini returned no score for Speaking question {$question->id} on attempt {$attempt->id}.");
                 }
 
-                $scores[] = (float) $answer->fresh()->band_score;
+                $answer->update([
+                    'evaluation_json' => $result['evaluation_text'],
+                    'band_score' => $result['band_score'],
+                    'submitted_at' => $answer->submitted_at ?? now(),
+                ]);
             }
 
-            if (count($scores) !== $questions->count()) {
-                $summary->update(['evaluation_status' => 'failed', 'failure_reason' => 'Not all speaking questions were scored.']);
-
-                return;
-            }
-
-            $answers = $attempt->speakingAnswers()->with('question')->get();
-            $transcript = $answers->map(function ($answer) {
-                $question = $answer->question;
-
-                return $question
-                    ? "Part {$question->part} - Q: {$question->question_text}\nA: ".($answer->transcript_text ?: '[No answer]')
-                    : null;
-            })->filter()->implode("\n\n");
-
-            $allEvaluations = $answers->whereNotNull('evaluation_json')->map(fn ($answer) => [
-                'question_id' => $answer->speaking_question_id,
-                'part' => $answer->question?->part,
-                'question' => $answer->question?->question_text,
-                'band_score' => $answer->band_score,
-                'evaluation' => json_decode($answer->evaluation_json, true),
-            ])->values()->toArray();
-
-            $summary->update([
-                'full_transcript' => $transcript,
-                'evaluation_json' => json_encode($allEvaluations, JSON_UNESCAPED_UNICODE),
-                'band_score' => round((array_sum($scores) / count($scores)) * 2) / 2,
-                'evaluation_status' => 'completed',
-                'failure_reason' => null,
-            ]);
-        } catch (\Exception $e) {
-            Log::error('EvaluateSpeakingSubmission failed: '.$e->getMessage());
-            $summary->update([
-                'evaluation_status' => 'failed',
-                'failure_reason' => $e->getMessage(),
-            ]);
+            $scores[] = (float) $answer->fresh()->band_score;
         }
+
+        $answers = $attempt->speakingAnswers()->with('question')->get();
+        $transcript = $answers->map(function ($answer) {
+            $question = $answer->question;
+
+            return $question
+                ? "Part {$question->part} - Q: {$question->question_text}\nA: ".($answer->transcript_text ?: '[No answer]')
+                : null;
+        })->filter()->implode("\n\n");
+
+        $allEvaluations = $answers->whereNotNull('evaluation_json')->map(fn ($answer) => [
+            'question_id' => $answer->speaking_question_id,
+            'part' => $answer->question?->part,
+            'question' => $answer->question?->question_text,
+            'band_score' => $answer->band_score,
+            'evaluation' => json_decode($answer->evaluation_json, true),
+        ])->values()->toArray();
+
+        $summary->update([
+            'full_transcript' => $transcript,
+            'evaluation_json' => json_encode($allEvaluations, JSON_UNESCAPED_UNICODE),
+            'band_score' => round((array_sum($scores) / count($scores)) * 2) / 2,
+            'evaluation_status' => 'completed',
+            'failure_reason' => null,
+        ]);
     }
 }
