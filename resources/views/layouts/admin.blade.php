@@ -85,6 +85,7 @@
                 ['label' => 'Dashboard', 'icon' => '/storage/asset/icons/overview.svg', 'route' => 'admin.dashboard', 'match' => 'admin.dashboard'],
                 ['label' => 'Users', 'icon' => '/storage/asset/icons/group.svg', 'route' => 'admin.users.index', 'match' => 'admin.users.*'],
                 ['label' => 'Exams & Tests', 'icon' => '/storage/asset/icons/library.svg', 'route' => 'admin.tests.index', 'match' => 'admin.tests.*'],
+                ['label' => 'Recent Attempts', 'icon' => '/storage/asset/icons/history.svg', 'route' => 'admin.recent-attempts', 'match' => 'admin.recent-attempts'],
                 ['label' => 'Settings', 'icon' => '/storage/asset/icons/settings.svg', 'route' => 'profile.show', 'match' => 'profile.*'],
             ];
         @endphp

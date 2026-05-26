@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AttemptApiController extends Controller
 {
@@ -184,6 +185,63 @@ class AttemptApiController extends Controller
                 'band_score'     => $attempt->aiSpeakingEvaluation?->band_score,
                 'failure_reason' => $attempt->aiSpeakingEvaluation?->failure_reason,
             ],
+        ]);
+    }
+
+    public function evaluationStream(Request $request, int $id): StreamedResponse
+    {
+        $attempt = TestAttempt::where('user_id', $request->user()->id)->findOrFail($id);
+
+        return response()->stream(function () use ($attempt): void {
+            $deadline = time() + 300; // 5-minute hard cap
+
+            while (time() < $deadline) {
+                if (connection_aborted()) {
+                    break;
+                }
+
+                $attempt->load(['aiWritingEvaluation', 'aiSpeakingEvaluation']);
+
+                $writing  = $attempt->aiWritingEvaluation;
+                $speaking = $attempt->aiSpeakingEvaluation;
+
+                echo 'data: '.json_encode([
+                    'writing'  => [
+                        'status'     => $writing?->evaluation_status ?? 'not_started',
+                        'band_score' => $writing?->band_score,
+                    ],
+                    'speaking' => [
+                        'status'     => $speaking?->evaluation_status ?? 'not_started',
+                        'band_score' => $speaking?->band_score,
+                    ],
+                ])."\n\n";
+
+                if (ob_get_level() > 0) {
+                    ob_flush();
+                }
+                flush();
+
+                $writingDone  = $writing === null
+                    || in_array($writing->evaluation_status, ['completed', 'failed'], true);
+                $speakingDone = $speaking === null
+                    || in_array($speaking->evaluation_status, ['completed', 'failed'], true);
+
+                if ($writingDone && $speakingDone) {
+                    echo "event: done\ndata: {}\n\n";
+                    if (ob_get_level() > 0) {
+                        ob_flush();
+                    }
+                    flush();
+                    break;
+                }
+
+                sleep(3);
+            }
+        }, 200, [
+            'Content-Type'      => 'text/event-stream',
+            'Cache-Control'     => 'no-cache, no-store',
+            'X-Accel-Buffering' => 'no',
+            'Connection'        => 'keep-alive',
         ]);
     }
 

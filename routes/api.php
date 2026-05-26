@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AttemptApiController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\HealthController;
 use App\Http\Controllers\Api\HistoryApiController;
 use App\Http\Controllers\Api\ListeningApiController;
 use App\Http\Controllers\Api\ProfileApiController;
@@ -31,6 +32,9 @@ Route::get('/', fn () => response()->json([
 
 Route::prefix('v1')->group(function () {
 
+    // ── Health check — public, no auth ────────────────────────────────────────
+    Route::get('health', [HealthController::class, 'check']);
+
     // ── Auth — public ─────────────────────────────────────────────────────────
     Route::post('auth/login', [AuthController::class, 'login'])
         ->middleware('throttle:api-login');
@@ -58,6 +62,7 @@ Route::prefix('v1')->group(function () {
         Route::post('attempts',             [AttemptApiController::class, 'start']);
         Route::get('attempts/{id}',         [AttemptApiController::class, 'show']);
         Route::get('attempts/{id}/status',  [AttemptApiController::class, 'evaluationStatus']);
+        Route::get('attempts/{id}/evaluation-stream', [AttemptApiController::class, 'evaluationStream']);
         Route::post('attempts/{id}/finish', [AttemptApiController::class, 'finish']);
         Route::post('attempts/{id}/violation', [AttemptApiController::class, 'recordViolation']);
 

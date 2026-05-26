@@ -319,7 +319,6 @@ class GeminiEvaluationService
 
         try {
             $response = Http::timeout(90)
-                ->retry(3, 3000, fn ($exception) => true)
                 ->withHeaders(['Content-Type' => 'application/json'])
                 ->post("{$this->endpoint}?key={$this->apiKey}", [
                     'system_instruction' => [

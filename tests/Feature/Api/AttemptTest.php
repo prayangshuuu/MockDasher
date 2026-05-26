@@ -282,4 +282,54 @@ class AttemptTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('writing.status', 'pending');
     }
+
+    // ── Evaluation SSE stream ──────────────────────────────────────────────────
+
+    public function test_evaluation_stream_returns_sse_headers(): void
+    {
+        $user    = User::factory()->create();
+        $attempt = $this->makeAttempt($user);
+        Sanctum::actingAs($user);
+
+        $response = $this->get("/api/v1/attempts/{$attempt->id}/evaluation-stream");
+
+        $response->assertStatus(200);
+        $this->assertStringContainsString('text/event-stream', $response->headers->get('Content-Type'));
+    }
+
+    public function test_evaluation_stream_sends_done_when_no_evaluations_pending(): void
+    {
+        $user    = User::factory()->create();
+        $attempt = $this->makeAttempt($user);
+        Sanctum::actingAs($user);
+
+        $response = $this->get("/api/v1/attempts/{$attempt->id}/evaluation-stream");
+
+        // No evaluations → both are "not_started" which count as terminal (null)
+        $content = $response->streamedContent();
+        $this->assertStringContainsString('data:', $content);
+        $this->assertStringContainsString('event: done', $content);
+    }
+
+    public function test_evaluation_stream_prevents_idor(): void
+    {
+        $alice   = User::factory()->create();
+        $bob     = User::factory()->create();
+        $attempt = $this->makeAttempt($bob);
+
+        Sanctum::actingAs($alice);
+        $response = $this->getJson("/api/v1/attempts/{$attempt->id}/evaluation-stream");
+
+        $response->assertStatus(404);
+    }
+
+    public function test_evaluation_stream_requires_authentication(): void
+    {
+        $user    = User::factory()->create();
+        $attempt = $this->makeAttempt($user);
+
+        $response = $this->getJson("/api/v1/attempts/{$attempt->id}/evaluation-stream");
+
+        $response->assertStatus(401);
+    }
 }
