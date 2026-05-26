@@ -73,9 +73,9 @@
                             {{ $task->task_title ?: 'Simulation Prompt' }}
                         </h2>
 
-                        @if($task->task_description)
+                        @if($task->task_prompt)
                             <div class="p-6 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-medium leading-relaxed italic shadow-inner">
-                                {{ $task->task_description }}
+                                {{ $task->task_prompt }}
                             </div>
                         @endif
 
@@ -85,10 +85,10 @@
                             </div>
                         @endif
 
-                        @if($task->task_number == 2 && $task->task_prompt)
+                        @if($task->task_description)
                             <div class="p-8 bg-indigo-50/50 dark:bg-indigo-950/20 rounded-2xl border border-indigo-100 dark:border-indigo-900/40 text-slate-850 dark:text-slate-200 font-semibold leading-relaxed shadow-soft">
-                                <span class="block text-[9px] font-black uppercase tracking-widest text-indigo-500 mb-2">Essay Question</span>
-                                <div class="whitespace-pre-line text-sm sm:text-base">{{ $task->task_prompt }}</div>
+                                <span class="block text-[9px] font-black uppercase tracking-widest text-indigo-500 mb-2">{{ $task->task_number == 1 ? 'Task Details' : 'Essay Question' }}</span>
+                                <div class="whitespace-pre-line text-sm sm:text-base">{{ $task->task_description }}</div>
                             </div>
                         @endif
 

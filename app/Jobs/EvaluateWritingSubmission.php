@@ -98,7 +98,7 @@ class EvaluateWritingSubmission implements ShouldQueue
                     $imageAltText = $firstImage?->alt_text ?? $task->precontext ?? null;
                 }
 
-                $question = trim($task->task_prompt ?? $task->task_description ?? "Writing Task {$task->task_number}");
+                $question = trim($task->task_description ?? $task->task_prompt ?? "Writing Task {$task->task_number}");
                 $result = $service->evaluateWritingTask(
                     (int) $task->task_number,
                     $question,

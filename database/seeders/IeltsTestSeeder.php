@@ -158,8 +158,8 @@ class IeltsTestSeeder extends Seeder
             ['test_set_id' => $testSet->id, 'task_number' => 1],
             [
                 'task_title' => 'Writing Task 1',
-                'task_description' => 'You should spend about 20 minutes on this task.',
-                'task_prompt' => 'The first table below shows changes in the total population of New York City from 1800 to 2000. The second and third tables show changes in the population of the five districts of the city (Manhattan, Brooklyn, Bronx, Queens, Staten Island) over the same period.'."\n\n".'Summarise the information by selecting and reporting the main features, and make comparisons where relevant.',
+                'task_prompt' => 'You should spend about 20 minutes on this task.',
+                'task_description' => 'The first table below shows changes in the total population of New York City from 1800 to 2000. The second and third tables show changes in the population of the five districts of the city (Manhattan, Brooklyn, Bronx, Queens, Staten Island) over the same period.'."\n\n".'Summarise the information by selecting and reporting the main features, and make comparisons where relevant.',
                 'instruction_text' => 'Write at least 150 words.',
                 'minimum_word_count' => 150,
             ]
@@ -174,8 +174,8 @@ class IeltsTestSeeder extends Seeder
             ['test_set_id' => $testSet->id, 'task_number' => 2],
             [
                 'task_title' => 'Writing Task 2',
-                'task_description' => 'You should spend about 40 minutes on this task.',
-                'task_prompt' => 'Write about the following topic:'."\n\n".'Access to clean water is a basic human right. Therefore every home should have a water supply that is provided free of charge.'."\n\n".'Do you agree or disagree?'."\n\n".'Give reasons for your answer and include any relevant examples from your own knowledge or experience.',
+                'task_prompt' => 'You should spend about 40 minutes on this task.',
+                'task_description' => 'Write about the following topic:'."\n\n".'Access to clean water is a basic human right. Therefore every home should have a water supply that is provided free of charge.'."\n\n".'Do you agree or disagree?'."\n\n".'Give reasons for your answer and include any relevant examples from your own knowledge or experience.',
                 'instruction_text' => 'Write at least 250 words.',
                 'minimum_word_count' => 250,
             ]
