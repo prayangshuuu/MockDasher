@@ -47,7 +47,7 @@ class ModuleCompletionTest extends TestCase
 
         $response = $this->actingAs($user)->post(route('user.writing.submit', $attempt));
 
-        $response->assertRedirect(route('user.tests.start', $attempt->testSet->test_id));
+        $response->assertRedirect(route('user.writing.result', $attempt));
 
         $attempt->refresh();
         $this->assertNull($attempt->completed_at);
@@ -102,7 +102,7 @@ class ModuleCompletionTest extends TestCase
 
         $response = $this->actingAs($user)->post(route('user.speaking.submit', $attempt));
 
-        $response->assertRedirect(route('user.tests.start', $attempt->testSet->test_id));
+        $response->assertRedirect(route('user.speaking.result', $attempt));
 
         $attempt->refresh();
         $this->assertNull($attempt->completed_at);
