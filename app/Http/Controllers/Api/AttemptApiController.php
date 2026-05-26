@@ -70,11 +70,25 @@ class AttemptApiController extends Controller
             $testSet = TestSet::findOrFail($request->test_set_id);
         }
 
-        $existing = TestAttempt::where('user_id', $request->user()->id)
-            ->where('test_set_id', $testSet->id)
+        // Check if the user already has an ongoing test session
+        $activeAttempt = TestAttempt::query()
+            ->with('testSet')
+            ->where('user_id', $request->user()->id)
             ->whereNull('completed_at')
-            ->latest()
             ->first();
+
+        if ($activeAttempt) {
+            if ($activeAttempt->testSet && $activeAttempt->testSet->test_id !== $testSet->test_id) {
+                return response()->json([
+                    'error' => 'active_attempt_exists',
+                    'message' => 'You already have an ongoing exam session for another test. Please finish it before starting a new one.',
+                    'active_test_id' => $activeAttempt->testSet->test_id
+                ], 422);
+            }
+            $existing = $activeAttempt;
+        } else {
+            $existing = null;
+        }
 
         if ($existing) {
             return response()->json(['data' => $this->formatAttempt($existing->load('test')), 'resumed' => true]);

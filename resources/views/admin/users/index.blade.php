@@ -67,8 +67,19 @@
                                 {{ $user->created_at->format('M d, Y') }}
                             </td>
 
-                            <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400 capitalize font-medium whitespace-nowrap">
-                                {{ $user->role ?? 'student' }}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @php $primaryRole = $user->roles->first(); @endphp
+                                @if($primaryRole && strtolower($primaryRole->name) === 'admin')
+                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-violet-100 dark:bg-violet-900/30 px-2.5 py-1 text-xs font-bold text-violet-700 dark:text-violet-300">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-violet-500"></span>
+                                        Admin
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 dark:bg-slate-800 px-2.5 py-1 text-xs font-bold text-slate-600 dark:text-slate-400">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>
+                                        {{ $primaryRole?->name ?? 'User' }}
+                                    </span>
+                                @endif
                             </td>
 
                             <td class="px-6 py-4 whitespace-nowrap">

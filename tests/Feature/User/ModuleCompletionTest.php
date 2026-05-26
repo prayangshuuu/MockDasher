@@ -220,6 +220,40 @@ class ModuleCompletionTest extends TestCase
         return [$user, $attempt, $questions];
     }
 
+    public function test_cannot_start_second_test_while_first_is_ongoing_web(): void
+    {
+        $user = User::factory()->create();
+        $test1 = Test::create([
+            'book_number' => 19,
+            'year' => 2026,
+            'exam_type' => 'Academic',
+            'status' => 'published',
+        ]);
+        $testSet1 = TestSet::create(['test_id' => $test1->id, 'set_number' => 1]);
+
+        $test2 = Test::create([
+            'book_number' => 20,
+            'year' => 2026,
+            'exam_type' => 'Academic',
+            'status' => 'published',
+        ]);
+        $testSet2 = TestSet::create(['test_id' => $test2->id, 'set_number' => 1]);
+
+        // Create an ongoing attempt for test 1
+        TestAttempt::create([
+            'user_id' => $user->id,
+            'test_set_id' => $testSet1->id,
+            'status' => 'in_progress',
+            'started_at' => now(),
+        ]);
+
+        // Attempting to access test 2 start page should redirect to test 1 start page
+        $response = $this->actingAs($user)->get(route('user.tests.start', $test2->id));
+
+        $response->assertRedirect(route('user.tests.start', $test1->id));
+        $response->assertSessionHas('error', 'You already have an ongoing exam session for another test. Please finish it before starting a new one.');
+    }
+
     private function geminiJsonResponse(float $score): array
     {
         return [

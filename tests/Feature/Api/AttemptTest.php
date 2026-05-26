@@ -119,6 +119,25 @@ class AttemptTest extends TestCase
             ->assertJsonPath('data.id', $attempt->id);
     }
 
+    public function test_start_prevents_starting_second_test_while_first_is_ongoing(): void
+    {
+        $user = User::factory()->create();
+        $testSet1 = $this->makeTestSet();
+        $testSet2 = $this->makeTestSet();
+
+        // Create an ongoing attempt for testSet1
+        $this->makeAttempt($user, $testSet1);
+
+        Sanctum::actingAs($user);
+
+        // Attempting to start an attempt for testSet2 should be blocked
+        $response = $this->postJson('/api/v1/attempts', ['test_set_id' => $testSet2->id]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('error', 'active_attempt_exists')
+            ->assertJsonPath('active_test_id', $testSet1->test_id);
+    }
+
     public function test_start_validates_missing_ids(): void
     {
         Sanctum::actingAs(User::factory()->create());

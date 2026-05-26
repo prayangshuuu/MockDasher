@@ -30,18 +30,27 @@ class TestController extends Controller
         // Only published tests are accessible to users
         abort_if($test->status !== 'published', 404);
 
+        // Check if the user already has an ongoing test session
+        $activeAttempt = TestAttempt::query()
+            ->with('testSet')
+            ->where('user_id', auth()->id())
+            ->whereNull('completed_at')
+            ->first();
+
+        if ($activeAttempt) {
+            if ($activeAttempt->testSet && $activeAttempt->testSet->test_id !== $test->id) {
+                return redirect()->route('user.tests.start', $activeAttempt->testSet->test_id)
+                    ->with('error', 'You already have an ongoing exam session for another test. Please finish it before starting a new one.');
+            }
+            $testAttempt = $activeAttempt;
+        } else {
+            $testAttempt = null;
+        }
+
         $testSet = $test->testSets()->first();
         if (! $testSet) {
             return redirect()->route('dashboard')->with('error', 'No test sets found for this test.');
         }
-
-        // Find an active (uncompleted) TestAttempt for this user & test set.
-        $testAttempt = TestAttempt::query()
-            ->where('user_id', auth()->id())
-            ->where('test_set_id', $testSet->id)
-            ->whereNull('completed_at')
-            ->orderByDesc('created_at')
-            ->first();
 
         // GET — show module selector dashboard
         if (! $request->has('module')) {

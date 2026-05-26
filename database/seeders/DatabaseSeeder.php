@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             DefaultUsersSeeder::class,
             IeltsTestSeeder::class,
+            ExamAttemptsSeeder::class,
         ]);
     }
 }
+

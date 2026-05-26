@@ -206,7 +206,10 @@
     <div class="bg-surface-light dark:bg-surface-dark border border-slate-200 dark:border-slate-800 rounded-2xl shadow-soft overflow-hidden">
         <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
             <div class="flex items-center justify-between">
-                <h3 class="text-base font-bold text-slate-900 dark:text-white">Recent Test History</h3>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px] text-primary shrink-0">monitoring</span>
+                    Recent Test History
+                </h3>
                 <a href="{{ route('user.history.index') }}" class="text-sm font-bold text-primary hover:text-primary-hover transition-colors">
                     See All
                 </a>

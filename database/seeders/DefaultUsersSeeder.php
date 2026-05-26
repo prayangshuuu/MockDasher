@@ -20,21 +20,25 @@ class DefaultUsersSeeder extends Seeder
         /** @var Role $userRole */
         $userRole = Role::query()->firstOrCreate(['name' => 'User']);
 
-        // Create Admin
+        // Create Admin – Prayangshu Biswas
         User::updateOrCreate(
             ['email' => 'admin@prayangshu.com'],
             [
-                'name' => 'Admin',
-                'password' => Hash::make('password'),
+                'name'       => 'Prayangshu Biswas',
+                'first_name' => 'Prayangshu',
+                'last_name'  => 'Biswas',
+                'password'   => Hash::make('password'),
             ]
         )->roles()->sync([$adminRole->id]);
 
-        // Create User
+        // Create User – Daniel Rozario
         User::updateOrCreate(
             ['email' => 'user@prayangshu.com'],
             [
-                'name' => 'User',
-                'password' => Hash::make('password'),
+                'name'       => 'Daniel Rozario',
+                'first_name' => 'Daniel',
+                'last_name'  => 'Rozario',
+                'password'   => Hash::make('password'),
             ]
         )->roles()->sync([$userRole->id]);
     }

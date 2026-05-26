@@ -40,4 +40,32 @@ class TestHistoryController extends Controller
 
         return view('user.history.show', compact('attempt'));
     }
+
+    public function exportPdf(Request $request, TestAttempt $attempt)
+    {
+        if ((int) $attempt->user_id !== (int) $request->user()->id) {
+            abort(403);
+        }
+
+        $attempt->load([
+            'user',
+            'testSet.test',
+            'writingAnswers.writingTask',
+            'speakingAnswers',
+            'readingAttempt',
+            'listeningAttempt',
+            'aiWritingEvaluation',
+            'aiSpeakingEvaluation',
+        ]);
+
+        $logoPath = storage_path('app/public/asset/logo.png');
+        $logoSrc  = file_exists($logoPath)
+            ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+            : null;
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('user.history.pdf', compact('attempt', 'logoSrc'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download('mockdasher-my-result-' . $attempt->id . '.pdf');
+    }
 }

@@ -76,6 +76,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/history', [TestHistoryController::class, 'index'])->name('user.history.index');
     Route::get('/history/{attempt}', [TestHistoryController::class, 'show'])->name('user.history.show');
+    Route::get('/history/{attempt}/pdf', [TestHistoryController::class, 'exportPdf'])->name('user.history.pdf');
 
     // Admin Routes
     Route::middleware([RoleMiddleware::class.':Admin'])->prefix('admin')->name('admin.')->group(function () {

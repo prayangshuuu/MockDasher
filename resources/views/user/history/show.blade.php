@@ -16,6 +16,27 @@
 
 <div class="max-w-6xl mx-auto space-y-8">
 
+    {{-- Action bar --}}
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-xl font-extrabold text-slate-900 dark:text-white">Attempt #{{ $attempt->id }}</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                {{ ($attempt->started_at ?? $attempt->created_at)->format('d M Y') }}
+                @if($attempt->time_spent)
+                    &bull; {{ $attempt->time_spent }}
+                @endif
+            </p>
+        </div>
+        <a href="{{ route('user.history.pdf', $attempt->id) }}"
+           target="_blank"
+           class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold border border-primary/25 text-primary bg-indigo-50 dark:bg-indigo-900/20 hover:bg-primary hover:text-white hover:border-primary transition-all duration-150 shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            </svg>
+            Export PDF
+        </a>
+    </div>
+
     {{-- Score Hero --}}
     <div class="bg-surface-light dark:bg-surface-dark rounded-2xl border border-slate-200 dark:border-slate-800 shadow-soft overflow-hidden p-6 md:p-8 hover:shadow-premium transition-all duration-200">
         <div class="flex flex-col items-center gap-8 md:flex-row">
@@ -283,7 +304,10 @@
         {{-- SPEAKING MODULE REPORTS --}}
         @if($attempt->aiSpeakingEvaluation && $attempt->aiSpeakingEvaluation->evaluation_json)
         @php
-            $speakingEvals = json_decode($attempt->aiSpeakingEvaluation->evaluation_json, true) ?: [];
+            $speakingEvalsRaw = json_decode($attempt->aiSpeakingEvaluation->evaluation_json, true) ?: [];
+            // Guard: only keep per-question entries (arrays with a question_id key).
+            // Flat summary objects (old format) produce scalar values when iterated — skip those.
+            $speakingEvals   = array_values(array_filter($speakingEvalsRaw, fn($item) => is_array($item) && isset($item['question_id'])));
             $speakingAnswers = $attempt->speakingAnswers->keyBy('speaking_question_id');
         @endphp
         
