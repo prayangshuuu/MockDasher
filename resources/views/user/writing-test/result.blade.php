@@ -39,7 +39,7 @@
         
         <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-soft">
             <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-                <span class="material-symbols-outlined text-indigo-500">sync</span>
+                <img src="/storage/asset/icons/ai.svg" class="w-6 h-6" alt="AI" />
                 Writing Evaluation Status
             </h2>
             @if(!$evaluation)

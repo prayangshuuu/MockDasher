@@ -33,7 +33,10 @@
     <div class="max-w-4xl mx-auto space-y-10 w-full">
         
         <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-soft">
-            <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Speaking Evaluation Status</h2>
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                <img src="/storage/asset/icons/ai.svg" class="w-6 h-6" alt="AI" />
+                Speaking Evaluation Status
+            </h2>
             @if(!$evaluation)
                 <p class="text-sm text-slate-500">Evaluation not started.</p>
             @elseif($evaluation->evaluation_status === 'pending' || $evaluation->evaluation_status === 'evaluating')
