@@ -66,8 +66,16 @@
                 </div>
 
                 @if($listeningStatus === 'completed')
-                    <div class="w-full text-center bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 py-2.5 rounded-xl text-sm font-bold shadow-soft">
-                        Completed (Band {{ number_format($listeningBand ?? 0.0, 1) }})
+                    <div class="flex flex-col gap-2 w-full">
+                        <div class="w-full text-center bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 py-2.5 rounded-xl text-sm font-bold shadow-soft">
+                            Completed (Band {{ number_format($listeningBand ?? 0.0, 1) }})
+                        </div>
+                        @if($testAttempt && $testAttempt->listeningAttempt)
+                            <a href="{{ route('user.listening.result', $testAttempt->listeningAttempt->id) }}" 
+                               class="w-full text-center text-xs font-bold text-indigo-500 hover:underline">
+                                View Listening Results
+                            </a>
+                        @endif
                     </div>
                 @else
                     <form action="{{ route('user.tests.start', $test->id) }}" method="POST" class="w-full">
@@ -152,8 +160,16 @@
                 </div>
 
                 @if($writingStatus === 'completed')
-                    <div class="w-full text-center bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 py-2.5 rounded-xl text-sm font-bold shadow-soft">
-                        Completed (Band {{ number_format($writingBand ?? 0.0, 1) }})
+                    <div class="flex flex-col gap-2 w-full">
+                        <div class="w-full text-center bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 py-2.5 rounded-xl text-sm font-bold shadow-soft">
+                            Completed (Band {{ number_format($writingBand ?? 0.0, 1) }})
+                        </div>
+                        @if($testAttempt && $testAttempt->id)
+                            <a href="{{ route('user.writing.result', $testAttempt->id) }}" 
+                               class="w-full text-center text-xs font-bold text-violet-500 hover:underline">
+                                View Writing Results
+                            </a>
+                        @endif
                     </div>
                 @elseif($writingStatus === 'evaluating')
                     <div class="w-full flex items-center justify-center gap-2 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 text-indigo-600 dark:text-indigo-400 py-2.5 rounded-xl text-sm font-bold shadow-soft">
@@ -195,8 +211,16 @@
                 </div>
 
                 @if($speakingStatus === 'completed')
-                    <div class="w-full text-center bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 py-2.5 rounded-xl text-sm font-bold shadow-soft">
-                        Completed (Band {{ number_format($speakingBand ?? 0.0, 1) }})
+                    <div class="flex flex-col gap-2 w-full">
+                        <div class="w-full text-center bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 text-emerald-600 dark:text-emerald-400 py-2.5 rounded-xl text-sm font-bold shadow-soft">
+                            Completed (Band {{ number_format($speakingBand ?? 0.0, 1) }})
+                        </div>
+                        @if($testAttempt && $testAttempt->id)
+                            <a href="{{ route('user.speaking.result', $testAttempt->id) }}" 
+                               class="w-full text-center text-xs font-bold text-emerald-500 hover:underline">
+                                View Speaking Results
+                            </a>
+                        @endif
                     </div>
                 @elseif($speakingStatus === 'evaluating')
                     <div class="w-full flex items-center justify-center gap-2 bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 text-indigo-600 dark:text-indigo-400 py-2.5 rounded-xl text-sm font-bold shadow-soft">

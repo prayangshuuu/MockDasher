@@ -132,5 +132,7 @@ class EvaluateWritingSubmission implements ShouldQueue
             'evaluation_status' => 'completed',
             'failure_reason' => null,
         ]);
+
+        app(\App\Http\Controllers\User\TestController::class)->autoFinishIfComplete($attempt);
     }
 }

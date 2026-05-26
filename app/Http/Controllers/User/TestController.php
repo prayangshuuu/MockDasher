@@ -335,4 +335,25 @@ class TestController extends Controller
             ]);
         }
     }
+
+    /**
+     * Auto-finish the exam if all 4 modules are completed.
+     */
+    public function autoFinishIfComplete(TestAttempt $attempt): void
+    {
+        if ($attempt->completed_at) {
+            return;
+        }
+
+        $attempt->loadMissing(['listeningAttempt', 'readingAttempt', 'aiWritingEvaluation', 'aiSpeakingEvaluation']);
+
+        $listeningDone = $attempt->listeningAttempt && $attempt->listeningAttempt->status === 'completed';
+        $readingDone = $attempt->readingAttempt && $attempt->readingAttempt->status === 'completed';
+        $writingDone = $attempt->aiWritingEvaluation && in_array($attempt->aiWritingEvaluation->evaluation_status, ['completed', 'failed']);
+        $speakingDone = $attempt->aiSpeakingEvaluation && in_array($attempt->aiSpeakingEvaluation->evaluation_status, ['completed', 'failed']);
+
+        if ($listeningDone && $readingDone && $writingDone && $speakingDone) {
+            $attempt->update(['status' => 'completed', 'completed_at' => now()]);
+        }
+    }
 }

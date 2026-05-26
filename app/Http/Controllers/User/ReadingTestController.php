@@ -105,6 +105,7 @@ class ReadingTestController extends Controller
 
         $attempt->update(['status' => 'completed', 'completed_at' => now()]);
         $attempt->evaluate();
+        app(\App\Http\Controllers\User\TestController::class)->autoFinishIfComplete($attempt->testAttempt);
 
         return redirect()->route('user.reading.result', $attempt->id);
     }
@@ -139,6 +140,7 @@ class ReadingTestController extends Controller
         if ($attempt->status !== 'completed') {
             $attempt->update(['status' => 'completed', 'completed_at' => now()]);
             $attempt->evaluate();
+            app(\App\Http\Controllers\User\TestController::class)->autoFinishIfComplete($attempt->testAttempt);
         }
 
         return redirect()->route('user.reading.result', $attempt->id);

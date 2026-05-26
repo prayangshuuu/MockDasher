@@ -143,6 +143,7 @@ class ListeningTestController extends Controller
 
         $attempt->update(['status' => 'completed', 'completed_at' => now()]);
         $attempt->evaluate();
+        app(\App\Http\Controllers\User\TestController::class)->autoFinishIfComplete($attempt->testAttempt);
 
         return redirect()->route('user.listening.result', $attempt->id)
             ->with('success', 'Listening test submitted successfully!');
@@ -176,6 +177,7 @@ class ListeningTestController extends Controller
         if ($attempt->status !== 'completed') {
             $attempt->update(['status' => 'completed', 'completed_at' => now()]);
             $attempt->evaluate();
+            app(\App\Http\Controllers\User\TestController::class)->autoFinishIfComplete($attempt->testAttempt);
         }
 
         return redirect()->route('user.listening.result', $attempt->id)
