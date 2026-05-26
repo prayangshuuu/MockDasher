@@ -265,6 +265,7 @@
             window.examHasChanges = false;
 
             // Guard against accidental navigation/reload during exam
+            @if(!request()->routeIs('*.result') && !request()->routeIs('user.tests.start'))
             window.onbeforeunload = function(e) {
                 if (!window.isAutoSubmitting) {
                     const msg = 'Your exam is in progress. Leaving this page will interrupt your test.';
@@ -272,6 +273,7 @@
                     return msg;
                 }
             };
+            @endif
 
             // Anti-cheat event triggers: Only trigger on actual visibility changes (tab switches or minimizing browser)
             document.addEventListener('visibilitychange', () => {

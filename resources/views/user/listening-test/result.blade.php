@@ -14,11 +14,18 @@
 @endsection
 
 @section('top_right_actions')
-<a href="{{ route('dashboard') }}" 
-   class="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 px-4 py-2 rounded-xl text-xs font-bold shadow-soft transition-all duration-150 focus:outline-none">
-    <img src="/storage/asset/icons/overview.svg" class="w-4 h-4 invert dark:invert-0" alt="Dashboard" />
-    Dashboard
-</a>
+<div class="flex items-center gap-3">
+    <a href="{{ route('user.tests.start', $attempt->testSet->test_id) }}" 
+       class="inline-flex items-center gap-1.5 bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-soft transition-all duration-150 focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        Back to Test
+    </a>
+    <a href="{{ route('dashboard') }}" 
+       class="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 px-4 py-2 rounded-xl text-xs font-bold shadow-soft transition-all duration-150 focus:outline-none">
+        <img src="/storage/asset/icons/overview.svg" class="w-4 h-4 invert dark:invert-0" alt="Dashboard" />
+        Dashboard
+    </a>
+</div>
 @endsection
 
 @section('content')
