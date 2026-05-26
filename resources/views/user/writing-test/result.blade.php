@@ -34,7 +34,7 @@
 @endsection
 
 @section('content')
-<div class="flex-1 flex flex-col overflow-hidden custom-scrollbar bg-slate-50 dark:bg-slate-900/40 p-6 sm:p-10">
+<div class="flex-1 flex flex-col overflow-y-auto custom-scrollbar bg-slate-50 dark:bg-slate-900/40 p-6 sm:p-10">
     <div class="max-w-4xl mx-auto space-y-10 w-full">
         
         <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-soft">
