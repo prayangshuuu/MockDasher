@@ -107,8 +107,8 @@ class EvaluateWritingSubmission implements ShouldQueue
                 );
 
                 if (! $result['success'] || $result['band_score'] === null) {
-                    // Throw so the queue retries with backoff ($tries / $backoff)
-                    throw new \RuntimeException("Gemini returned no score for Writing Task {$task->task_number} on attempt {$attempt->id}.");
+                    $summary->update(['evaluation_status' => 'failed', 'failure_reason' => "Gemini returned no score for Writing Task {$task->task_number} on attempt {$attempt->id}."]);
+                    return;
                 }
 
                 $answer->update([
