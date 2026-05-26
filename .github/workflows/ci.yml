@@ -1,0 +1,169 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Cancel in-progress runs for the same branch on new push
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PHP_VERSION: '8.2'
+  NODE_VERSION: '20'
+
+jobs:
+  # ── 1. PHP Code Style ────────────────────────────────────────────────────
+  code-style:
+    name: Code Style (Pint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-progress
+
+      - name: Check code style
+        run: ./vendor/bin/pint --test
+
+  # ── 2. PHP Tests ─────────────────────────────────────────────────────────
+  tests:
+    name: Tests (PHPUnit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          # Extensions required by Laravel + DomPDF + SQLite for tests
+          extensions: sqlite3, pdo_sqlite, mbstring, xml, dom, ctype, json, bcmath, gd, curl, fileinfo, zip, intl
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-progress
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          # Override for CI — phpunit.xml already sets DB to sqlite :memory:,
+          # but .env drives artisan commands run before test bootstrap.
+          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=sqlite/' .env
+          sed -i 's/^CACHE_STORE=.*/CACHE_STORE=array/' .env
+          sed -i 's/^SESSION_DRIVER=.*/SESSION_DRIVER=array/' .env
+          sed -i 's/^QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/' .env
+          echo "SENTRY_DSN=" >> .env
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Run migrations (in-memory SQLite)
+        run: php artisan migrate --force
+
+      - name: Run test suite
+        run: php artisan test --stop-on-failure
+
+  # ── 3. Frontend Asset Build ───────────────────────────────────────────────
+  build-assets:
+    name: Frontend Build (Vite)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-${{ github.sha }}
+          path: public/build/
+          retention-days: 7
+
+  # ── 4. Security Audit (non-blocking) ─────────────────────────────────────
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    # Audit failures are reported but don't block merges.
+    # Remove continue-on-error once you've resolved any existing findings.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          coverage: none
+          tools: composer:v2
+
+      - name: Audit PHP packages
+        run: composer audit
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Audit Node packages
+        run: npm audit --audit-level=high
+
+  # ── Gate: required for GitHub branch protection ───────────────────────────
+  # Set "ci" as the required status check in your branch protection rule.
+  # This single check will fail if any required job above fails.
+  ci:
+    name: CI
+    needs: [code-style, tests, build-assets]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Evaluate required jobs
+        run: |
+          results=("${{ needs.code-style.result }}" "${{ needs.tests.result }}" "${{ needs.build-assets.result }}")
+          for result in "${results[@]}"; do
+            if [[ "$result" != "success" ]]; then
+              echo "A required CI job did not succeed (result: $result)."
+              exit 1
+            fi
+          done
+          echo "All CI checks passed."
