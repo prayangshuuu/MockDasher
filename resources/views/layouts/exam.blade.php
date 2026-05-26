@@ -69,13 +69,11 @@
     <header class="z-50 flex h-14 shrink-0 items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-surface-light dark:bg-surface-dark px-4 sm:px-6 lg:px-8">
 
         {{-- Left: Brand + Test Info --}}
-        <div class="flex min-w-0 items-center gap-3">
-            <div class="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-soft">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                    <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
-                    <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
-                </svg>
-            </div>
+        <div class="flex min-w-0 items-center gap-4">
+            <a href="/" class="flex shrink-0 items-center">
+                <img src="/storage/asset/logo.png" alt="{{ config('app.name', 'MockDasher') }} Logo" class="h-8" />
+            </a>
+            <div class="h-8 w-px bg-slate-200 dark:bg-slate-800"></div>
             <div class="min-w-0">
                 <p class="text-[9px] font-black uppercase tracking-widest text-primary leading-none">@yield('test_type', 'Exam')</p>
                 <h1 class="truncate text-sm font-extrabold text-slate-900 dark:text-white mt-0.5 tracking-tight">@yield('test_title', 'Mock Test')</h1>

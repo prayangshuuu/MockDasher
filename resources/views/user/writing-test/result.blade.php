@@ -5,11 +5,16 @@
 @section('test_title', 'IELTS ' . optional($attempt->testSet->test)->book_number)
 
 @section('timer_area')
-<div class="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/40 px-4 py-1.5 rounded-full shadow-soft">
-    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-500 fill-current" viewBox="0 0 24 24">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-    </svg>
-    <span class="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Completed</span>
+<div class="flex items-center gap-2 {{ (!$evaluation || in_array($evaluation->evaluation_status, ['pending', 'evaluating'])) ? 'bg-indigo-50 dark:bg-indigo-950/30 border-indigo-100 dark:border-indigo-900/40' : 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-100 dark:border-emerald-900/40' }} px-4 py-1.5 rounded-full shadow-soft">
+    @if(!$evaluation || in_array($evaluation->evaluation_status, ['pending', 'evaluating']))
+        <span class="material-symbols-outlined text-[16px] text-indigo-500 animate-spin">sync</span>
+        <span class="text-[9px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Evaluating</span>
+    @else
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-emerald-500 fill-current" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+        <span class="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Completed</span>
+    @endif
 </div>
 @endsection
 
@@ -26,7 +31,10 @@
     <div class="max-w-4xl mx-auto space-y-10 w-full">
         
         <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-soft">
-            <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Writing Evaluation Status</h2>
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                <span class="material-symbols-outlined text-indigo-500">sync</span>
+                Writing Evaluation Status
+            </h2>
             @if(!$evaluation)
                 <p class="text-sm text-slate-500">Evaluation not started.</p>
             @elseif($evaluation->evaluation_status === 'pending' || $evaluation->evaluation_status === 'evaluating')

@@ -78,18 +78,26 @@ class TestController extends Controller
 
             $writingStatus = 'not_started';
             $writingBand = null;
-            if ($testAttempt->aiWritingEvaluation?->band_score !== null) {
-                $writingStatus = 'completed';
-                $writingBand = $testAttempt->aiWritingEvaluation->band_score;
+            if ($testAttempt->aiWritingEvaluation) {
+                if (in_array($testAttempt->aiWritingEvaluation->evaluation_status, ['pending', 'evaluating'])) {
+                    $writingStatus = 'evaluating';
+                } elseif ($testAttempt->aiWritingEvaluation->band_score !== null) {
+                    $writingStatus = 'completed';
+                    $writingBand = $testAttempt->aiWritingEvaluation->band_score;
+                }
             } elseif ($testAttempt->writingAnswers()->exists()) {
                 $writingStatus = 'in_progress';
             }
 
             $speakingStatus = 'not_started';
             $speakingBand = null;
-            if ($testAttempt->aiSpeakingEvaluation?->band_score !== null) {
-                $speakingStatus = 'completed';
-                $speakingBand = $testAttempt->aiSpeakingEvaluation->band_score;
+            if ($testAttempt->aiSpeakingEvaluation) {
+                if (in_array($testAttempt->aiSpeakingEvaluation->evaluation_status, ['pending', 'evaluating'])) {
+                    $speakingStatus = 'evaluating';
+                } elseif ($testAttempt->aiSpeakingEvaluation->band_score !== null) {
+                    $speakingStatus = 'completed';
+                    $speakingBand = $testAttempt->aiSpeakingEvaluation->band_score;
+                }
             } elseif ($testAttempt->speakingAnswers()->exists()) {
                 $speakingStatus = 'in_progress';
             }

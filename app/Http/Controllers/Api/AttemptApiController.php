@@ -169,12 +169,20 @@ class AttemptApiController extends Controller
 
     public function evaluationStatus(Request $request, int $id): JsonResponse
     {
-        $attempt = TestAttempt::with(['aiWritingEvaluation', 'aiSpeakingEvaluation'])
+        $attempt = TestAttempt::with(['aiWritingEvaluation', 'aiSpeakingEvaluation', 'listeningAttempt', 'readingAttempt'])
             ->where('user_id', $request->user()->id)
             ->findOrFail($id);
 
         return response()->json([
             'attempt_id' => $attempt->id,
+            'listening'  => [
+                'status'         => $attempt->listeningAttempt?->status ?? 'not_started',
+                'band_score'     => $attempt->listeningAttempt?->band_score,
+            ],
+            'reading'    => [
+                'status'         => $attempt->readingAttempt?->status ?? 'not_started',
+                'band_score'     => $attempt->readingAttempt?->band_score,
+            ],
             'writing'    => [
                 'status'         => $attempt->aiWritingEvaluation?->evaluation_status ?? 'not_started',
                 'band_score'     => $attempt->aiWritingEvaluation?->band_score,
@@ -200,12 +208,22 @@ class AttemptApiController extends Controller
                     break;
                 }
 
-                $attempt->load(['aiWritingEvaluation', 'aiSpeakingEvaluation']);
+                $attempt->load(['aiWritingEvaluation', 'aiSpeakingEvaluation', 'listeningAttempt', 'readingAttempt']);
 
+                $listening = $attempt->listeningAttempt;
+                $reading  = $attempt->readingAttempt;
                 $writing  = $attempt->aiWritingEvaluation;
                 $speaking = $attempt->aiSpeakingEvaluation;
 
                 echo 'data: '.json_encode([
+                    'listening' => [
+                        'status'     => $listening?->status ?? 'not_started',
+                        'band_score' => $listening?->band_score,
+                    ],
+                    'reading'  => [
+                        'status'     => $reading?->status ?? 'not_started',
+                        'band_score' => $reading?->band_score,
+                    ],
                     'writing'  => [
                         'status'     => $writing?->evaluation_status ?? 'not_started',
                         'band_score' => $writing?->band_score,
