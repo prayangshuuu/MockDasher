@@ -8,6 +8,7 @@ use App\Models\ListeningAttempt;
 use App\Models\TestAttempt;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ListeningApiController extends Controller
 {
@@ -87,10 +88,11 @@ class ListeningApiController extends Controller
             }
         }
 
-        $sections      = $la->testSet->listeningSections()
-            ->with(['questions.options'])
-            ->orderBy('section_number')
-            ->get();
+        $sections = Cache::remember(
+            "testset:{$la->test_set_id}:listening-sections",
+            3600,
+            fn () => $la->testSet->listeningSections()->with(['questions.options'])->orderBy('section_number')->get()
+        );
 
         $savedAnswers   = $la->answers->pluck('answer_text', 'question_id')->toArray();
         $flaggedAnswers = $la->answers->filter(fn ($a) => $a->is_flagged)->pluck('is_flagged', 'question_id')->toArray();
@@ -257,38 +259,46 @@ class ListeningApiController extends Controller
             return response()->json(['error' => 'not_completed', 'message' => 'Listening test not yet submitted.'], 409);
         }
 
-        $sections       = $la->testSet->listeningSections()
-            ->with(['questions.options'])
-            ->orderBy('section_number')
-            ->get();
+        $data = Cache::remember(
+            "listening-result:{$la->id}",
+            3600,
+            function () use ($attempt, $la) {
+                $sections       = Cache::remember(
+                    "testset:{$la->test_set_id}:listening-sections",
+                    3600,
+                    fn () => $la->testSet->listeningSections()->with(['questions.options'])->orderBy('section_number')->get()
+                );
+                $answers        = $la->answers()->with('question')->get()->keyBy('question_id');
+                $totalQuestions = $sections->flatMap(fn ($s) => $s->questions)->count();
 
-        $answers        = $la->answers()->with('question')->get()->keyBy('question_id');
-        $totalQuestions = $sections->flatMap(fn ($s) => $s->questions)->count();
-
-        $sectionData = $sections->map(function ($section) use ($answers) {
-            return [
-                'id'             => $section->id,
-                'section_number' => $section->section_number,
-                'questions'      => $section->questions->map(function ($q) use ($answers) {
-                    $userAnswer = $answers->get($q->id);
-
+                $sectionData = $sections->map(function ($section) use ($answers) {
                     return [
-                        'id'            => $q->id,
-                        'question_text' => $q->question_text ?? null,
-                        'user_answer'   => $userAnswer?->answer_text,
-                        'is_correct'    => $userAnswer ? $this->isCorrect($userAnswer->answer_text, $q->correct_answer) : false,
-                    ];
-                })->values(),
-            ];
-        });
+                        'id'             => $section->id,
+                        'section_number' => $section->section_number,
+                        'questions'      => $section->questions->map(function ($q) use ($answers) {
+                            $userAnswer = $answers->get($q->id);
 
-        return response()->json([
-            'attempt_id'      => $attempt->id,
-            'band_score'      => $la->band_score,
-            'score'           => $la->total_correct,
-            'total_questions' => $totalQuestions,
-            'sections'        => $sectionData,
-        ]);
+                            return [
+                                'id'            => $q->id,
+                                'question_text' => $q->question_text ?? null,
+                                'user_answer'   => $userAnswer?->answer_text,
+                                'is_correct'    => $userAnswer ? $this->isCorrect($userAnswer->answer_text, $q->correct_answer) : false,
+                            ];
+                        })->values(),
+                    ];
+                });
+
+                return [
+                    'attempt_id'      => $attempt->id,
+                    'band_score'      => $la->band_score,
+                    'score'           => $la->total_correct,
+                    'total_questions' => $totalQuestions,
+                    'sections'        => $sectionData,
+                ];
+            }
+        );
+
+        return response()->json($data);
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────────

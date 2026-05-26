@@ -10,6 +10,7 @@ use App\Models\WritingAnswer;
 use App\Models\WritingTask;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class WritingApiController extends Controller
 {
@@ -56,7 +57,12 @@ class WritingApiController extends Controller
             ], 422);
         }
 
-        $tasks   = $attempt->testSet->writingTasks()->with('images')->orderBy('task_number')->get();
+        // Task content is static once the exam is created — cache for 1 hour.
+        $tasks   = Cache::remember(
+            "testset:{$attempt->test_set_id}:writing-tasks",
+            3600,
+            fn () => $attempt->testSet->writingTasks()->with('images')->orderBy('task_number')->get()
+        );
         $answers = $attempt->writingAnswers->keyBy('writing_task_id');
 
         $taskData = $tasks->map(function (WritingTask $task) use ($answers) {

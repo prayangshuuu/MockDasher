@@ -10,6 +10,7 @@ use App\Models\SpeakingQuestion;
 use App\Models\TestAttempt;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class SpeakingApiController extends Controller
 {
@@ -56,11 +57,11 @@ class SpeakingApiController extends Controller
             ], 422);
         }
 
-        $speakingQuestions = $attempt->testSet
-            ->speakingQuestions()
-            ->orderBy('part')
-            ->orderBy('id')
-            ->get();
+        $speakingQuestions = Cache::remember(
+            "testset:{$attempt->test_set_id}:speaking-questions",
+            3600,
+            fn () => $attempt->testSet->speakingQuestions()->orderBy('part')->orderBy('id')->get()
+        );
 
         $existingAnswers = $attempt->speakingAnswers()->get()->keyBy('speaking_question_id');
 

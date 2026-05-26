@@ -11,26 +11,38 @@ use App\Models\TestAttempt;
 use App\Models\TestSet;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class AttemptApiController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $attempts = TestAttempt::with(['test'])
-            ->where('user_id', $request->user()->id)
-            ->latest()
-            ->paginate(15);
+        $userId = $request->user()->id;
+        $page   = max(1, (int) $request->input('page', 1));
 
-        return response()->json([
-            'data' => $attempts->map(fn ($a) => $this->formatAttempt($a)),
-            'meta' => [
-                'current_page' => $attempts->currentPage(),
-                'last_page'    => $attempts->lastPage(),
-                'per_page'     => $attempts->perPage(),
-                'total'        => $attempts->total(),
-            ],
-        ]);
+        $result = Cache::tags(["user-{$userId}"])->remember(
+            "attempts:{$userId}:p{$page}",
+            60,
+            function () use ($userId, $page) {
+                $paginator = TestAttempt::with(['test'])
+                    ->where('user_id', $userId)
+                    ->latest()
+                    ->paginate(15, ['*'], 'page', $page);
+
+                return [
+                    'data' => collect($paginator->items())->map(fn ($a) => $this->formatAttempt($a)),
+                    'meta' => [
+                        'current_page' => $paginator->currentPage(),
+                        'last_page'    => $paginator->lastPage(),
+                        'per_page'     => $paginator->perPage(),
+                        'total'        => $paginator->total(),
+                    ],
+                ];
+            }
+        );
+
+        return response()->json($result);
     }
 
     public function show(Request $request, int $id): JsonResponse
@@ -75,6 +87,9 @@ class AttemptApiController extends Controller
             'started_at'  => now(),
         ]);
 
+        // New attempt — flush cached list so it appears immediately
+        Cache::tags(["user-{$request->user()->id}"])->flush();
+
         return response()->json(['data' => $this->formatAttempt($attempt->load('test')), 'resumed' => false], 201);
     }
 
@@ -90,6 +105,9 @@ class AttemptApiController extends Controller
             $this->zeroFillIncompleteModules($attempt);
             $attempt->update(['status' => 'completed', 'completed_at' => now()]);
         });
+
+        // Flush list cache — completed attempt must appear in history immediately
+        Cache::tags(["user-{$attempt->user_id}"])->flush();
 
         $attempt->load(['readingAttempt', 'listeningAttempt', 'aiWritingEvaluation', 'aiSpeakingEvaluation']);
 

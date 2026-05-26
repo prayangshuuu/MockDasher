@@ -8,6 +8,7 @@ use App\Models\ReadingAttempt;
 use App\Models\TestAttempt;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ReadingApiController extends Controller
 {
@@ -61,10 +62,14 @@ class ReadingApiController extends Controller
             }
         }
 
-        $passages = $ra->testSet->readingPassages()
-            ->with(['questionGroups' => fn ($q) => $q->with(['questions.options'])])
-            ->orderBy('passage_number')
-            ->get();
+        $passages = Cache::remember(
+            "testset:{$ra->test_set_id}:reading-passages",
+            3600,
+            fn () => $ra->testSet->readingPassages()
+                ->with(['questionGroups' => fn ($q) => $q->with(['questions.options'])])
+                ->orderBy('passage_number')
+                ->get()
+        );
 
         $savedAnswers   = $ra->answers->pluck('answer_text', 'question_id')->toArray();
         $flaggedAnswers = $ra->answers->filter(fn ($a) => $a->is_flagged)->pluck('is_flagged', 'question_id')->toArray();
@@ -200,46 +205,57 @@ class ReadingApiController extends Controller
             return response()->json(['error' => 'not_completed', 'message' => 'Reading test not yet submitted.'], 409);
         }
 
-        $passages = $ra->testSet->readingPassages()
-            ->with(['questionGroups' => fn ($q) => $q->with(['questions.options'])])
-            ->orderBy('passage_number')
-            ->get();
+        $data = Cache::remember(
+            "reading-result:{$ra->id}",
+            3600,
+            function () use ($attempt, $ra) {
+                $passages = Cache::remember(
+                    "testset:{$ra->test_set_id}:reading-passages",
+                    3600,
+                    fn () => $ra->testSet->readingPassages()
+                        ->with(['questionGroups' => fn ($q) => $q->with(['questions.options'])])
+                        ->orderBy('passage_number')
+                        ->get()
+                );
+                $answers        = $ra->answers()->with('question')->get()->keyBy('question_id');
+                $totalQuestions = $passages
+                    ->flatMap(fn ($p) => $p->questionGroups->flatMap(fn ($g) => $g->questions))
+                    ->count();
 
-        $answers        = $ra->answers()->with('question')->get()->keyBy('question_id');
-        $totalQuestions = $passages
-            ->flatMap(fn ($p) => $p->questionGroups->flatMap(fn ($g) => $g->questions))
-            ->count();
-
-        $passageData = $passages->map(function ($passage) use ($answers) {
-            return [
-                'id'              => $passage->id,
-                'passage_number'  => $passage->passage_number,
-                'title'           => $passage->title ?? null,
-                'question_groups' => $passage->questionGroups->map(function ($group) use ($answers) {
+                $passageData = $passages->map(function ($passage) use ($answers) {
                     return [
-                        'id'        => $group->id,
-                        'questions' => $group->questions->map(function ($q) use ($answers) {
-                            $userAnswer = $answers->get($q->id);
-
+                        'id'              => $passage->id,
+                        'passage_number'  => $passage->passage_number,
+                        'title'           => $passage->title ?? null,
+                        'question_groups' => $passage->questionGroups->map(function ($group) use ($answers) {
                             return [
-                                'id'            => $q->id,
-                                'question_text' => $q->question_text ?? null,
-                                'user_answer'   => $userAnswer?->answer_text,
-                                'is_correct'    => $userAnswer ? $this->isCorrect($userAnswer->answer_text, $q->correct_answer) : false,
+                                'id'        => $group->id,
+                                'questions' => $group->questions->map(function ($q) use ($answers) {
+                                    $userAnswer = $answers->get($q->id);
+
+                                    return [
+                                        'id'            => $q->id,
+                                        'question_text' => $q->question_text ?? null,
+                                        'user_answer'   => $userAnswer?->answer_text,
+                                        'is_correct'    => $userAnswer ? $this->isCorrect($userAnswer->answer_text, $q->correct_answer) : false,
+                                    ];
+                                })->values(),
                             ];
                         })->values(),
                     ];
-                })->values(),
-            ];
-        });
+                });
 
-        return response()->json([
-            'attempt_id'      => $attempt->id,
-            'band_score'      => $ra->band_score,
-            'score'           => $ra->total_correct,
-            'total_questions' => $totalQuestions,
-            'passages'        => $passageData,
-        ]);
+                return [
+                    'attempt_id'      => $attempt->id,
+                    'band_score'      => $ra->band_score,
+                    'score'           => $ra->total_correct,
+                    'total_questions' => $totalQuestions,
+                    'passages'        => $passageData,
+                ];
+            }
+        );
+
+        return response()->json($data);
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────────

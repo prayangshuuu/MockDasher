@@ -6,27 +6,40 @@ use App\Http\Controllers\Controller;
 use App\Models\TestAttempt;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class HistoryApiController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $attempts = TestAttempt::with(['testSet.test', 'readingAttempt', 'listeningAttempt', 'aiWritingEvaluation', 'aiSpeakingEvaluation'])
-            ->where('user_id', $request->user()->id)
-            ->latest()
-            ->paginate(15);
+        $userId = $request->user()->id;
+        $page   = max(1, (int) $request->input('page', 1));
 
-        $data = $attempts->map(fn (TestAttempt $a) => $this->formatSummary($a));
+        $result = Cache::tags(["user-{$userId}"])->remember(
+            "history:{$userId}:p{$page}",
+            60,
+            function () use ($userId, $page) {
+                $paginator = TestAttempt::with([
+                    'testSet.test', 'readingAttempt', 'listeningAttempt',
+                    'aiWritingEvaluation', 'aiSpeakingEvaluation',
+                ])
+                    ->where('user_id', $userId)
+                    ->latest()
+                    ->paginate(15, ['*'], 'page', $page);
 
-        return response()->json([
-            'data' => $data,
-            'meta' => [
-                'current_page' => $attempts->currentPage(),
-                'last_page'    => $attempts->lastPage(),
-                'per_page'     => $attempts->perPage(),
-                'total'        => $attempts->total(),
-            ],
-        ]);
+                return [
+                    'data' => collect($paginator->items())->map(fn ($a) => $this->formatSummary($a)),
+                    'meta' => [
+                        'current_page' => $paginator->currentPage(),
+                        'last_page'    => $paginator->lastPage(),
+                        'per_page'     => $paginator->perPage(),
+                        'total'        => $paginator->total(),
+                    ],
+                ];
+            }
+        );
+
+        return response()->json($result);
     }
 
     public function show(Request $request, int $id): JsonResponse
@@ -41,7 +54,21 @@ class HistoryApiController extends Controller
             'aiSpeakingEvaluation',
         ])->where('user_id', $request->user()->id)->findOrFail($id);
 
-        return response()->json(['data' => $this->formatDetail($attempt)]);
+        // Cache only when all async evaluations have settled — avoids serving
+        // a stale 'pending' snapshot after the AI job eventually completes.
+        $resolved = $attempt->status === 'completed'
+            && ($attempt->aiWritingEvaluation === null
+                || in_array($attempt->aiWritingEvaluation->evaluation_status, ['completed', 'failed'], true))
+            && ($attempt->aiSpeakingEvaluation === null
+                || in_array($attempt->aiSpeakingEvaluation->evaluation_status, ['completed', 'failed'], true));
+
+        if ($resolved) {
+            $data = Cache::remember("history:detail:{$id}", 3600, fn () => $this->formatDetail($attempt));
+        } else {
+            $data = $this->formatDetail($attempt);
+        }
+
+        return response()->json(['data' => $data]);
     }
 
     // ── Formatters ─────────────────────────────────────────────────────────────
