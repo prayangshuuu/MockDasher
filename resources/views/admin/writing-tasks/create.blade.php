@@ -225,15 +225,7 @@
                 <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Description</label>
                 <input type="text" name="task_description" id="form-task-description" value="{{ old('task_description') }}" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm" placeholder="e.g. You should spend about 20 minutes on this task.">
             </div>
-            <div class="space-y-3 bg-slate-50 dark:bg-slate-900/30 p-5 rounded-xl border border-slate-200 dark:border-slate-700" id="precontext-field">
-                <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
-                    Task 1 Data Context <span class="text-primary">(AI Evaluation Context)</span>
-                </label>
-                <p class="text-[10px] font-medium text-slate-500 dark:text-slate-400 mb-2">
-                    For Task 1 only. The image you upload is shown to students as usual. This text is what gets sent to Gemini for AI scoring — describe the data the image shows in detail. Example: "A bar chart showing the percentage of households with internet access in five countries between 2000 and 2020."
-                </p>
-                <textarea name="precontext" id="form-precontext" rows="3" class="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary transition-all shadow-sm" placeholder="Describe the visual data here...">{{ old('precontext') }}</textarea>
-            </div>
+
             <div class="space-y-3">
                 <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Prompt</label>
                 <textarea name="task_prompt" id="form-task-prompt" rows="5" class="w-full px-4 py-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm" required>{{ old('task_prompt') }}</textarea>
@@ -250,9 +242,9 @@
             </div>
 
             {{-- Image Alt Text for Gemini AI Evaluation (Task 1 only) --}}
-            <div class="space-y-2 p-5 rounded-xl border-2 border-violet-200 dark:border-violet-700 bg-violet-50/50 dark:bg-violet-900/10" id="image-alt-text-field">
+            <div class="space-y-2 p-5 rounded-xl border-2 border-violet-200 dark:border-violet-700 bg-violet-50/50 dark:bg-violet-900/10" id="precontext-field">
                 <label class="block text-xs font-black text-violet-600 dark:text-violet-400 uppercase tracking-widest">
-                    <span class="material-symbols-outlined text-sm align-middle mr-1">smart_toy</span>
+                    <img src="/storage/asset/icons/ai.svg" class="w-4 h-4 inline-block align-text-bottom mr-1" alt="AI" />
                     Image Description for AI Evaluation (Alt Text)
                     <span class="ml-2 px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-600 text-[9px] font-black uppercase tracking-widest border border-violet-200 dark:border-violet-700">GEMINI INPUT</span>
                 </label>
@@ -261,9 +253,9 @@
                     The image above is displayed to students as a visual. This text is what gets sent to the Gemini AI for evaluating the student's response — describe the graph, chart, or table data in complete detail.<br>
                     <em>Example: "A line graph comparing internet usage rates in five countries (UK, USA, China, India, Brazil) from 2000 to 2020. The UK started at 26% in 2000 and rose to 96% in 2020, the highest of all countries..."</em>
                 </p>
-                <textarea name="image_alt_text" id="form-image-alt-text" rows="5"
+                <textarea name="precontext" id="form-precontext" rows="5"
                           class="w-full px-4 py-4 rounded-xl border border-violet-200 dark:border-violet-700 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-violet-500 focus:border-violet-500 focus:bg-white dark:focus:bg-surface-dark transition-all shadow-sm"
-                          placeholder="Describe the chart/graph/table data here so Gemini can evaluate the student's response...">{{ old('image_alt_text') }}</textarea>
+                          placeholder="Describe the chart/graph/table data here so Gemini can evaluate the student's response...">{{ old('precontext') }}</textarea>
             </div>
 
             <div class="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-800">

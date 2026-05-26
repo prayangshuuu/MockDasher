@@ -65,18 +65,6 @@
                 </div>
             </div>
 
-            @if($writing_task->task_number == 1)
-            <div class="space-y-3">
-                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest ml-1">
-                    Task 1 Data Context <span class="text-primary">(AI Evaluation Context)</span>
-                </label>
-                <p class="text-[10px] font-semibold text-slate-400 ml-1">
-                    The image is still shown to students as usual. This text is sent to Gemini for AI scoring — describe the data the image shows in detail. Example: "A bar chart showing the percentage of households with internet access in five countries between 2000 and 2020."
-                </p>
-                <textarea name="precontext" rows="4" class="w-full px-5 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm" placeholder="Describe the visual data here...">{{ $writing_task->precontext }}</textarea>
-            </div>
-            @endif
-
             <div class="p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-800 space-y-5">
                 <div class="flex flex-col md:flex-row items-start gap-6">
                     <div class="flex-1">
@@ -96,7 +84,7 @@
                 {{-- Image Alt Text for Gemini AI Evaluation --}}
                 <div class="space-y-2">
                     <label class="block text-xs font-black text-violet-500 uppercase tracking-widest">
-                        <span class="material-symbols-outlined text-sm align-middle mr-1">smart_toy</span>
+                        <img src="/storage/asset/icons/ai.svg" class="w-4 h-4 inline-block align-text-bottom mr-1" alt="AI" />
                         Image Description for AI Evaluation (Alt Text)
                         <span class="ml-2 px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-900/40 text-violet-600 text-[9px] font-black uppercase tracking-widest">GEMINI INPUT</span>
                     </label>
@@ -105,7 +93,7 @@
                         The image is shown to students as a visual. This text is what gets sent to Gemini for AI grading — describe the graph, table, or chart data in detail so the AI can assess whether the student summarised it correctly.<br>
                         <em>Example: "A bar chart showing the percentage of internet users in five countries (UK, USA, China, India, Brazil) between 2000 and 2020. The UK had the highest usage at 96% in 2020..."</em>
                     </p>
-                    <textarea name="image_alt_text" rows="5"
+                    <textarea name="precontext" rows="5"
                               class="w-full px-5 py-4 rounded-2xl border-2 border-violet-200 dark:border-violet-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:ring-4 focus:ring-violet-500/20 focus:border-violet-500 transition-all shadow-sm"
                               placeholder="Describe the chart/graph/table data here so Gemini can evaluate the student's response...">{{ $writing_task->images->first()?->alt_text ?? $writing_task->precontext ?? '' }}</textarea>
                 </div>

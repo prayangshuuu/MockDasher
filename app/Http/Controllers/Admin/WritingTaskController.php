@@ -33,16 +33,15 @@ class WritingTaskController extends Controller
             'instruction_text' => 'nullable|string',
             'minimum_word_count' => 'required|integer|min:1',
             'task_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
-            'image_alt_text' => 'nullable|string|max:5000',
         ]);
 
-        $task = $testSet->writingTasks()->create(Arr::except($validated, ['task_image', 'image_alt_text']));
+        $task = $testSet->writingTasks()->create(Arr::except($validated, ['task_image']));
 
         if ($request->hasFile('task_image')) {
             $path = $request->file('task_image')->store('writing_images', 'public');
             $task->images()->create([
                 'image_path' => $path,
-                'alt_text' => $request->input('image_alt_text', ''),
+                'alt_text' => $request->input('precontext', ''),
             ]);
         }
 
@@ -71,10 +70,9 @@ class WritingTaskController extends Controller
             'instruction_text' => 'nullable|string',
             'minimum_word_count' => 'required|integer|min:1',
             'task_image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
-            'image_alt_text' => 'nullable|string|max:5000',
         ]);
 
-        $writing_task->update(Arr::except($validated, ['task_image', 'image_alt_text']));
+        $writing_task->update(Arr::except($validated, ['task_image']));
 
         if ($request->hasFile('task_image')) {
             // Delete old images
@@ -86,13 +84,13 @@ class WritingTaskController extends Controller
             $path = $request->file('task_image')->store('writing_images', 'public');
             $writing_task->images()->create([
                 'image_path' => $path,
-                'alt_text' => $request->input('image_alt_text', ''),
+                'alt_text' => $request->input('precontext', ''),
             ]);
-        } elseif ($request->filled('image_alt_text')) {
+        } else {
             // Update alt_text on existing image without re-uploading
             $existingImage = $writing_task->images->first();
             if ($existingImage) {
-                $existingImage->update(['alt_text' => $request->input('image_alt_text')]);
+                $existingImage->update(['alt_text' => $request->input('precontext', '')]);
             }
         }
 
