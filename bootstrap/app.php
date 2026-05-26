@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\LogHttpRequest;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
@@ -8,6 +9,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Sentry\Laravel\Integration;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -21,8 +23,14 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
+        $middleware->append(LogHttpRequest::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+
+        // Route all unhandled exceptions to Sentry (no-op when DSN is unset)
+        $exceptions->reportable(function (Throwable $e) {
+            Integration::captureUnhandledException($e);
+        });
 
         $isApiRequest = fn (Request $r): bool =>
             $r->is('api/*') || $r->expectsJson();

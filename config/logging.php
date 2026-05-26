@@ -1,5 +1,6 @@
 <?php
 
+use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -53,9 +54,28 @@ return [
     'channels' => [
 
         'stack' => [
-            'driver' => 'stack',
-            'channels' => explode(',', (string) env('LOG_STACK', 'single')),
+            'driver'            => 'stack',
+            // Production default: json + sentry. Override via LOG_STACK in .env.
+            'channels'          => explode(',', (string) env('LOG_STACK', 'json,sentry')),
             'ignore_exceptions' => false,
+        ],
+
+        // Structured JSON lines — one JSON object per log entry.
+        // Parseable by Datadog, Logtail, Papertrail, Grafana Loki, etc.
+        'json' => [
+            'driver'    => 'daily',
+            'path'      => storage_path('logs/laravel.log'),
+            'level'     => env('LOG_LEVEL', 'debug'),
+            'days'      => env('LOG_DAILY_DAYS', 14),
+            'formatter' => JsonFormatter::class,
+        ],
+
+        // Sentry channel — routes error/critical events to Sentry.
+        // Set SENTRY_DSN in .env to activate; safe no-op when DSN is empty.
+        'sentry' => [
+            'driver' => 'sentry',
+            'level'  => env('SENTRY_LOG_LEVEL', 'error'),
+            'bubble' => true,
         ],
 
         'single' => [
