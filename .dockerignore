@@ -1,0 +1,44 @@
+.git
+.gitignore
+.github
+.vscode
+.idea
+.DS_Store
+
+# Local env files — Docker reads .env.docker at runtime
+.env
+.env.backup
+.env.production
+.env.local
+
+# Node modules rebuilt in Docker
+node_modules
+
+# PHP vendor rebuilt in Docker (composer install --no-dev)
+vendor
+
+# Vite build output rebuilt in Docker
+public/hot
+public/build
+
+# Tests not needed in production image
+tests
+phpunit.xml
+.phpunit.cache
+.phpunit.result.cache
+
+# IDE helpers
+_ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php
+.phpactor.json
+.phpstorm.meta.php
+
+# Bootstrap cache — regenerated at runtime by artisan commands
+bootstrap/cache/*.php
+
+# Docker files themselves
+docker-compose*.yml
+Dockerfile*
+
+README.md
