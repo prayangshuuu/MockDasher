@@ -52,12 +52,13 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?DB_ROOT_PASSWORD is required}
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./docker/mysql:/docker-entrypoint-initdb.d
     ports:
       - "${DB_PORT_EXPOSE:-3306}:3306"
     networks:
       - mockdasher
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_ROOT_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${DB_USERNAME:-mockdasher}", "-p${DB_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
