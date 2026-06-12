@@ -7,7 +7,7 @@ services:
       target: app
     container_name: mockdasher_app
     restart: unless-stopped
-    env_file: .env.docker
+    env_file: .env
     volumes:
       - storage_app:/var/www/html/storage/app
       - storage_logs:/var/www/html/storage/logs
@@ -28,7 +28,7 @@ services:
       target: app
     container_name: mockdasher_worker
     restart: unless-stopped
-    env_file: .env.docker
+    env_file: .env
     command: ["worker"]
     volumes:
       - storage_app:/var/www/html/storage/app
@@ -45,6 +45,7 @@ services:
     image: mysql:8.4
     container_name: mockdasher_mysql
     restart: unless-stopped
+    env_file: .env
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-MockDasherDB}
       MYSQL_USER: ${DB_USERNAME:-mockdasher}
